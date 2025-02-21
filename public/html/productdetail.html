@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nature's Palette</title>
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- custom css link -->
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/style copy.css" />
+  </head>
+  <body>
+    <div id="nav"></div>
+    <section class="product-detail">
+      <div class="details container">
+        <!-- Left Side - Image Gallery -->
+        <div class="image-container">
+          <div class="main">
+            <img id="featured-image" src="" alt="Featured Product" />
+          </div>
+          <!-- Small Image Thumbnails -->
+          <div class="small-Card" id="thumbnail-container">
+            <!-- Thumbnails will be inserted dynamically -->
+          </div>
+        </div>
+
+        <!-- Right Side - Product Info -->
+        <div class="product-info">
+          <h3 id="product-title"></h3>
+          <h5 id="product-price">Price :&nbsp;&nbsp;</h5>
+          <!-- <p id="product-description"></p> -->
+
+          <!-- Quantity Input -->
+          <label for="quantity">Quantity:</label>
+          <div class="product__quantity">
+            <input type="number" id="quantity" value="1" min="1" />
+          </div>
+          <br /><br />
+
+          <!-- Buttons -->
+          <div class="cart-btn">
+            <button class="cart__btn wishlist" id="add-to-wishlist">
+              Add to Wishlist
+            </button>
+            <button class="cart__btn cart" id="add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="product-desc container">
+      <div class="wrapper tabbed">
+        <!-- Navigation -->
+        <nav class="nav-wrap">
+          <ul class="ul-wrapper">
+            <li class="tab-link active" data-id="product-description">
+              Product Details
+            </li>
+            <li class="tab-link" data-id="product-review">
+              Reviews <span id="review-count"></span>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Product Description -->
+        <div id="product-description" class="product-about active">
+          <h2 id="product-title"></h2>
+          <p id="product-desc"></p>
+        </div>
+
+        <!-- Reviews Section -->
+        <div id="product-review" class="product-about">
+          <div class="review-wrapper">
+            <!-- <h2>Rating & Review</h2> -->
+            <div class="head-review">
+              <div class="sum-rating">
+                <strong id="average-rating"></strong>
+                <span id="total-reviews"></span>
+              </div>
+              <button class="btn" id="write-review">Write a Review</button>
+            </div>
+            <div class="body-review" id="review-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h1 id="heading1">You may also like them</h1>
+    <div class="product-section">
+      <div id="newarrival-container" class="product-container"></div>
+    </div>
+    <!-- Footer section  starts-->
+    <div id="footer"></div>
+    <!-- Footer section  ends-->
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+    <script>
+      const btnScrollToTop = document.querySelector("#btnScrollToTop");
+      btnScrollToTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+          console.log("Footer loaded successfully");
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+      // Sample product data (Can be loaded from API or database)
+
+      const product = {
+        title: "Delicate Beauty Orchids & Roses Arrangement",
+        description:
+          "A beautiful blend of orchids and roses to add elegance to any space.",
+        reviews: [
+          {
+            name: "Sarah",
+            rating: 5,
+            date: "November 7, 2024",
+            comment: "Awesome Product!",
+            desc: "cabsuvhaeofwajkvnakljoiib",
+          },
+          {
+            name: "John",
+            rating: 4,
+            date: "December 10, 2024",
+            comment: "Good quality but slightly expensive.",
+            desc: "cabsuvhaeofwajkvnakljoiib",
+          },
+          {
+            name: "Emily",
+            rating: 5,
+            date: "January 5, 2025",
+            comment: "Absolutely love it!",
+            desc: "cabsuvhaeofwajkvnakljoiib",
+          },
+        ],
+      };
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Product Data
+        const product = {
+          title: "Delicate Beauty Orchids & Roses Arrangement",
+          description:
+            "A beautiful blend of orchids and roses to add elegance to any space.",
+        };
+
+        // Ensure elements exist before updating
+        const titleElement = document.getElementById("product-title");
+        const descElement = document.getElementById("product-desc");
+
+        if (titleElement && descElement) {
+          titleElement.textContent = product.title;
+          descElement.textContent = product.description;
+        } else {
+          console.error("Product title or description element not found!");
+        }
+      });
+
+      // Populate reviews dynamically
+      const reviewContainer = document.getElementById("review-container");
+      let totalRating = 0;
+
+      product.reviews.forEach((review) => {
+        totalRating += review.rating;
+        const reviewElement = document.createElement("div");
+        reviewElement.classList.add("profile");
+        reviewElement.innerHTML = `
+            <div class="thumb-name">
+              <img src=  "../Database(image)/Plant/P0001/1.jpg" alt="">
+                <div class="grouping">
+                    <strong>${review.name}</strong>
+                    <div class="ratingg">${"⭐".repeat(review.rating)}</div>
+                    <div class="date">${review.date}</div>
+                </div>
+            </div>
+            <div class="comment">${review.comment}</div>
+            <p class="gray">${review.desc}</p>
+            `;
+        reviewContainer.appendChild(reviewElement);
+      });
+
+      // Calculate average rating
+      const averageRating = (totalRating / product.reviews.length).toFixed(1);
+      document.getElementById(
+        "average-rating"
+      ).textContent = `${averageRating} ⭐`;
+      document.getElementById(
+        "total-reviews"
+      ).textContent = `${product.reviews.length} Reviews`;
+      document.getElementById("review-count").textContent =
+        product.reviews.length;
+
+      // Tab switching functionality (Fixed)
+      document.querySelectorAll(".tab-link").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Remove active class from all tabs & sections
+          document
+            .querySelectorAll(".tab-link")
+            .forEach((t) => t.classList.remove("active"));
+          document
+            .querySelectorAll(".product-about")
+            .forEach((content) => content.classList.remove("active"));
+
+          // Activate clicked tab and corresponding section
+          tab.classList.add("active");
+          document.getElementById(tab.dataset.id).classList.add("active");
+        });
+      });
+
+      const products1 = [
+        {
+          id: 1,
+          name: "aaa",
+          price: 599,
+          category: "Plant",
+          image: "../Database(image)/Plant/P0001/1.jpg",
+          rating: 4.5,
+          isBestseller: true,
+          isNewArrival: false,
+        },
+        {
+          id: 2,
+          name: "bbb",
+          price: 999,
+          category: "Plant",
+          image: "../Database(image)/Plant/P0001/2.jpg",
+          rating: 4.7,
+          isBestseller: true,
+          isNewArrival: false,
+        },
+        {
+          id: 3,
+          name: "bbb",
+          price: 999,
+          category: "Plant",
+          image: "../Database(image)/Plant/P0001/2.jpg",
+          rating: 4.7,
+          isBestseller: true,
+          isNewArrival: true,
+        },
+        {
+          id: 5,
+          name: "ccc",
+          price: 20,
+          category: "Bouquet",
+          image: "../Database(image)/Bouquet/B0001/1.jpg",
+          rating: 4.2,
+          isBestseller: true,
+          isNewArrival: true,
+        },
+        {
+          id: 6,
+          name: "ddd",
+          price: 40,
+          category: "Bouquet",
+          image: "../Database(image)/Bouquet/B0002/2.jpg",
+          rating: 4.3,
+          isBestseller: true,
+          isNewArrival: false,
+        },
+        {
+          id: 7,
+          name: "ddd",
+          price: 40,
+          category: "Bouquet",
+          image: "../Database(image)/Bouquet/B0003/1.png",
+          rating: 4.3,
+          isBestseller: true,
+          isNewArrival: false,
+        },
+        {
+          id: 8,
+          name: "eee",
+          price: 199,
+          category: "Garden Decor",
+          image: "../Database(image)/Pot/PT0001/1.png",
+          rating: 4.3,
+          isBestseller: false,
+          isNewArrival: true,
+        },
+        {
+          id: 9,
+          name: "eee",
+          price: 199,
+          category: "Garden Decor",
+          image: "../Database(image)/Pot/PT0001/1.png",
+          rating: 4.3,
+          isBestseller: true,
+          isNewArrival: false,
+        },
+        {
+          id: 10,
+          name: "eee",
+          price: 199,
+          category: "Garden Decor",
+          image: "../Database(image)/Pot/PT0001/1.png",
+          rating: 4.3,
+          isBestseller: false,
+          isNewArrival: true,
+        },
+      ];
+      function displayProducts1(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ""; // Clear previous products
+
+        products1.forEach((product) => {
+          const productCard = document.createElement("div");
+          productCard.className = "product-card";
+          productCard.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>Rating: ${product.rating} ⭐</p>
+          <p>Price: $${product.price}</p>
+          <div class="product-icons">
+             <a href="/wishlist/add" class="action__btn" aria-label="Add to Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                  </a>
+                  <a href="/cart/add" class="action__btn" aria-label="ADD TO CART">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                  </a>
+          </div>
+        `;
+          container.appendChild(productCard);
+        });
+      }
+      displayProducts1("newarrival-container");
+    </script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/prodetail.js"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

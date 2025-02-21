@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions button {
+            margin-right: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <button onclick="openModal()">Add Product</button>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productTable">
+        </tbody>
+    </table>
+    <div id="modal" class="modal">
+        <h2 id="modalTitle">Add Product</h2>
+        <input type="hidden" id="productId">
+        <input type="text" id="productName" placeholder="Product Name">
+        <select id="productCategory">
+            <option value="">Select Category</option>
+        </select>
+        <input type="number" id="productPrice" placeholder="Product Price">
+        <textarea id="productDescription" placeholder="Product Description"></textarea>
+        <input type="file" id="productImage" accept="image/*">
+        <input type="text" id="productColor" placeholder="Product Color">
+        <input type="text" id="productSize" placeholder="Product Size">
+        <button onclick="saveProduct()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+    <script>
+        let products = [];
+        let categories = ["Category 1", "Category 2", "Category 3"];
+        
+        function renderTable() {
+            const tableBody = document.getElementById("productTable");
+            tableBody.innerHTML = "";
+            products.forEach((product, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.price}</td>
+                        <td>${product.description}</td>
+                        <td><img src="${product.image}" width="50"></td>
+                        <td>${product.color}</td>
+                        <td>${product.size}</td>
+                        <td class="actions">
+                            <button onclick="editProduct(${index})">Edit</button>
+                            <button onclick="deleteProduct(${index})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function editProduct(index) {
+            openModal(index);
+        }
+        
+        function deleteProduct(index) {
+            products.splice(index, 1);
+            renderTable();
+        }
+        
+        function openModal(index = null) {
+            const modal = document.getElementById("modal");
+            const title = document.getElementById("modalTitle");
+            const nameInput = document.getElementById("productName");
+            const categorySelect = document.getElementById("productCategory");
+            const priceInput = document.getElementById("productPrice");
+            const descriptionInput = document.getElementById("productDescription");
+            const colorInput = document.getElementById("productColor");
+            const sizeInput = document.getElementById("productSize");
+            
+            categorySelect.innerHTML = "<option value=''>Select Category</option>";
+            categories.forEach(category => {
+                categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+            });
+            
+            if (index !== null) {
+                document.getElementById("productId").value = index;
+                nameInput.value = products[index].name;
+                categorySelect.value = products[index].category;
+                priceInput.value = products[index].price;
+                descriptionInput.value = products[index].description;
+                colorInput.value = products[index].color;
+                sizeInput.value = products[index].size;
+                title.textContent = "Edit Product";
+            } else {
+                document.getElementById("productId").value = "";
+                nameInput.value = "";
+                categorySelect.value = "";
+                priceInput.value = "";
+                descriptionInput.value = "";
+                colorInput.value = "";
+                sizeInput.value = "";
+                title.textContent = "Add Product";
+            }
+            modal.style.display = "block";
+        }
+        
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+        
+        function saveProduct() {
+            const id = document.getElementById("productId").value;
+            const name = document.getElementById("productName").value;
+            const category = document.getElementById("productCategory").value;
+            const price = document.getElementById("productPrice").value;
+            const description = document.getElementById("productDescription").value;
+            const image = document.getElementById("productImage").files[0] ? URL.createObjectURL(document.getElementById("productImage").files[0]) : "";
+            const color = document.getElementById("productColor").value;
+            const size = document.getElementById("productSize").value;
+            
+            if (name && category && price && description && color && size) {
+                if (id) {
+                    products[id] = { name, category, price, description, image, color, size };
+                } else {
+                    products.push({ name, category, price, description, image, color, size });
+                }
+                renderTable();
+                closeModal();
+            } else {
+                alert("Please fill all fields.");
+            }
+        }
+        
+        renderTable();
+    </script>
+</body>
+</html>

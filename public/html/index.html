@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nature's Palette</title>
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- custom css link -->
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+
+  <body>
+    <div id="nav"></div>
+    <!-- Home section starts -->
+    <section class="home__container bg-overlay">
+      <div class="container">
+        <div class="home__content">
+          <h2 class="home__title">Welcome to Nature’s Palette</h2>
+          <!-- <h2 class="home__title">Plants exist in the weather and light rays that surround them</h2> -->
+          <p class="home__description">
+            Where Nature Meets Creativity! Explore our handpicked collection of
+            plants, floral arrangements, and garden decor to bring the beauty of
+            nature to your home and special occasions.
+          </p>
+          <!-- <h2 class="home__title">Plants exist in the weather and light rays that surround them</h2> -->
+          <!-- <p class="home__description">Whether you're a seasoned gardener or a first-time plant parent,Nature's palette is your green haven.</p> -->
+          <div class="welcome-btn-group">
+            <a href="#category" class="home__btn">Shop now</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Home section ends -->
+
+    <!-- Container section stats -->
+    <section class="icons__container container flex">
+      <img src="../images/imagetrial2_1.png" width="1100px" height="200px" />
+    </section>
+    <!-- Container section ends -->
+
+    <!-- Category section starts -->
+    <section class="categories container section" id="category">
+      <h3 class="section__title"><span>Popular</span> Categories</h3>
+      <div class="categories__container flex">
+        <div class="">
+          <a href="/plants" class="category__item">
+            <img src="../images/plant.jpeg" alt="" class="category__img" />
+            <h3 class="category__title">Plant&rarr;</h3>
+          </a>
+        </div>
+
+        <div class="">
+          <a href="/bouquets" class="category__item">
+            <img src="../images/bouquet.jpeg" alt="" class="category__img" />
+            <h3 class="category__title">Bouquet &rarr;</h3>
+          </a>
+        </div>
+        <div class="">
+          <a href="/pots" class="category__item">
+            <img src="../images/3.avif" alt="" class="category__img" />
+            <h3 class="category__title">Pot &rarr;</h3>
+          </a>
+        </div>
+        <div class="">
+          <a href="/fertilizers" class="category__item">
+            <img src="../images/fertilizer.jpeg" alt="" class="category__img" />
+            <h3 class="category__title">Fertilizer &rarr;</h3>
+          </a>
+        </div>
+        <div class="">
+          <a href="/tools" class="category__item">
+            <img src="../images/5.webp" alt="" class="category__img" />
+            <h3 class="category__title">Tool &rarr;</h3>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- Category section ends -->
+
+    <!-- About Us section starts -->
+    <section class="about" id="about">
+      <div class="about__container container grid">
+        <div class="about__content">
+          <h1 class="about__title">
+            <span>Nature's Palette </span>: Cultivating Green Dreams
+          </h1>
+          <p class="about__description">
+            At Nature's Palette,we're more than just a plant or a floral shop.
+            We're a team of passionate plant whispers,floral enthusiasts and
+            soli-stained dreamers. Our curated green house is a palette of
+            colors and fragrances-a place where each plant has a name and soft
+            jazz encourages growth.Ready to bloom with us? Explore Nature's
+            Palette today!
+          </p>
+          <a href="#category" class="home__btn1">Shop Now</a>
+        </div>
+        <img
+          src="../images/e88ef7ba-cc55-4c93-b8a5-156a7335baa8.png"
+          alt=""
+          class="about__img"
+        />
+      </div>
+    </section>
+
+    <!-- About Us section ends -->
+    <div class="product-section">
+      <h3 class="section__title"><span>Most loved</span> on our website</h3>
+      <div class="filter-buttons" id="bestseller-filters"></div>
+      <div class="slider">
+        <button class="slide-btn" id="slide-left-bestseller">&lt;</button>
+        <div
+          id="bestseller-container"
+          class="product-container container"
+        ></div>
+        <button class="slide-btn" id="slide-right-bestseller">&gt;</button>
+      </div>
+    </div>
+    <!-- bestseller section starts -->
+    <!-- bestseller section ends -->
+    <!-- Augmented Reality Product Section -->
+    <img src="../images/Hotels Business Website.png" alt="" width="100%" />
+
+    <div class="product-section">
+      <h3 class="section__title"><span>Fresh Arrivals</span> on our website</h3>
+      <div class="filter-buttons" id="newarrival-filters"></div>
+      <div class="slider">
+        <button class="slide-btn" id="slide-left-newarrival">&lt;</button>
+        <div
+          id="newarrival-container"
+          class="product-container container"
+        ></div>
+        <button class="slide-btn" id="slide-right-newarrival">&gt;</button>
+      </div>
+    </div>
+    <!-- Rating section starts -->
+    <section class="rating" id="rate">
+      <div class="rate container">
+        <h1 class="title-text">Read What Others Have to Say</h1>
+        <div class="rating-div" id="testimonials"></div>
+
+        <!-- View More Button -->
+        <div class="flex">
+          <button class="rate__btn">View More</button>
+        </div>
+      </div>
+    </section>
+    <!-- Rating section ends -->
+    <!-- Footer section  starts-->
+    <div id="footer"></div>
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+      const btnScrollToTop = document.querySelector("#btnScrollToTop");
+      btnScrollToTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+    </script>
+    <script src="../js2/index.js"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+    <!-- <script src="../js/dataindex.js"></script> -->
+  </body>
+</html>

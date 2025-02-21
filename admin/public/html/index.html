@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font awsome link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="../css/style.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <section class="container">
+      <aside>
+        <div class="top">
+          <div class="logo">
+            <img src="../ad-images/logo.png" alt="Logo" />
+            <h2>Nature's <span class="danger">Pallete</span></h2>
+          </div>
+          <div class="close" id="close-btn">
+            <span class="fas fa-close"></span>
+          </div>
+        </div>
+        <div class="sidebar container grid">
+          <div class="account__tabs">
+            <p class="account__tab active-tab" data-target="#dashboard">
+              <!-- <span class="fa-solid fa-house"></span> -->
+              <img src="../ad-images/icon/dashboard.png" alt="">Dashboard
+            </p>
+            <p class="account__tab" data-target="#customer">
+              <img src="../ad-images/icon/user.png" alt="">Customer
+            </p>
+            <p class="account__tab" data-target="#orders">
+              <img src="../ad-images/icon/order.png" alt=""> Orders
+            </p>
+            <p class="account__tab" data-target="#analytics">
+              <img src="../ad-images/icon/statistics.png" alt=""> Analytics
+            </p>
+            <p class="account__tab" data-target="#category">
+              <img src="../ad-images/icon/list.png" alt=""> Category
+            </p>
+            <p class="account__tab" data-target="#product">
+              <img src="../ad-images/icon/new-product.png" alt=""> Product
+            </p>
+            <p class="account__tab" data-target="#report">
+              <img src="../ad-images/icon/report.png" alt="">Report
+            </p>
+            <p class="account__tab" data-target="#review">
+              <img src="../ad-images/icon/review.png" alt="">Review
+            </p>
+           
+            <p class="account__tab accordion-menu" data-target="#report" data-accordion-btn>
+              <img src="../ad-images/icon/insurance.png" alt="">Authentication
+              <ul class="submenu-category-list" data-accordion>
+    
+                <li class="submenu-category" data-target="#login">
+                    <a href="login.html" class="submenu-title">Login</a>
+                </li>
+    
+                <li class="submenu-category" data-target="#register">
+                  <a href="register.html" class="submenu-title">Register</a>
+                </li>
+                
+                <li class="submenu-category" data-target="#forgot">
+                  <a href="forgot.html" class="submenu-title">Forgot Password</a>
+                </li>
+                <li>
+                <li class="submenu-category" data-target="#setting">
+                  <a href="" class="submenu-title"><img src="./ad-images/icon/settings.png" alt="">Setting</a>
+                </li>
+                </li>
+              </ul>
+            </p> 
+            <p class="account__tab" data-target="#logout">
+              <img src="../ad-images/icon/logout.png" alt="">Logout
+            </p>
+          </div>
+        </div>
+      </aside>
+      <div class="right">
+        <div class="top">
+          <button id="menu-btn">
+            <span class="fas fa-bars"></span>
+            <!-- <i class="fas fa-bars"></i> -->
+          </button>       
+          <nav class="right-navbar">
+            <div class="theme-toggler">
+              <span class="material-icons-sharp active"> light_mode </span>
+              <span class="material-icons-sharp"> dark_mode </span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="nav-item message">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="nav-item profile" onclick="toggleDropdown()">
+              <img src="" alt="Profile Picture" class="profile-photo">
+          </div>
+          <div class="dropdown-menu" id="dropdownMenu">
+              <div class="user-info">
+                  <img src="" alt="Profile Picture" class="profile-photo">
+                  <div>
+                      <span class="user-name">John Doe</span>
+                      <span class="user-role">Admin</span>
+                  </div>
+              </div>
+              <ul>
+                  <li><i class="fas fa-user"></i> My Profile</li>
+                  <li><i class="fas fa-cog"></i> Settings</li>
+                  <li><i class="fas fa-sign-out-alt"></i> Log Out</li>
+              </ul>
+          </div>
+        </nav>
+        </div>
+        <div class="cards">
+          <div class="tabs__content">
+            <div class="tab__content active-tab" content id="dashboard">
+              <div class="dashboard-cards">
+                <div class="card">Total Sales: <span>$12,345</span></div>
+                <div class="card">Total Orders: <span>245</span></div>
+                <div class="card">Customers: <span>150</span></div>
+            </div>
+            <canvas id="salesChart"></canvas>
+            </div>
+            <div class="tab__content" content id="customer">
+              <div class="container1">
+                <h2>Customer Table</h2>
+                <div class="table-actions">
+                    <div> </div>
+                    <div>
+                        <button class="add-customer">+ Add Customer</button>
+                        <button class="export-btn">Export <i class="fas fa-caret-down"></i></button>
+                        <ul class="export-menu">
+                            <li><a href="#" class="export-option" data-type="print"><i class="fas fa-print"></i> Print</a></li>
+                            <li><a href="#" class="export-option" data-type="csv"><i class="fas fa-file-csv"></i> Csv</a></li>
+                            <li><a href="#" class="export-option" data-type="excel"><i class="fas fa-file-excel"></i> Excel</a></li>
+                            <li><a href="#" class="export-option" data-type="pdf"><i class="fas fa-file-pdf"></i> Pdf</a></li>
+                            <li><a href="#" class="export-option" data-type="copy"><i class="fas fa-copy"></i> Copy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div  id="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Cust_Id</th>
+                        <th>Cust_Name</th>
+                        <th>Cust_Email</th>
+                        <th>Cust_Mobileno</th>
+                        <th>Cust_Address</th>
+                        <th>Cust_Pincode</th>
+                        <th>Cust_Areaid</th>
+                        <th>Cust_Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="customer-table-body">
+                      <!-- Records will be dynamically added here -->
+                    </tbody>
+                  </table>
+                  <!-- <div id="pagination-controls">
+                    <button id="prev-page" onclick="prevPage()">&#60; Prev</button>
+                    <span id="page-number">1</span>
+                    <button id="next-page" onclick="nextPage()">Next &#62;</button>
+                  </div> -->
+                </div>
+            </div>
+            </div>      
+            <div class="tab__content" content id="orders">
+              <h3 class="tab__header">Order Details</h3>
+              <div class="tab__body">
+              <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                        <th>Customer ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders will be displayed here -->
+                </tbody>
+
+                <table id="order-details-table">
+                  <thead>
+                      <tr>
+                          <th>Order Detail ID</th>
+                          <th>Product Name</th>
+                          <th>Description</th>
+                          <th>Image</th>
+                          <th>Quantity</th>
+                          <th>Price</th>
+                          <th>Category</th>
+                      </tr>
+                  </thead>
+                  <tbody id="order-details">
+                      <!-- Rows will be populated here -->
+                  </tbody>
+              </table>
+              
+              
+            </table>
+              </div>
+            </div>
+            <div class="tab__content" content id="analytics">
+              <h3 class="tab__header">Analytics</h3>
+              <div class="tab__body">
+                
+              </div>
+            </div>
+            <div class="tab__content" content id="category">
+              <div class="wrapper tabbed">
+                <nav class="nav-wrap">
+                    <ul class="ul-wrapper">
+                        <li class="active"><a href="#" class="tabbed-trigger" data-id="addcat"><span>View</span></a></li>
+                        <li><a href="#" class="tabbed-trigger" data-id="addtbl"><span>Add</span></a></li>
+                    </ul>
+                </nav>
+                <div id="addcat" class="product-about active">
+                  <section>
+                    <h2>Add Category</h2>
+                    <div class="form-group">
+                      <form id="category-form">
+                          <label for="cy-name">Category Name</label>
+                          <input type="text" id="cy-name" placeholder="Enter Category Name" required>
+                  
+                          <label for="cy-desc">Description</label>
+                          <textarea id="cy-desc" placeholder="Enter Category Description" required></textarea>
+                  
+                          <label for="cy-image">Upload Image</label>
+                          <input type="file" id="cy-image" accept="image/*">
+                  
+                          <button type="submit" class="btn">Add Category</button>
+                      </form>
+                  </div>    
+                        <!-- Update Category Modal -->
+                    <div id="updateCategoryModal" class="form_container">
+                      <h3 class="form-h2">Update Category</h3>
+                      <form id="updateCategoryForm" enctype="multipart/form-data">
+                          <input type="hidden" id="updateCategoryId">
+                          <div class="form-group">
+                            <label for="updateCategoryName">Category Name:</label>
+                            <input type="text" id="updateCategoryName" name="cy_name" placeholder="Enter Category Name" required style="width: 100%; padding: 5px;">
+                          </div>
+                          <div class="form-group">
+                            <label for="updateCategoryDescription">Category Description:</label>
+                            <textarea id="updateCategoryDescription" name="cy_desc" placeholder="Enter Category Description" style="width: 100%; padding: 5px;"></textarea>
+                        </div>
+                          <div class="form-group">
+                            <label for="updateCategoryImage">Category Image:</label>
+                            <input type="file" id="updateCategoryImage" name="cy_image" accept="image/*" style="width: 100%; padding: 5px;">
+                          </div>
+                          
+                          <button type="submit"class="btn-2"  >Update Category</button>
+                          <button type="button" class="btn-cancle" onclick="closeUpdateModal()">Cancel</button>
+                      </form>
+                    </div>
+    
+                   <!-- HTML for Subcategory Form -->
+                    <div id="subcategory-form-container" class="form_container">
+                      <h2 class="form-h2">Add Subcategory</h2>
+                      <form id="subcategory-form" enctype="multipart/form-data">
+    
+                        <input type="hidden" id="parent-category-id">
+                          <div class="form-group">
+                              <label for="sc-name">Subcategory Name:</label>
+                              <input type="text" id="sc-name" placeholder="Enter Subcategory Name" required style="width: 100%; padding: 5px;">
+                          </div>
+                          
+                          <div class="form-group">
+                            <label for="sc-desc">Subcategory Description:</label>
+                            <textarea id="sc-desc" placeholder="Enter Subcategory Description" required style="width: 100%; padding: 5px;"></textarea>
+                          </div>
+
+                          <div class="form-group">
+                              <label for="sc-image">Subcategory Image:</label>
+                              <input type="file" id="sc-image" accept="image/*" required style="width: 100%; padding: 5px;">
+                          </div>
+    
+                          <button type="submit" class="btn-2">Add Subcategory</button>
+                          <button type="button" class="btn-cancle" onclick="closeSubcategoryModal()">Cancel</button>
+                      </form>
+                    </div>
+    
+                                  <!-- Modal for Updating Subcategory -->
+                    <div id="update-subcategory-modal" class="form_container">
+                      <h2 class="form-h2">Update Subcategory</h2>
+                      <form id="update-subcategory-form" enctype="multipart/form-data">
+                          <input type="hidden" id="update-sub-id">
+                          
+                          <div class="form-group">
+                            <label for="update-sub-name">Subcategory Name:</label>
+                            <input type="text" id="update-sub-name"  name="sub_name" required style="width: 100%; padding: 5px;">
+                          </div>
+                          <div class="form-group">
+                            <label for="update-sub-desc">Category Description:</label>
+                            <textarea id="update-sub-desc" name="sub_desc" placeholder="Enter Category Description" style="width: 100%; padding: 5px;"></textarea>
+                        </div>
+                          <div class="form-group">
+                            <label for="update-sub-image">Change Image:</label>
+                          <input type="file" id="update-sub-image" name="sub_image" accept="image/*" style="width: 100%; padding: 5px;">
+                          </div>
+                         
+                          <button type="submit" class="btn-2">Update</button>
+                          <button type="button" class="btn-cancle" onclick="closeUpdateSubModal()">Cancel</button>
+                      </form>
+                    </div>
+    
+                                    <!-- Sub-Subcategory Form Modal -->
+                    <!-- Sub-Subcategory Form Modal -->
+                    <div id="subsubcategory-form-container" class="form_container">
+                      <h2 class="form-h2">Add Sub-Subcategory</h2>
+                      <form id="subsubcategory-form" enctype="multipart/form-data">
+                          
+                          <input type="hidden" id="parent-sub-id">
+                          
+                          <div class="form-group">
+                              <label for="ssc-name">Sub-Subcategory Name:</label>
+                              <input type="text" id="ssc-name" placeholder="Enter Sub-Subcategory Name" required style="width: 100%; padding: 5px;">
+                          </div>
+    
+                          <div class="form-group">
+                              <label for="ssc-image">Sub-Subcategory Image:</label>
+                              <input type="file" id="ssc-image" accept="image/*" required style="width: 100%; padding: 5px;">
+                          </div>
+    
+                          <div style="text-align: center;">
+                              <button type="submit" class="btn-2">Add Sub-Subcategory</button>
+                              <button type="button" class="btn-cancle" onclick="closeSubSubcategoryModal()" class="btn-cancle">Cancel</button>
+                          </div>
+                      </form>
+                    </div>
+    
+                    <!-- Update Sub-Subcategory Modal -->
+                    <div id="update-subsubcategory-modal" class="form_container">
+                     <h2 class="form-h2">Update Sub-Subcategory</h2>
+                      <form id="update-subsubcategory-form" enctype="multipart/form-data">
+                          <input type="hidden" id="update-ss-id">
+                          
+                          <div class="form-group">
+                            <label for="update-ss-name">Sub-Subcategory Name:</label>
+                            <input type="text" id="update-ss-name" required style="width: 100%; padding: 5px;">
+                          </div>
+                          <div class="form-group">
+                            <label for="update-ss-image">Change Image:</label>
+                            <input type="file" id="update-ss-image" accept="image/*" style="width: 100%; padding: 5px;">
+                          </div>
+                          <button type="submit" class="btn-2">Update</button>
+                          <button type="button" onclick="closeUpdateSubSubModal()"class="btn-cancle">Cancel</button>
+                      </form>
+                    </div>
+    
+                  
+                      <table border="1">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-list">
+                         
+                        </tbody>
+                    </table>
+                 
+                  </section>
+              
+                </div>
+                <div id="addtbl" class="product-about">
+                  <div class="form-group">
+                    <label>Category:</label>
+                    <select id="prod-cat" required>
+                        <option value="">Loading categories...</option>
+                    </select>
+                </div>
+                <div class="form-column">
+                  <div class="form-group">
+                    <label for="field-name">Field Name:</label>
+                    <input type="text" id="field-name" name="fieldName" required>
+                </div>
+                <div class="form-group">
+                    <label for="field-type">Field Type:</label>
+                    <select id="field-type" name="fieldType" required>
+                        <option value="VARCHAR(255)">Text (VARCHAR)</option>
+                        <option value="INT">Integer</option>
+                        <option value="DECIMAL(10, 2)">Decimal</option>
+                    </select>
+                </div>
+                </div>
+                
+                <button type="button" class="btn" id="add-field">Add Field</button>
+                <div id="field-list"></div>
+                <button type="submit" class="btn-2" id="create-table">Create Table</button>
+                </div>
+              </div>
+             
+            </div>
+            <div class="tab__content" content id="product">
+              <div class="wrapper tabbed">
+                <nav class="nav-wrap">
+                    <ul class="ul-wrapper">
+                        <li class="active"><a href="#0" class="tabbed-trigger" data-id="view1"><span>View</span></a></li>
+                        <li><a href="#0" class="tabbed-trigger" data-id="add1"><span>Add</span></a></li>
+                    </ul>
+                </nav>
+                <div id="view1" class="product-about active">
+                  <h3 class="tab__header">Product Details</h3>
+                  <div class="table-actions">
+                    <div> </div>
+                    <div>
+                        <button class="add-customer">+ Add Product</button>
+                    </div>
+                </div>
+                <table id="product-table" class="table table-bordered">
+                  <thead>
+                      <tr>
+                          <th>Product ID</th>
+                          <th>Product Name</th>
+                          <th>Description</th>
+                          <th>Price</th>
+                          <th>Image</th>
+                          <th>Category</th>
+                      </tr>
+                  </thead>
+                  <tbody id="product-details"></tbody>
+              </table>
+              
+              <!-- Pagination Controls -->
+              <nav>
+                  <ul class="pagination" id="pagination-controls"></ul>
+              </nav>
+              
+                </div>
+                <div id="add1" class="product-about">
+                  <h3>Add / Update Product</h3>
+                  <form id="addProductForm">
+                      <div class="form-group">
+                        <label>Category:</label>
+                        <select id="prod_cat"  onchange="handleCategoryChange()" required>
+                            <option value="">Loading categories...</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Sub Category:</label>
+                        <select id="prod_subcat" required>
+                          <option value="">Loading categories...</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                          <label>Sub SubCategory:</label>
+                          <select id="prod_subsubcat" required>
+                            <option value="">Loading categories...</option>
+                          </select>
+                      </div>
+                      <div id="product-form-container">
+                        <!-- The dynamic form will be inserted here -->
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+  
+            <div class="tab__content" content id="report">
+              <h3 class="tab__header">Reports</h3>
+              <div class="tab__body">
+                
+              </div>
+            </div>
+            <div class="tab__content" content id="setting">
+              <h3 class="tab__header">Setting</h3>
+              <div class="tab__body">
+                <div class="card">
+                  <!-- Account -->
+                  <div class="card-body">
+                    <div class="account">
+                      <img
+                        src="./ad-images/profile/img2.jpg"
+                        alt="user-avatar"
+                        class="avatar"
+                        id="uploadedAvatar" />
+                      <div class="button-wrapper">
+                        <label for="upload" class="button" tabindex="0">
+                          <span>Upload new photo</span>
+                          <input
+                            type="file"
+                            id="upload"
+                            class="account-file-input"
+                            hidden
+                            accept="image/png, image/jpeg" />
+                        </label>
+                        <button type="button" class="button1">
+                          <span>Reset</span>
+                        </button>
+  
+                        <div class="imgtext">Allowed JPG, GIF or PNG. Max size of 800K</div>
+                      </div>
+                    </div>
+                  </div>
+                 <div class="card-body"> 
+                    <form id="formAccountSettings" method="">
+  
+                          <label for="userName" class="form-label">User Name</label>
+                          <input
+                            class="form-control"
+                            type="text"
+                            id="userName"
+                            name="userName"
+                            value="John"
+                             />
+                      <br/>
+                          <label for="email" class="form-label">E-mail    </label>
+                          <input
+                            class="form-control"
+                            type="text"
+                            id="email"
+                            name="email"
+                            value="john.doe@example.com"
+                            placeholder="john.doe@example.com"/>
+                        
+                      <div class="change">
+                        <button type="submit" class="button">Save changes</button>
+                        <button type="reset" class="button1">Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- /Account -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="../js/index.js" ></script>
+    <script src="../js/customer.js"></script>
+    <script src="../js/orderdet.js"></script>
+    <script src="../js/product.js"></script>
+    <script src="../js/category.js"></script>
+    <!-- <script src="../js/category2.js"></script> -->
+<script>
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+          datasets: [{
+              label: 'Sales',
+              data: [1000, 1500, 1800, 2200, 2600],
+              borderColor: '#7380ec',
+              backgroundColor: 'rgba(115, 128, 236, 0.2)'
+          }]
+      }
+  });
+</script>
+
+  </body>
+</html>
+

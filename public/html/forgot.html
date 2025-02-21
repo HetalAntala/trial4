@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>login</title>
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/login.css" />
+  </head>
+  <body>
+    <div class="overlay" data-overlay></div>
+    <!-- Header section starts -->
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <section>
+      <div id="login-form" class="login-page">
+        <div class="form-box1">
+          <form id="forgot" action="" method="">
+            <div class="pagetitle">
+              <h2 style="font-size: 1.7rem; margin-bottom: 1.5rem">
+                Recover your password
+              </h2>
+              <span style="line-height: 1.5; letter-spacing: 0.1rem"
+                >Please enter your email address and we'll send you instructions
+                on how to reset your password.</span
+              >
+            </div>
+            <input
+              type="email"
+              class="input-field"
+              placeholder="Email"
+              name="email"
+              required
+            />
+            <button type="submit" class="submit-btn">Recovery Password</button
+            ><br />
+            <center>
+              <div class="forgot">
+                <a href="/login">Back To login-page </a>
+              </div>
+            </center>
+            <br />
+          </form>
+        </div>
+      </div>
+    </section>
+    <script>
+      function loadNav() {
+        async function loadNav() {
+          try {
+            const response = await fetch("/header");
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.text();
+            document.getElementById("nav").innerHTML = data;
+            console.log("Navigation loaded successfully");
+          } catch (error) {
+            console.error("Error loading navigation:", error);
+            // Optionally, you can show an error message to the user
+            document.getElementById("nav").innerHTML =
+              "<p>Failed to load navigation.</p>";
+          }
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>

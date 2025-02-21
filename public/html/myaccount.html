@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--=============== FLATICON ===============-->
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/2.0.0/uicons-regular-straight/css/uicons-regular-straight.css"
+    />
+
+    <!--=============== SWIPER CSS ===============-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      /*=============== ACCOUNTS ===============*/
+      .accounts {
+        margin-top: 5rem;
+      }
+      .accounts__container {
+        grid-template-columns: 4fr 8fr;
+        font-size: 1.6rem;
+      }
+
+      .account__tabs {
+        border: 1px solid gray;
+        border-radius: 0.25rem;
+      }
+
+      .account__tab {
+        padding: 1rem 2rem;
+        color: hsl(0, 0%, 13%);
+        display: flex;
+        column-gap: 0.625rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0, 0, 0.05, 1);
+      }
+
+      .account__tab.active-tab {
+        background-color: hsl(160, 21%, 61%);
+        color: black;
+      }
+
+      .account__tab:not(:last-child) {
+        border-bottom: 1px solid hsl(113, 15%, 90%);
+      }
+
+      .tab__content:not(.active-tab) {
+        display: none;
+      }
+
+      .tab__content {
+        border: 1px solid hsl(113, 15%, 90%);
+      }
+
+      .tab__header {
+        background-color: hsl(0, 0%, 93%);
+        border-bottom: 1px solid hsl(113, 15%, 90%);
+        padding: 1rem;
+        /* font-size: 1rem; */
+      }
+
+      .tab__body {
+        padding: 1rem;
+      }
+      .placed__order-table {
+        width: 100%;
+      }
+      .placed__order-table thead tr th {
+        color: hsl(0, 0%, 13%);
+        text-align: left;
+      }
+
+      .placed__order-table thead tr th,
+      .placed__order-table tbody tr td {
+        border: 1px solid hsl(113, 15%, 90%);
+        padding: 0.5rem;
+        /* font-size: 1rem; */
+      }
+
+      .view__order,
+      .edit {
+        color: hsl(176, 88%, 27%);
+      }
+
+      .address {
+        font-style: normal;
+        /* font-size: 1rem; */
+        line-height: 1.5;
+      }
+
+      .city {
+        margin-bottom: 0.25rem;
+      }
+
+      .edit {
+        padding-top: 1rem;
+      }
+      .btn {
+        display: inline-block;
+        border: 2px solid hsl(176, 88%, 27%);
+        color: black;
+        padding-inline: 1.75rem;
+        /* padding: 0.75rem 1.75rem; */
+        height: 49px;
+        line-height: 43px;
+        font-weight: 700;
+        border-radius: 0.25rem;
+        transition: all 0.4s cubic-bezier(0, 0, 0.05, 1);
+      }
+
+      .btn:hover {
+        color: white;
+        background-color: hsl(176, 88%, 27%);
+      }
+
+      .btn--md {
+        height: 45px;
+        line-height: 40px;
+      }
+      .form__input {
+        padding: 10px;
+      }
+      /*=============== BREAKPOINTS ===============*/
+      /* For large devices */
+      @media screen and (max-width: 1400px) {
+        .accounts__container {
+          grid-template-columns: 3fr 9fr;
+        }
+      }
+
+      /* For medium devices */
+      @media screen and (max-width: 992px) {
+        .accounts__container {
+          grid-template-columns: 1fr;
+        }
+
+        .table thead tr th:nth-child(1),
+        .table tbody tr td:nth-child(1) {
+          width: 140px;
+        }
+
+        .table thead tr th:nth-child(2),
+        .table tbody tr td:nth-child(2) {
+          width: 330px;
+        }
+
+        .table thead tr th:nth-child(3),
+        .table tbody tr td:nth-child(3) {
+          width: 80px;
+        }
+
+        .table thead tr th:nth-child(4),
+        .table tbody tr td:nth-child(4) {
+          width: 220px;
+        }
+
+        .table thead tr th:nth-child(5),
+        .table tbody tr td:nth-child(5) {
+          width: 160px;
+        }
+
+        .table thead tr th:nth-child(6),
+        .table tbody tr td:nth-child(6) {
+          width: 100px;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .tab__header,
+        .tab__body {
+          padding: 0.75rem;
+        }
+      }
+    </style>
+    <title>My Account</title>
+  </head>
+  <body>
+    <div class="overlay" data-overlay></div>
+    <!-- Header section starts -->
+    <div id="nav"></div>
+    <!-- Header section ends -->
+
+    <!--=============== MAIN ===============-->
+    <main class="main">
+      <!--=============== ACCOUNTS ===============-->
+      <section class="accounts section--lg">
+        <div class="accounts__container container grid">
+          <div class="account__tabs">
+            <p class="account__tab active-tab" data-target="#dashboard">
+              <i class="fi fi-rs-settings-sliders"></i> Dashboard
+            </p>
+            <p class="account__tab" data-target="#orders">
+              <i class="fi fi-rs-shopping-bag"></i> Orders
+            </p>
+            <p class="account__tab" data-target="#update-profile">
+              <i class="fi fi-rs-user"></i> Update Profile
+            </p>
+            <p class="account__tab" data-target="#change-password">
+              <i class="fi fi-rs-settings-sliders"></i> Change Password
+            </p>
+            <button id="logout" onclick="logout()">
+              <p class="account__tab"><i class="fi fi-rs-exit"></i> Logout</p>
+            </button>
+          </div>
+          <div class="tabs__content">
+            <div class="tab__content active-tab" content id="dashboard">
+              <h3 class="tab__header" id="username">Hello&nbsp;</h3>
+              <div class="tab__body">
+                <p class="tab__description" id="userdescription">
+                  From your account dashboard. you can easily check & view your
+                  recent order, manage your shipping and billing addresses and
+                  edit your password and account details
+                </p>
+              </div>
+            </div>
+            <div class="tab__content" content id="orders">
+              <h3 class="tab__header">Your Orders</h3>
+              <div class="tab__body">
+                <table class="placed__order-table">
+                  <thead>
+                    <tr>
+                      <th>Orders</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Totals</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orderTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab__content" content id="update-profile">
+              <h3 class="tab__header">Update Profile</h3>
+              <div class="tab__body" id="updateprofile">
+                <form class="form grid">
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    class="form__input"
+                    id="updateuname"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    class="form__input"
+                    id="updateemail"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    class="form__input"
+                    id="updateuaddress"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Pincode"
+                    class="form__input"
+                    id="updatepincode"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Mobile Number"
+                    class="form__input"
+                    id="updatembno"
+                  />
+                  <div class="form__btn">
+                    <button class="btn btn--md" onclick="updateUser()">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="tab__content" content id="change-password">
+              <h3 class="tab__header">Change Password</h3>
+              <div class="tab__body">
+                <form class="form grid">
+                  <input
+                    type="password"
+                    placeholder="Current Password"
+                    class="form__input"
+                    id="cpass"
+                  />
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    class="form__input"
+                    id="npass"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    class="form__input"
+                    id="cnpass"
+                  />
+                  <div class="form__btn">
+                    <button class="btn btn--md" onclick="changepass()">Save</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+      const btnScrollToTop = document.querySelector("#btnScrollToTop");
+      btnScrollToTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          // console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js2/main.js"></script>
+    <script src="../js2/myaccount.js"></script>
+  </body>
+</html>

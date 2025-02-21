@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Boxicons -->
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Glide js -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css"
+    />
+    <!-- Custom StyleSheet -->
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .contact {
+        width: 100%;
+        background: #f9f5f5;
+        padding-top: 99px;
+        padding-bottom: 97px;
+      }
+      .review_form_container {
+        width: 100%;
+      }
+      .review_form_title {
+        font-family: "Lucida", serif;
+        font-size: 30px;
+        color: #232323;
+        text-transform: uppercase;
+        line-height: 0.75;
+        text-align: center;
+      }
+      .review_form_content {
+        margin-top: 99px;
+        text-align: center;
+      }
+      .review_form {
+        width: 100%;
+      }
+      .review_form div {
+        width: 100%;
+      }
+      .review_form_input {
+        display: block;
+        width: calc((100% - 60px) / 3);
+        height: 53px;
+        border: solid 1px #b5b5b5;
+        outline: none;
+        padding-left: 22px;
+      }
+      .review_form_text {
+        width: 100%;
+        height: 53px;
+        border: solid 1px #b5b5b5;
+        outline: none;
+        padding-left: 22px;
+        margin-top: 27px;
+        height: 234px;
+        padding-top: 20px;
+      }
+      .review_form_input::-webkit-input-placeholder,
+      .review_form_text {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        font-style: italic;
+        color: #8c8c8c !important;
+      }
+      .review_form_input:-moz-placeholder,
+      .review_form_text {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        font-style: italic;
+        color: #8c8c8c !important;
+      }
+      .review_form_input::-moz-placeholder,
+      .review_form_text {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        font-style: italic;
+        color: #8c8c8c !important;
+      }
+      .review_form_input:-ms-input-placeholder,
+      .review_form_text {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        font-style: italic;
+        color: #8c8c8c !important;
+      }
+      .review_form_input::input-placeholder,
+      .review_form_text {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        font-style: italic;
+        color: #8c8c8c !important;
+      }
+      .review_form_button {
+        width: 179px;
+        height: 46px;
+        border: none;
+        outline: none;
+        background: #937c6f;
+        color: #ffffff;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        cursor: pointer;
+        margin-top: 18px;
+        -webkit-transition: all 200ms ease;
+        -moz-transition: all 200ms ease;
+        -ms-transition: all 200ms ease;
+        -o-transition: all 200ms ease;
+        transition: all 200ms ease;
+      }
+      .review_form_button:hover {
+        background: #e0e3e4;
+        color: #232323;
+      }
+      @media (max-width: 468px) {
+        .flex {
+          display: block;
+        }
+        .review_form_input {
+          width: 100%;
+          margin-bottom: 2rem;
+        }
+        .review_form_text {
+          margin-top: 0.5rem;
+        }
+      }
+    </style>
+    <title>Contact Us</title>
+  </head>
+
+  <body>
+    <div id="nav"></div>
+
+    <div class="contact">
+      <div class="container">
+        <div class="review_form_container">
+          <div class="review_form_title">get in touch</div>
+          <div class="review_form_content">
+            <form action="#" id="review_form" class="review_form">
+              <div class="flex">
+                <input
+                  type="text"
+                  class="review_form_input"
+                  placeholder="Name"
+                  required="required"
+                />
+                <input
+                  type="email"
+                  class="review_form_input"
+                  placeholder="E-mail"
+                  required="required"
+                />
+                <input
+                  type="text"
+                  class="review_form_input"
+                  placeholder="Subject"
+                />
+              </div>
+              <textarea
+                class="review_form_text"
+                name="review_form_text"
+                placeholder="Message"
+              ></textarea>
+              <button type="submit" class="review_form_button">
+                send message
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer"></div>
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+      const btnScrollToTop = document.querySelector("#btnScrollToTop");
+      btnScrollToTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+          console.log("Footer loaded successfully");
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>

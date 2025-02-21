@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project</title>
+    <!-- Font awsome link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <!-- custom css link -->
+    <link rel="stylesheet" href="C:\Netra sem 5\SDP (project)\Database\Bouquet\style.css">
+</head>
+<body>
+    <!-- Header section starts -->
+    <header class="header" id="header">
+        <div class="nav container">
+            <div class="nav-title">
+                <div class="nav-left"></div>
+                <div class="nav-center">
+                    <div class="nav-logo">
+                        <img src="./img/logo/logo1.png" style="width: 80px; height: 80px;">
+                        <div class="navbar-text">Nature's <span>Pallete</span></div>
+                    </div>
+                </div>
+                <div class="nav-right">
+                    <div class="nav-icons">
+                        <a href="#" class="fa fa-search" trigger-button data-target="search-float"></a>
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fa-regular fa-heart"></a>
+                        <a href="#" class="fas fa-user"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="subnav">
+                <div class="topnav" id="myTopnav">
+                    <a href="#home" class="">Home</a>
+                    <a href="#category">Shop</a>
+                    <a href="#about">About</a>
+                    <div class="dropdown">
+                      <button class="dropbtn">Plant
+                        <i class="fa fa-caret-down"></i>
+                      </button>
+                      <div class="dropdown-content">
+                        <a href="#">Link 1</a>
+                        <a href="#">Link 2</a>
+                        <a href="#">Link 3</a>
+                      </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropbtn">Boquet
+                          <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                          <a href="#">Link 1</a>
+                          <a href="#">Link 2</a>
+                          <a href="#">Link 3</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropbtn">Pot
+                          <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                          <a href="#">Link 1</a>
+                          <a href="#">Link 2</a>
+                          <a href="#">Link 3</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropbtn">Fertilizer
+                          <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                          <a href="#">Link 1</a>
+                          <a href="#">Link 2</a>
+                          <a href="#">Link 3</a>
+                        </div>
+                    </div>
+                    <a href="#about">Tool</a>
+                    <a href="#contact">Contact</a>
+                    <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+                  </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header section ends -->
+
+    <!-- Home section starts -->
+    <section class="home">
+        <div class="home" id="home">
+            <video controls autoplay height="800px" width="100%">
+                <source src="./img/WhatsApp Video 2024-12-06 at 1.30.26 PM.mp4">
+            </video>
+            <div class="content">
+                <h1>Welcome to the official page <br/> of Nature's Palette</h1>
+                <p>Whether you're a seasoned gardener or a first-time plant parent,<br/>Nature's palette is your green haven.</p>
+                <!-- <p>Ready to dig in?Explore our collection,and remember:Life is better <br/>with a little dirt under your nails. </p> -->
+                <form action="">
+                    <a href="#category"><button class="btn">Shop Now</button></a>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Home section ends -->
+
+    <!-- Container section stats -->
+    <section class="icons-container">
+        <div class="icon">
+            <i class="fa-solid fa-truck"></i>
+            <div class="icon-content">
+                <h3>Free shipping</h3>
+                <p>Free shipping on order</p>
+            </div>
+        </div>
+        <div class="icon">
+            <i class="fa-solid fa-circle-notch"></i>
+            <div class="icon-content">
+                <h3>100% Money Back</h3>
+                <p>You've 30 days to return</p>
+            </div>
+        </div>
+        <div class="icon">
+            <i class="fa-solid fa-money-bill"></i>
+            <div class="icon-content">
+                <h3>Payment Secure</h3>
+                <p>100% secure payment</p>
+            </div>
+        </div>
+        <div class="icon">
+            <i class="fa-regular fa-clock"></i>
+            <div class="icon-content">
+                <h3>Support24/7</h3>
+                <p>Contact us any times</p>
+            </div>
+        </div>
+    </section>
+    <!-- Container section stats -->
+
+    <!-- Category section starts -->
+    <section class="category">
+        <div class="category" id="category">
+            <div class="category-option">
+                <h1 class="title-text">Shop By Category</h1>
+                <div class="options">
+                    <div class="option-div">
+                        <div class="option-item">
+                            <img src="./img/plant1-p.jpg" alt="">
+                        </div>
+                        <a href="#">Plants &rarr;</a>   
+                    </div>
+                    <div class="option-div">
+                        <div class="option-item">
+                            <img src="./img/boq.jpg" alt="">
+                        </div>
+                        <a href="#">Bouquets &rarr;</a>   
+                    </div>
+                    <div class="option-div">
+                        <div class="option-item">
+                            <img src="./img/pot.jpg" alt="">
+                        </div>
+                        <a href="#">Pots &rarr;</a>   
+                    </div>
+                    <div class="option-div">
+                        <div class="option-item">
+                            <img src="./img/fer.jpg" alt="" class="img-size">
+                        </div>
+                        <a href="#">Fertilizers &rarr;</a>   
+                    </div>
+                    <div class="option-div">
+                        <div class="option-item">
+                            <img src="./img/tool1.jpg" alt="" class="img-size">
+                        </div>
+                        <a href="#">Tools &rarr;</a>   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Category section ends -->
+
+    <!-- About Us section starts -->
+    <section class="about" id="about">
+        <div class="about-div">
+            <h1 class="title-text">Nature's  Palette :  Cultivating Green Dreams</h1>
+            <div class="options">
+                <img src="./img/about.jpg" alt="">
+                <p>At Nature's Palette,we're more than just a plant or a floral shop. 
+                    We're a team of  passionate plant whispers,floral enthusiasts and soli-stained dreamers.
+                    Our curated  green house is a palette of colors and fragrances-a place where each plant 
+                    has a name and soft jazz encourages growth.Ready to bloom with us?<br/> Explore Nature's Palette today!<br/><br/>
+                    <button class="btn">Shop Now</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    <!--==================== STEPS ====================-->
+    <section class="steps__section">
+        <div class="steps__bg">
+            <h2 class="section__title-center steps__title">
+                Steps to start your plants off right
+            </h2>
+
+            <div class="steps__container">
+                <div class="steps__card">
+                    <div class="steps__card-number">01</div>
+                    <h3 class="steps__card-title">Choose Plant</h3>
+                    <p class="steps__card-description">
+                        We have several varieties plants you can choose from.
+                    </p>
+                </div>
+
+                <div class="steps__card">
+                    <div class="steps__card-number">02</div>
+                    <h3 class="steps__card-title">Place an order</h3>
+                    <p class="steps__card-description">
+                        Once your order is set, we move to the next step which is the shipping.
+                    </p>
+                </div>
+
+                <div class="steps__card">
+                    <div class="steps__card-number">03</div>
+                    <h3 class="steps__card-title">Get plants delivered</h3>
+                    <p class="steps__card-description">
+                        Our delivery process is easy, you receive the plant direct to your door.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- About Us section ends -->
+
+    <!-- bestseller section starts -->
+    <section class="best-seller">
+        <h1 class="title-text">Most Loved on our website</h1>
+
+      <div class="product-center">
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="overlay">
+            <a href="product.html" class="product-thumb">
+              <img src="./img/plant5.jpg" alt="" />
+            </a>
+          </div>
+          <div class="product-text">
+            <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+            <h4>&#8377; 700</h4>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- best seller section ends -->
+    <!-- NewArrival section starts -->
+    <section class="new-arrival">
+          <h1 class="title-text">Fresh on the market</h1>
+  
+          <div class="product-center">
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="C:\Users\User\Pictures\Screenshots\Screenshot 2024-12-24 230155.png" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0002.jpeg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0003.jpeg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0269.jpg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/plant7.jpg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0242.jpg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0146.jpg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+            <div class="product-item">
+              <div class="overlay">
+                <a href="product.html" class="product-thumb">
+                  <img src="./img/I0208.jpg" alt="" />
+                </a>
+              </div>
+              <div class="product-text">
+                <a href="product.html">Delicate Beauty Orchids & Roses Arrangementn</a>
+                <h4>&#8377; 700</h4>
+              </div>
+            </div>
+          </div>
+    </section>
+    <!-- NewArrival section ends -->
+
+    <!-- Rating section starts -->
+    <section class="rating" id="rate">
+        <div class="rate">
+            <h1 class="title-text">Read What other have to Say</h1>
+            <div class="rating-div">
+                <div class="card">
+                    <div class="story">
+                        <figure class="story__shape">
+                            <img src="./img/pot-p.jpg" class="story__img">
+                            <figcaption class="story__caption">Mary Smith</figcaption>
+                        </figure>
+                        <div class="story__text">
+                            <h3 class="heading-tertiary">Totally love it..</h3>
+                            <p>It's totally a great initialtive by Nature's Pallete.Totally in love with all the plants.5 star rating from my side.
+                                I approach everyone to take and order fro Nature's Pallete.Totally good for our nature.Ti's time to do something for nature.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="story">
+                        <figure class="story__shape">
+                            <img src="./img/pot.jpg" class="story__img">
+                            <figcaption class="story__caption">Mary Smith</figcaption>
+                        </figure>
+                        <div class="story__text">
+                            <h3 class="heading-tertiary">Totally love it..</h3>
+                            <p>It's totally a great initialtive by Nature's Pallete.Totally in love with all the plants.5 star rating from my side.
+                                I approach everyone to take and order fro Nature's Pallete.Totally good for our nature.Ti's time to do something for nature.
+                            </p>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>
+    </section>
+    <!-- Rating section ends -->
+
+    <!-- Thumbnail images -->
+    <div class="row-thumb">
+        <div class="column-thumb">
+          <img class="demo cursor" src="./img/bouquet_2-p.webp" style="width:100%">
+        </div>
+        <div class="column-thumb">
+            <img class="demo cursor" src="./img/plant.jpg" style="width:100%">
+        </div>
+        <div class="column-thumb">
+            <img class="demo cursor" src="./img/bouquet_1-p.webp" style="width:100%">
+        </div>
+        <div class="column-thumb">
+            <img class="demo cursor" src="./img/pot-p.jpg" style="width:100%">
+        </div>
+        <div class="column-thumb">
+            <img class="demo cursor" src="./img/plant1-p.jpg" style="width:100%">
+        </div>
+        <div class="column-thumb">
+            <img class="demo cursor" src="./img/pot.jpg" style="width:100%">
+          </div>
+      </div>
+    
+    <!-- Footer section  starts-->
+    <footer>
+        <div class="row primary">
+            <div class="column about">
+              <h3>Address</h3>
+              <p>
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate, aspernatur?
+              </p>
+              <div class="social">
+                <i class="fa fa-facebook"></i>
+                <i class="fa fa-twitter"></i>
+                <i class="fa fa-linkedin"></i>
+                <i class="fa fa-instagram"></i>
+              </div>
+            </div>
+          
+            <div class="column link">
+                <h3>Pages</h3>
+                     <ul>
+                        <li><a href="">My Account</a></li>
+                        <li><a href="">Login</a></li>
+                        <li><a href="">Wishlist</a></li>
+                        <li><a href="">Cart</a></li>
+                        <li><a href="">Checkout</a></li>
+                    </ul>
+            </div>
+          
+            <div class="column subscribe">
+              <h3>Newsletter</h3>
+              <div>
+                <input type="email" placeholder="Your email id here" />
+                <button class="subscribe-btn">Subscribe</button>
+              </div>
+            </div>
+          </div>
+          <div class="row copyright">
+            <div class="footer-menu">
+                <a href="">Home</a>
+                <a href="">Careers</a>
+                <a href="">Delivery Information</a>
+                <a href="">Terms & Condition</a>
+                <a href="">Privacy Policy</a>
+            </div>
+             <p>&copy; 2024. Nature's Pallete. All rights reserved</p>
+          </div>
+    </footer>
+    <!-- Footer section  ends-->
+
+    <script src="main.js"></script>
+    </body>
+</html>

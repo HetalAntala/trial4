@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cart</title>
+    <!-- custom css link -->
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      /* Same CSS styles as before */
+      /* body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f8f8; } */
+      .header {
+        text-align: center;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .cart-container {
+        width: 80%;
+        margin: 0 auto;
+        padding-top: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+      .action-btns {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      .checkout-btn {
+        padding: 10px 20px;
+        background-color: #008cba;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+      .checkout-btn:hover {
+        background-color: #007b9f;
+      }
+      .summary-subtotal,
+      .summary-total,
+      .summary-shipping {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        clear: both;
+        margin: 1rem 0;
+        overflow: hidden;
+        padding: 0.5rem 0;
+        font-size: 1.5rem;
+      }
+      .cart-summary strong,
+      button {
+        float: right;
+      }
+
+      /* Checkout Button */
+      .checkout-btn {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 12px;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 15px;
+      }
+
+      .checkout-btn:hover {
+        background: #218c53;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .checkout-btn {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header section starts -->
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <div class="header">
+      <h1>My Cart</h1>
+    </div>
+
+    <div class="cart-container">
+      <table id="cartTable">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="cart-container"></tbody>
+        <!-- <tbody class="cart-items" id="cart-items"></tbody> -->
+      </table>
+      <div class="cart-summary">
+        <p class="summary-subtotal">Subtotal: <strong>Rs. 540</strong></p>
+        <p class="summary-shipping">Shipping: <strong>Rs. 50</strong></p>
+        <h4 class="summary-total">Total: <strong>Rs. 590</strong></h4>
+        <button class="checkout-btn">Proceed to Checkout</button>
+      </div>
+    </div>
+    <div id="footer"></div>
+    <script>
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+          console.log("Footer loaded successfully");
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>

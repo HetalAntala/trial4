@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <title>login</title>
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/login.css" />
+  </head>
+  <body>
+    <div class="overlay" data-overlay></div>
+    <!-- Header section starts -->
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <section>
+      <div id="login-form" class="login-page">
+        <!-- <img src="./images/icon/20.jpg" alt=""> -->
+        <div class="form-box">
+          <div class="button-box" style="display: flex">
+            <div id="btn"></div>
+            <button type="button" class="toggle-btn" onclick="login()">
+              Login
+            </button>
+            <button type="button" class="toggle-btn" onclick="register()">
+              Register
+            </button>
+          </div>
+
+          <form id="login" class="input-group-login" action="/" method="POST">
+            <input type="hidden" id="redirectUrl" name="redirectUrl" value="" />
+            <input
+              type="email"
+              class="input-field"
+              placeholder="Email"
+              name="email"
+              id="cemail"
+              required
+            />
+            <input
+              type="password"
+              class="input-field"
+              placeholder="Password"
+              name="password"
+              id="cpassword"
+              required
+            />
+            <button type="submit" class="submit-btn">Login</button><br />
+            <div class="forgot">
+              <a href="/forgot">Forgot Password ?</a>
+            </div>
+            <br />
+            <center>
+              <a href="#" onclick="register()"> New User ? Then Register !</a>
+            </center>
+          </form>
+
+          <form id="register" class="input-group-register">
+            <input
+              type="text"
+              class="input-field"
+              placeholder="Firstname"
+              name="firstname"
+              id="fn"
+              required
+            />
+            <div id="error_message1"></div>
+            <input
+              type="text"
+              class="input-field"
+              placeholder="Lastname"
+              name="lastname"
+              id="ln"
+              required
+            />
+            <div id="error_message2"></div>
+            <input
+              type="email"
+              class="input-field"
+              placeholder="Email"
+              name="email"
+              id="em"
+              required
+            />
+            <input
+              type="num"
+              class="input-field"
+              placeholder="Mobile"
+              name="mobile"
+              id="mb"
+              required
+            />
+            <div id="error_message3"></div>
+            <input
+              type="text"
+              class="input-field"
+              placeholder="Address"
+              name="address"
+              id="ad"
+              required
+            />
+            <input
+              type="password"
+              class="input-field"
+              placeholder="Password"
+              name="password"
+              id="pw"
+              required
+            />
+            <div id="error_message4"></div>
+            <button
+              type="submit"
+              class="submit-btn"
+              onsubmit="return validateForm()"
+            >
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      var x = document.getElementById("login");
+      var y = document.getElementById("register");
+      var z = document.getElementById("btn");
+
+      function register() {
+        x.style.left = "-400px";
+        y.style.left = "50px";
+        z.style.left = "110px";
+      }
+      function login() {
+        x.style.left = "50px";
+        y.style.left = "450px";
+        z.style.left = "0px";
+      }
+
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/login.js"></script>
+  </body>
+</html>
