@@ -103,7 +103,7 @@ for (let i = 0; i < accordionBtn.length; i++) {
   });
 }
 
-function toggleDropdown() {
+function toggleDropdown1() {
     const dropdown = document.getElementById('dropdownMenu');
     dropdown.classList.toggle('active');
 }

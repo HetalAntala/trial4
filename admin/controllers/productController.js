@@ -99,6 +99,15 @@ const getAllProducts = (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     });
 };
+const getCategories = (req, res) => {
+    db.query('SELECT CY_ID,CY_NAME FROM category', (err, results) => {
+        if (err) {
+            console.error('Error fetching categories:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(results);
+    });
+};
 
 const getAllCategories = (req, res) => {
     db.query('SELECT CY_ID,CY_NAME FROM category', (err, results) => {
@@ -133,6 +142,57 @@ const getSubSubcategories = (req, res) => {
         res.json(results);
     });
 };
+// const getProductsByCategory = async (req, res) => {
+//     const { category } = req.query;
+
+//     if (!category) {
+//         return res.status(400).json({ success: false, error: "Category ID is required" });
+//     }
+
+//     try {
+//         const categoryQuery = "SELECT CY_NAME FROM category WHERE CY_ID = ?";
+//         db.query(categoryQuery, [category], (error, categoryResult) => {
+//             if (error) {
+//                 console.error("❌ Error fetching category name:", error);
+//                 return res.status(500).json({ success: false, error: "Database error", details: error.message });
+//             }
+            
+//             if (categoryResult.length === 0) {
+//                 console.error(`❌ No category found for ID: ${category}`);
+//                 return res.status(404).json({ success: false, error: "Category not found" });
+//             }
+
+//             const tableName = categoryResult[0].name.toLowerCase().replace(/\s+/g, '_');
+//             console.log("✅ Resolved Table Name:", tableName);
+
+//             const checkTableQuery = `SHOW TABLES LIKE ?`;
+//             db.query(checkTableQuery, [tableName], (error, tableResult) => {
+//                 if (error) {
+//                     console.error("❌ Error checking table existence:", error);
+//                     return res.status(500).json({ success: false, error: "Database error", details: error.message });
+//                 }
+
+//                 if (tableResult.length === 0) {
+//                     console.error(`❌ Table '${tableName}' does not exist in the database.`);
+//                     return res.status(404).json({ success: false, error: `Table '${tableName}' does not exist.` });
+//                 }
+
+//                 const query = `SELECT * FROM \`${tableName}\``;
+//                 db.query(query, (error, results) => {
+//                     if (error) {
+//                         console.error("❌ SQL Error:", error);
+//                         return res.status(500).json({ success: false, error: "Database error", details: error.message });
+//                     }
+//                     res.json({ success: true, products: results });
+//                 });
+//             });
+//         });
+
+//     } catch (error) {
+//         console.error("❌ Unexpected Server Error:", error);
+//         res.status(500).json({ success: false, error: "Unexpected server error", details: error.message });
+//     }
+// };
 
 const getField = async (req, res) => {
     const { category } = req.query;
@@ -158,135 +218,6 @@ const getField = async (req, res) => {
         res.status(500).json({ success: false, error: "Database error" });
     }
 };
-
-// const addProduct = (req, res) => {
-//     console.log("Received request:", req.body);
-
-//     const { categoryId, productData, images } = req.body;
-
-//     if (!categoryId || !productData || Object.keys(productData).length === 0 || !images || images.length === 0) {
-//         return res.status(400).json({ success: false, error: "Missing category, product data, or images" });
-//     }
-
-//     // Fetch category name from the database
-//     db.query("SELECT CY_NAME FROM category WHERE CY_ID = ?", [categoryId], (err, rows) => {
-//         if (err) {
-//             console.error("Error fetching category:", err);
-//             return res.status(500).json({ success: false, error: "Database error" });
-//         }
-
-//         if (rows.length === 0) {
-//             return res.status(400).json({ success: false, error: "Invalid category ID" });
-//         }
-
-//         const categoryName = rows[0].CY_NAME;
-//         console.log("Resolved Category Name:", categoryName);
-
-//         db.query(`SHOW TABLES LIKE ?`, [categoryName], (err, tableResult) => {
-//             if (err) {
-//                 console.error("Error checking table existence:", err);
-//                 return res.status(500).json({ success: false, error: "Database error" });
-//             }
-
-//             if (tableResult.length === 0) {
-//                 return res.status(404).json({
-//                     success: false,
-//                     error: `Table for category '${categoryName}' does not exist.`,
-//                     action: "Create Table"
-//                 });
-//             }
-
-//             // 🔹 Step 1: Fetch the Primary Key Column Name Dynamically
-//             db.query(`SHOW KEYS FROM \`${categoryName}\` WHERE Key_name = 'PRIMARY'`, (err, keyResult) => {
-//                 if (err) {
-//                     console.error("Error fetching primary key:", err);
-//                     return res.status(500).json({ success: false, error: "Database error" });
-//                 }
-
-//                 if (keyResult.length === 0) {
-//                     return res.status(500).json({ success: false, error: "No primary key found for the category table" });
-//                 }
-
-//                 const primaryKey = keyResult[0].Column_name;
-//                 console.log("Resolved Primary Key Column:", primaryKey);
-
-//                 // 🔹 Step 2: Fetch the Last Product ID for That Category
-//                 db.query(`SELECT ${primaryKey} FROM \`${categoryName}\` ORDER BY ${primaryKey} DESC LIMIT 1`, (err, result) => {
-//                     if (err) {
-//                         console.error("Error fetching last product ID:", err);
-//                         return res.status(500).json({ success: false, error: "Database error" });
-//                     }
-
-//                     let newProductId;
-//                     if (result.length > 0) {
-//                         const lastId = result[0][primaryKey]; // Get last ID
-//                         const numericPart = parseInt(lastId.match(/\d+/)[0], 10) + 1; // Extract number and increment
-//                         const prefix = lastId.match(/[A-Za-z]+/)[0]; // Extract letters (prefix)
-//                         newProductId = `${prefix}${String(numericPart).padStart(4, "0")}`; // Ensure 4-digit padding
-//                     } else {
-//                         const prefix = primaryKey.split("_")[0]; // Extract prefix dynamically
-//                         newProductId = `${prefix}0001`; // Start with '0001' if no records exist
-//                     }
-
-//                     console.log("Generated New Product ID:", newProductId);
-
-//                     // Insert the new product with the corrected ID
-//                     productData[primaryKey] = newProductId;
-//                     const columns = Object.keys(productData).map(col => `\`${col}\``).join(", ");
-//                     const values = Object.values(productData);
-//                     const placeholders = values.map(() => "?").join(", ");
-
-//                     const query = `INSERT INTO \`${categoryName}\` (${columns}) VALUES (${placeholders})`;
-
-//                     db.query(query, values, (err, result) => {
-//                         if (err) {
-//                             console.error("Error inserting product:", err);
-//                             return res.status(500).json({ success: false, error: "Database error" });
-//                         }
-
-//                         console.log("Product added successfully. Inserting images...");
-
-//                         // 🔹 Step 3: Fetch Last Image ID to Auto-Increment
-//                         db.query(`SELECT IMG_ID FROM image ORDER BY IMG_ID DESC LIMIT 1`, (err, imgResult) => {
-//                             if (err) {
-//                                 console.error("Error fetching last image ID:", err);
-//                                 return res.status(500).json({ success: false, error: "Database error" });
-//                             }
-
-//                             let newImgId;
-//                             if (imgResult.length > 0) {
-//                                 const lastImgId = imgResult[0].IMG_ID;
-//                                 const numericPart = parseInt(lastImgId.match(/\d+/)[0], 10) + 1;
-//                                 newImgId = `IMG${String(numericPart).padStart(3, "0")}`;
-//                             } else {
-//                                 newImgId = "IMG001";
-//                             }
-
-//                             console.log("Generated New Image ID:", newImgId);
-
-//                             // 🔹 Step 4: Insert Images into Image Table
-//                             const imageQuery = `INSERT INTO image (IMG_ID, PATH1, PATH2, PATH3, PRODUCT_ID) VALUES (?, ?, ?, ?, ?)`;
-
-//                             db.query(imageQuery, [newImgId, images[0] || null, images[1] || null, images[2] || null, newProductId], (err, imgInsertResult) => {
-//                                 if (err) {
-//                                     console.error("Error inserting images:", err);
-//                                     return res.status(500).json({ success: false, error: "Image insertion failed" });
-//                                 }
-
-//                                 res.json({
-//                                     success: true,
-//                                     message: "Product and images added successfully",
-//                                     insertedProductId: newProductId,
-//                                     insertedImageId: newImgId
-//                                 });
-//                             });
-//                         });
-//                     });
-//                 });
-//             });
-//         });
-//     });
-// };
 
 const addProduct = (req, res) => {
     console.log("Received Request:", req.body);
@@ -376,39 +307,33 @@ const addProduct = (req, res) => {
 
 // ✅ Function to Insert Images
 function insertImages(productId, images, res) {
-    db.query(`SELECT IMG_ID FROM image ORDER BY CAST(SUBSTRING(IMG_ID, 4) AS UNSIGNED) DESC LIMIT 1`, (err, imgResult) => {
-        if (err) {
-            console.error("Error fetching last image ID:", err);
-            return res.status(500).json({ success: false, error: "Database error" });
-        }
+    db.query(
+        `SELECT IMG_ID FROM image ORDER BY CAST(SUBSTRING(IMG_ID, 4) AS UNSIGNED) DESC LIMIT 1`,
+        (err, imgResult) => {
+            if (err) return res.status(500).json({ error: "Database error" });
 
-        let newImgId;
-        if (imgResult.length > 0) {
-            const lastImgId = imgResult[0].IMG_ID;  // Example: "IMG149"
-            const numericPart = parseInt(lastImgId.replace(/\D/g, ''), 10) + 1;  // Extract number & increment
-            newImgId = `IMG${String(numericPart).padStart(3, "0")}`;  // Ensure 3-digit format (IMG150)
-        } else {
-            newImgId = "IMG001";  // First image ID if table is empty
-        }
+            let newImgId = imgResult.length > 0
+                ? `IMG${String(parseInt(imgResult[0].IMG_ID.replace(/\D/g, ''), 10) + 1).padStart(3, "0")}`
+                : "IMG001";
 
-        console.log("Generated New Image ID:", newImgId);
+            let filteredImages = images.filter(img => img); // Remove null values
+            if (filteredImages.length === 0) return res.json({ success: true, message: "No images uploaded." });
 
-        // ✅ Insert Image Paths into `image` Table
-        const imageQuery = `INSERT INTO image (IMG_ID, PATH1, PATH2, PATH3, PRODUCT_ID) VALUES (?, ?, ?, ?, ?)`;
-        db.query(imageQuery, [newImgId, images[0] || null, images[1] || null, images[2] || null, productId], (err, imgInsertResult) => {
-            if (err) {
-                console.error("Error inserting images:", err);
-                return res.status(500).json({ success: false, error: "Image insertion failed" });
-            }
+            let placeholders = new Array(filteredImages.length).fill('?').join(', ');
+            let imageQuery = `INSERT INTO image (IMG_ID, ${filteredImages.map((_, i) => `PATH${i + 1}`).join(', ')}, PRODUCT_ID) VALUES (?, ${placeholders}, ?)`;
 
-            res.json({
-                success: true,
-                message: "Product and images added successfully",
-                insertedProductId: productId,
-                insertedImageId: newImgId
+            db.query(imageQuery, [newImgId, ...filteredImages, productId], (err) => {
+                if (err) return res.status(500).json({ error: "Image insertion failed" });
+
+                res.json({
+                    success: true,
+                    message: "Product and images added successfully",
+                    insertedProductId: productId,
+                    insertedImageId: newImgId
+                });
             });
-        });
-    });
+        }
+    );
 }
 
 
@@ -458,22 +383,20 @@ const getPK = (req, res) => {
 };
 
 function generateProductId(lastId, primaryKey) {
-    let prefix = primaryKey.split('_')[0]; // Extract prefix from primary key (e.g., "B" from "B_ID")
+    let prefix = primaryKey.split('_')[0];
 
-    if (!lastId) {
-        return `${prefix}0001`; // Start from 0001 if no records exist
-    }
+    if (!lastId) return `${prefix}0001`;
 
-    // Extract numeric part from last ID and increment
     const numericPartMatch = lastId.match(/\d+/);
     const numericPart = numericPartMatch ? parseInt(numericPartMatch[0], 10) + 1 : 1;
 
-    // Ensure 4-digit formatting (e.g., B0001, PT0002)
     return `${prefix}${String(numericPart).padStart(4, '0')}`;
 }
 
 
+
 module.exports = {
+    getCategories,
     getField,
     getAllProducts,
     getAllCategories,

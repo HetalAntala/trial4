@@ -70,146 +70,260 @@ function changePage(page) {
     currentPage = page;
     fetchProducts(page);
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-    fetchProducts(); // Load first page
-    fetchCategories1();
-});
-
-// Fetch Categories for the first dropdown
-function fetchCategories1() {
-    fetch('/product/categories1')
+function fetchCategories2() {
+    fetch('/product/categories2')
         .then(response => response.json())
         .then(categories => {
-            const categorySelect = document.getElementById("prod_cat");
+            const categorySelect = document.getElementById("prod_catt");
             categorySelect.innerHTML = '<option value="">Select Category</option>';
             categories.forEach(cat => {
-                // Using uppercase property names as per the JSON response
                 categorySelect.innerHTML += `<option value="${cat.CY_ID}">${cat.CY_NAME}</option>`;
             });
         })
         .catch(error => console.error('Error fetching categories:', error));
 }
+// function fetchProductsByCategory() {
+//     const categoryId = document.getElementById("prod_catt").value;
+//     if (!categoryId) return;
 
-// Fetch Subcategories based on selected Category
-function handleCategoryChange() {
-    const categoryId = document.getElementById("prod_cat").value;
-    fetch(`/product/category/${categoryId}/subcategories`)
-        .then(response => response.json())
-        .then(subcategories => {
-            const subcategorySelect = document.getElementById("prod_subcat");
-            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-            subcategories.forEach(sub => {
-                subcategorySelect.innerHTML += `<option value="${sub.sub_id}">${sub.sub_name}</option>`;
-            });
-        })
-        .catch(error => console.error('Error fetching subcategories:', error));
-}
-
-// Fetch Sub-Subcategories based on selected Subcategory
-// document.getElementById("prod_subcat").addEventListener('change', function() {
-//     const subcategoryId = document.getElementById("prod_subcat").value;
-//     fetch(`/product/subcategory/${subcategoryId}/subsubcategories`)
+//     fetch(`/product/category/${categoryId}/products`)
 //         .then(response => response.json())
-//         .then(subsubcategories => {
-//             const subsubcategorySelect = document.getElementById("prod_subsubcat");
-//             subsubcategorySelect.innerHTML = '<option value="">Select Sub-Subcategory</option>';
-//             subsubcategories.forEach(subsub => {
-//                 subsubcategorySelect.innerHTML += `<option value="${subsub.ss_id}">${subsub.ss_name}</option>`;
+//         .then(products => {
+//             const productTable = document.getElementById("product-details");
+//             productTable.innerHTML = "";
+
+//             if (products.length === 0) {
+//                 productTable.innerHTML = '<tr><td colspan="6" class="text-center">No products found</td></tr>';
+//                 return;
+//             }
+
+//             products.forEach(product => {
+//                 productTable.innerHTML += `
+//                     <tr>
+//                         <td>${product.P_ID}</td>
+//                         <td>${product.P_NAME}</td>
+//                         <td>${product.P_DESC}</td>
+//                         <td>${product.P_PRICE}</td>
+//                         <td><img src="${product.P_IMAGE}" alt="Product Image" width="50"></td>
+//                         <td>${product.CY_NAME}</td>
+//                     </tr>
+//                 `;
 //             });
 //         })
-//         .catch(error => console.error('Error fetching sub-subcategories:', error));
+//         .catch(error => console.error('Error fetching products:', error));
+// }
+// document.getElementById("prod_catt").addEventListener("change", async function() {
+//     const categoryId = this.value;
+    
+//     if (!categoryId) return;
+
+//     try {
+//         const response = await fetch(`/product/get-products?category=${categoryId}`);
+//         const data = await response.json();
+        
+//         if (data.success) {
+//             displayProducts(data.products);
+//         } else {
+//             console.error("Error fetching products:", data.error);
+//         }
+//     } catch (error) {
+//         console.error("Network error:", error);
+//     }
 // });
 
-// document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-//     const formData = new FormData(e.target);
-//     const data = Object.fromEntries(formData);
 
-//     const response = await fetch('/product/products', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(data)
-//     });
+function displayProducts(products) {
+    const tableBody = document.getElementById('product-details');
+    tableBody.innerHTML = ""; // Clear previous data
 
-//     const result = await response.json();
-//     alert(result.message);
-// });
-
-function handleCategoryChange() {
-    const categoryId = document.getElementById("prod_cat").value;
-    fetch(`/product/category/${categoryId}/subcategories`)
-        .then(response => response.json())
-        .then(subcategories => {
-            const subcategorySelect = document.getElementById("prod_subcat");
-            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-            subcategories.forEach(sub => {
-                subcategorySelect.innerHTML += `<option value="${sub.sub_id}">${sub.sub_name}</option>`;
-            });
-        })
-        .catch(error => console.error('Error fetching subcategories:', error));
-}
-
-// Fetch Sub-Subcategories based on selected Subcategory
-// document.getElementById("prod_subcat").addEventListener('change', function() {
-//     const subcategoryId = document.getElementById("prod_subcat").value;
-//     fetch(`/product/subcategory/${subcategoryId}/subsubcategories`)
-//         .then(response => response.json())
-//         .then(subsubcategories => {
-//             const subsubcategorySelect = document.getElementById("prod_subsubcat");
-//             subsubcategorySelect.innerHTML = '<option value="">Select Sub-Subcategory</option>';
-//             subsubcategories.forEach(subsub => {
-//                 subsubcategorySelect.innerHTML += `<option value="${subsub.ss_id}">${subsub.ss_name}</option>`;
-//             });
-//         })
-//         .catch(error => console.error('Error fetching sub-subcategories:', error));
-// });
-
-// document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-//     const formData = new FormData(e.target);
-//     const data = Object.fromEntries(formData);
-
-//     const response = await fetch('/product/products', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(data)
-//     });
-
-//     const result = await response.json();
-//     alert(result.message);
-// });
-function handleCategoryChange() {
-    const categoryDropdown = document.getElementById("prod_cat");
-    const categoryId = categoryDropdown.value; // Get the selected category ID
-    const categoryName = categoryDropdown.options[categoryDropdown.selectedIndex]?.text.trim(); // Get category name
-
-    if (!categoryId || !categoryName) {
-        console.error("Category ID or Name is missing.");
+    if (products.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No products found</td></tr>";
         return;
     }
 
-    console.log("Selected Category:", categoryName, "Category ID:", categoryId);
+    products.forEach(product => {
+        const row = document.createElement('tr');
 
-    // Fetch fields dynamically based on category
-    fetch(`/product/get-fields?category=${encodeURIComponent(categoryName)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                generateForm(data.fields, categoryName, categoryId); // Pass categoryId properly
-            } else {
-                alert("Error fetching fields: " + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching fields:', error);
-            alert('Failed to fetch fields.');
-        });
+        row.innerHTML = `
+            <td>${product.P_ID || 'N/A'}</td>
+            <td>${product.P_NAME || 'N/A'}</td>
+            <td>${product.P_DESC || 'N/A'}</td>
+            <td>${product.P_PRICE || 'N/A'}</td>
+            <td><img src="/uploads/${product.P_IMAGE || 'default.jpg'}" alt="Product Image" width="50"></td>
+            <td>${product.CY_ID || 'N/A'}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    fetchProducts(); // Load first page
+    fetchCategories1();
+    fetchCategories2();
+});
+function fetchCategories1() {
+    fetch('/product/categories1')
+        .then(response => response.json())
+        .then(categories => {
+            const categorySelect = document.getElementById("prodcat");
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                categorySelect.innerHTML += `<option value="${cat.CY_ID}">${cat.CY_NAME}</option>`; // ✅ Correctly setting ID
+            });
+              categorySelect.addEventListener("change", handleCategoryChange1);
+        })
+        .catch(error => console.error('Error fetching categories:', error));
+}
+
+// ✅ Fetch Categories for the first dropdown
+// function fetchCategories1() {
+//     fetch('/product/categories1')
+//         .then(response => response.json())
+//         .then(categories => {
+//             const categorySelect = document.getElementById("prodcat");
+//             categorySelect.innerHTML = '<option value="">Select Category</option>';
+
+//             if (categories.length === 0) {
+//                 categorySelect.innerHTML = '<option value="">No categories found</option>';
+//                 return;
+//             }
+
+//             categories.forEach(cat => {
+//                 const option = document.createElement("option");
+//                 option.value = cat.CY_ID;
+//                 option.textContent = cat.CY_NAME;
+//                 categorySelect.appendChild(option);
+//             });
+
+//             // ✅ Attach event listener for category change
+//             categorySelect.addEventListener("change", handleCategoryChange1);
+//         })
+//         .catch(error => console.error("Error fetching categories:", error));
+// }
+
+// ✅ Fetch Subcategories based on selected Category
+function handleCategoryChange1() {
+    const categoryId = document.getElementById("prodcat").value;
+    const subcategorySelect = document.getElementById("prodsubcat");
+    const subsubCategorySelect = document.getElementById("prodsubsubcat");
+
+    // Clear previous selections
+    subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+    subsubCategorySelect.innerHTML = '<option value="">Select Sub Subcategory</option>';
+
+    if (!categoryId) return;
+
+    fetch(`/product/category/${categoryId}/subcategories`)
+        .then(response => response.json())
+        .then(subcategories => {
+            if (subcategories.length === 0) {
+                subcategorySelect.innerHTML = '<option value="">No subcategories found</option>';
+                return;
+            }
+
+            subcategories.forEach(sub => {
+                const option = document.createElement("option");
+                option.value = sub.sub_id;
+                option.textContent = sub.sub_name;
+                subcategorySelect.appendChild(option);
+            });
+
+            // ✅ Attach event listener for subcategory change
+            subcategorySelect.addEventListener("change", handleSubcategoryChange1);
+        })
+        .catch(error => console.error("Error fetching subcategories:", error));
+}
+
+// ✅ Fetch Sub-Subcategories based on selected Subcategory
+function handleSubcategoryChange1() {
+    const subcategoryId = document.getElementById("prodsubcat").value;
+    const subsubCategorySelect = document.getElementById("prodsubsubcat");
+
+    // Clear previous selection
+    subsubCategorySelect.innerHTML = '<option value="">Select Sub Subcategory</option>';
+
+    if (!subcategoryId) return;
+
+    fetch(`/product/subcategory/${subcategoryId}/subsubcategories`)
+        .then(response => response.json())
+        .then(subsubcategories => {
+            if (subsubcategories.length === 0) {
+                subsubCategorySelect.innerHTML = '<option value="">No sub-subcategories found</option>';
+                return;
+            }
+
+            subsubcategories.forEach(subsub => {
+                const option = document.createElement("option");
+                option.value = subsub.subsub_id;
+                option.textContent = subsub.subsub_name;
+                subsubCategorySelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Error fetching sub-subcategories:", error));
+}
+
+
+// Fetch Sub-Subcategories based on selected Subcategory
+// document.getElementById("prod_subcat").addEventListener('change', function() {
+//     const subcategoryId = document.getElementById("prod_subcat").value;
+//     fetch(`/product/subcategory/${subcategoryId}/subsubcategories`)
+//         .then(response => response.json())
+//         .then(subsubcategories => {
+//             const subsubcategorySelect = document.getElementById("prod_subsubcat");
+//             subsubcategorySelect.innerHTML = '<option value="">Select Sub-Subcategory</option>';
+//             subsubcategories.forEach(subsub => {
+//                 subsubcategorySelect.innerHTML += `<option value="${subsub.ss_id}">${subsub.ss_name}</option>`;
+//             });
+//         })
+//         .catch(error => console.error('Error fetching sub-subcategories:', error));
+// });
+
+// document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+//     const formData = new FormData(e.target);
+//     const data = Object.fromEntries(formData);
+
+//     const response = await fetch('/product/products', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data)
+//     });
+
+//     const result = await response.json();
+//     alert(result.message);
+// });
+
+document.getElementById('prodcat').addEventListener('change', async function () {
+    const categoryId = this.value;  // ✅ Get the selected category ID
+    const categoryName = this.options[this.selectedIndex]?.text.trim(); // ✅ Get category name
+
+    if (!categoryId) {
+        console.error("Category ID is undefined");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/product/get-fields?category=${encodeURIComponent(categoryName)}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            generateForm(data.fields, categoryName, categoryId); // ✅ Pass categoryId correctly
+        } else {
+            alert("Error fetching fields: " + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch fields. Check console for details.');
+    }
+});
+
+
 async function fetchFieldTypes(tableName) {
     try {
         const response = await fetch(`/product/get-field-types?tableName=${tableName}`);
@@ -222,50 +336,82 @@ async function fetchFieldTypes(tableName) {
 }
 
 
-// Function to generate form dynamically
-// function generateForm(fields, categoryName) {
+// async function generateForm(fields, categoryName, categoryId) {
 //     const formContainer = document.getElementById('product-form-container');
-//     formContainer.innerHTML = `<h3>Add Product to ${categoryName}</h3>`; // Title
+//     formContainer.innerHTML = `<h3>Add Product to ${categoryName}</h3>`;
 
 //     const form = document.createElement('form');
 //     form.id = 'product-form';
+//     form.enctype = 'multipart/form-data';
 
+//     // Get Table Name
+//     let tableName = categoryName.toLowerCase().replace(/\s+/g, '_');
+
+//     // Fetch primary key dynamically
+//     let primaryKey = await fetchPrimaryKey(tableName);
+//     let newProductId = await fetchLastProductId(tableName, primaryKey);
+
+//     // ✅ Hidden Category ID Field
+//     form.appendChild(createHiddenField('categoryId', categoryId));
+
+//     // ✅ Read-Only Product ID Field
+//     form.appendChild(createReadOnlyField("Product ID", primaryKey, newProductId));
+
+//     // ✅ Read-Only Category ID Field
+//     form.appendChild(createReadOnlyField("Category ID", "CY_ID", categoryId));
+
+//     // ✅ Generate fields dynamically with correct input types
 //     fields.forEach(field => {
-//         const div = document.createElement('div');
-//         div.className = 'form-group';
-
-//         const label = document.createElement('label');
-//         label.textContent = field.name;
-//         div.appendChild(label);
-
-//         const input = document.createElement('input');
-//         input.type = field.type === 'INT' ? 'number' : 'text'; // Adjust input type
-//         input.name = field.name;
-//         input.required = true;
-//         div.appendChild(input);
-
-//         form.appendChild(div);
+//         if (field.name === primaryKey || field.name === "CY_ID") return;
+//         form.appendChild(createInputField(field));
 //     });
 
+//     // ✅ Image Upload Fields
+//     for (let i = 1; i <= 3; i++) {
+//         form.appendChild(createFileInputField(`Upload Image ${i}`, `prod_img${i}`));
+//     }
+
+//     // ✅ Submit Button
 //     const submitButton = document.createElement('button');
 //     submitButton.textContent = 'Add Product';
 //     submitButton.type = 'submit';
+//     submitButton.className = 'btn';
 //     form.appendChild(submitButton);
 
 //     formContainer.appendChild(form);
 
-//     // Handle form submission
+//     // ✅ Handle Form Submission
 //     form.addEventListener('submit', async function (event) {
 //         event.preventDefault();
 //         const formData = new FormData(form);
+
 //         const productData = {};
-//         formData.forEach((value, key) => (productData[key] = value));
+//         formData.forEach((value, key) => {
+//             if (!value || value === 'undefined') return;
+//             productData[key] = value;
+//         });
+
+//         // ✅ Extract Image File Names
+//         const images = [];
+//         for (let i = 1; i <= 3; i++) {
+//             let fileInput = formData.get(`prod_img${i}`);
+//             if (fileInput && fileInput.name) {
+//                 images.push(fileInput.name);
+//             }
+//         }
+
+//         console.log("Final Collected Data:", { categoryId, productData, images });
+
+//         if (!categoryId || Object.keys(productData).length === 0) {
+//             alert('Error: Missing required product details.');
+//             return;
+//         }
 
 //         try {
 //             const response = await fetch('/product/add', {
 //                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify({ categoryName, productData })
+//                 body: JSON.stringify({ categoryId, productData, images }),
+//                 headers: { 'Content-Type': 'application/json' }
 //             });
 
 //             const result = await response.json();
@@ -281,98 +427,6 @@ async function fetchFieldTypes(tableName) {
 //         }
 //     });
 // }
-
-async function generateForm(fields, categoryName, categoryId) {
-    const formContainer = document.getElementById('product-form-container');
-    formContainer.innerHTML = `<h3>Add Product to ${categoryName}</h3>`;
-
-    const form = document.createElement('form');
-    form.id = 'product-form';
-    form.enctype = 'multipart/form-data';
-
-    // Get Table Name
-    let tableName = categoryName.toLowerCase().replace(/\s+/g, '_');
-
-    // Fetch primary key dynamically
-    let primaryKey = await fetchPrimaryKey(tableName);
-    let newProductId = await fetchLastProductId(tableName, primaryKey);
-
-    // ✅ Hidden Category ID Field
-    form.appendChild(createHiddenField('categoryId', categoryId));
-
-    // ✅ Read-Only Product ID Field
-    form.appendChild(createReadOnlyField("Product ID", primaryKey, newProductId));
-
-    // ✅ Read-Only Category ID Field
-    form.appendChild(createReadOnlyField("Category ID", "CY_ID", categoryId));
-
-    // ✅ Generate fields dynamically with correct input types
-    fields.forEach(field => {
-        if (field.name === primaryKey || field.name === "CY_ID") return;
-        form.appendChild(createInputField(field));
-    });
-
-    // ✅ Image Upload Fields
-    for (let i = 1; i <= 3; i++) {
-        form.appendChild(createFileInputField(`Upload Image ${i}`, `prod_img${i}`));
-    }
-
-    // ✅ Submit Button
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Add Product';
-    submitButton.type = 'submit';
-    submitButton.className = 'btn';
-    form.appendChild(submitButton);
-
-    formContainer.appendChild(form);
-
-    // ✅ Handle Form Submission
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(form);
-
-        const productData = {};
-        formData.forEach((value, key) => {
-            if (!value || value === 'undefined') return;
-            productData[key] = value;
-        });
-
-        // ✅ Extract Image File Names
-        const images = [];
-        for (let i = 1; i <= 3; i++) {
-            let fileInput = formData.get(`prod_img${i}`);
-            if (fileInput && fileInput.name) {
-                images.push(fileInput.name);
-            }
-        }
-
-        console.log("Final Collected Data:", { categoryId, productData, images });
-
-        if (!categoryId || Object.keys(productData).length === 0) {
-            alert('Error: Missing required product details.');
-            return;
-        }
-
-        try {
-            const response = await fetch('/product/add', {
-                method: 'POST',
-                body: JSON.stringify({ categoryId, productData, images }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                alert('Product added successfully!');
-                form.reset();
-            } else {
-                alert('Error: ' + result.error);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to add product.');
-        }
-    });
-}
 
 
 // ✅ Create a Read-Only Field

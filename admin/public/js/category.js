@@ -23,49 +23,16 @@ const fetchCategories = async () => {
                     <td>${category.category_id}</td>
                     <td id="cat-name-${category.category_id}">${category.category_name}</td>
                     <td>${category.category_desc ? category.category_desc : 'No description'}</td>
-                    <td><img src="/uploads/${category.category_image}" alt="${category.category_name}" width="50"></td>
                     <td>
-                        <button class="btn" onclick="openUpdateModal('${category.category_id}', '${category.category_name}')">Update</button>
-                        <button class="btn" onclick="openSubcategoryModal('${category.category_id}')">Add Subcategory</button>
-
+                        <img src="/images/${category.category_image}" alt="${category.category_name}" width="50">
+                    </td>
+                    <td>
+                        <button class="btn" onclick="openUpdateModal('${category.category_id}', '${category.category_name}', '${category.category_desc ? category.category_desc : ''}', '${category.category_image ? category.category_image : ''}')">Update</button>
+                        <button class="btn" onclick="removeCategory('${category.category_id}')">Remove</button>
                     </td>
                 </tr>
             `;
 
-            // Display Subcategories
-            Object.values(category.subcategories).forEach(sub => {
-                let imageSrc = sub.subcategory_image ? `/uploads/${sub.subcategory_image}` : "/default-image.png"; // Handle missing image
-
-                row += `
-                    <tr>
-                        <td>${sub.subcategory_id}</td>
-                        <td id="sub-name-${sub.subcategory_id}">${sub.subcategory_name}</td>
-                        <td id="sub-desc-${sub.subcategory_id}">${sub.subcategory_desc ? sub.subcategory_desc : 'No description available'}</td>
-                        <td><img src="/uploads/${sub.subcategory_image}" alt="${sub.subcategory_name}" width="50"></td>
-                        <td>
-                            <button class="btn" onclick="opensubUpdateModal('${sub.subcategory_id}', '${sub.subcategory_name}', '${sub.subcategory_desc}')">Update</button>
-                            <button class="btn" onclick="deleteSubCategory('${sub.subcategory_id}')">Delete</button>
-                           <button class="btn" onclick="openSubSubcategoryModal('${sub.subcategory_id}')">Add Sub-Subcategory</button>
-                        </td>
-                    </tr>
-                `;
-
-                // Display Sub-Subcategories
-                Object.values(sub.subsubcategories).forEach(subsub => {
-                    row += `
-                        <tr>
-                            <td> ${subsub.subsubcategory_id}</td>
-                            <td id="subsub-name-${subsub.subsubcategory_id}"> ${subsub.subsubcategory_name}</td>
-                            <td><img src="/uploads/${subsub.subsubcategory_image}" alt="${subsub.subsubcategory_name}" width="50"></td>
-                            <td>
-                                <button class="btn" onclick="openUpdateSubSubModal('${subsub.subsubcategory_id}', '${subsub.subsubcategory_name}')">Update</button>
-
-                                <button class="btn" onclick="deleteSubSubcategory('${subsub.subsubcategory_id}')">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
 
             tableBody.innerHTML += row;
         });
@@ -73,6 +40,21 @@ const fetchCategories = async () => {
         console.error('Error fetching categories:', error);
     }
 };
+
+function handleCategoryChange() {
+    fetch('/category/get-categories') // ✅ Fetch categories from backend
+        .then(response => response.json())
+        .then(categories => {
+            const categoryDropdowns = document.querySelectorAll(".category-dropdown"); // Select all dropdowns
+            categoryDropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Category</option>'; // Reset dropdown
+                categories.forEach(cat => {
+                    dropdown.innerHTML += `<option value="${cat.CY_ID}">${cat.CY_NAME}</option>`;
+                });
+            });
+        })
+        .catch(error => console.error('❌ Error fetching categories:', error));
+}
 
 // Call the function when the page loads
 window.onload = fetchCategories;
@@ -115,63 +97,47 @@ document.getElementById("category-form").addEventListener("submit", async functi
     }
 });
 
-// function updateCategory(categoryId) {
-//     const newName = prompt("Enter new category name:");
-//     if (!newName || newName.trim() === "") {
-//         alert("Category name cannot be empty!");
-//         return;
-//     }
-  
-//     fetch(`/category/categories/${categoryId}`, {
-//         method: 'PUT',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ cy_name: newName })
-//     })
+function removeCategory(categoryId) {
+    fetch(`/category/rcategories/${encodeURIComponent(categoryId)}`, { method: "PUT" })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // ✅ Show success message
+            
+            // ✅ Hide the category from the UI
+            document.getElementById(`category-row-${categoryId}`).style.display = "none";
+        })
+        .catch(error => console.error("❌ Error removing category:", error));
+}
+
+
+// function deleteCategory(categoryId) {
+//     if (!confirm("Are you sure you want to delete this category? All related subcategories will also be removed!")) return;
+    
+//     fetch(`/category/categories/${categoryId}`, { method: 'DELETE' })
 //     .then(response => response.json())
 //     .then(data => {
-//         alert("Category updated successfully!");
+//         alert("Category deleted successfully!");
 //         fetchCategories(); // Refresh category list
 //     })
-//     .catch(error => console.error('Error updating category:', error));
+//     .catch(error => console.error('Error deleting category:', error));
 // }
 
-function deleteCategory(categoryId) {
-    if (!confirm("Are you sure you want to delete this category? All related subcategories will also be removed!")) return;
-    
-    fetch(`/category/categories/${categoryId}`, { method: 'DELETE' })
-    .then(response => response.json())
-    .then(data => {
-        alert("Category deleted successfully!");
-        fetchCategories(); // Refresh category list
-    })
-    .catch(error => console.error('Error deleting category:', error));
-}
+function openUpdateModal(categoryId, categoryName, categoryDesc, categoryImage) {
+    document.getElementById("updateCategoryModal").classList.remove("hidden");
+    document.getElementById("updateCategoryId").value = categoryId;
+    document.getElementById("updateCategoryName").value = categoryName;
+    document.getElementById("updateCategoryDescription").value = categoryDesc ? categoryDesc : ""; // Prevents undefined
 
-// Open Update Modal and Fill Form Fields
-function openUpdateModal(categoryId, currentName, currentDescription) {
-    // Ensure modal exists before updating values
-    const modal = document.getElementById('updateCategoryModal');
-    if (!modal) {
-        console.error("Modal not found!");
-        return;
-    }
-
-    document.getElementById('updateCategoryId').value = categoryId;
-    document.getElementById('updateCategoryName').value = currentName;
-
-    const descriptionField = document.getElementById('updateCategoryDesc'); // Ensure ID matches HTML
-    if (descriptionField) {
-        descriptionField.value = currentDescription || ''; // Set description, fallback to empty
+    // Show existing image name
+    if (categoryImage) {
+        document.getElementById("updateCategoryImageName").innerText = `Current Image: ${categoryImage}`;
     } else {
-        console.error("Description field not found! Make sure your textarea has id='updateCategoryDesc'");
+        document.getElementById("updateCategoryImageName").innerText = "No image uploaded";
     }
-
-    modal.style.display = 'block';
 }
 
-// Close Update Modal
 function closeUpdateModal() {
-    document.getElementById('updateCategoryModal').style.display = 'none';
+    document.getElementById("updateCategoryModal").classList.add("hidden");
 }
 
 document.getElementById('updateCategoryForm').addEventListener('submit', function(event) {
@@ -213,189 +179,160 @@ document.getElementById('updateCategoryForm').addEventListener('submit', functio
 
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    handleCategoryChange(); // Load categories in dropdown
+});
+
+// ✅ Open Add Subcategory Modal
 function openSubcategoryModal(categoryId) {
     document.getElementById('parent-category-id').value = categoryId;
     document.getElementById('subcategory-form-container').style.display = 'block';
 }
 
+// ✅ Close Add Subcategory Modal
 function closeSubcategoryModal() {
     document.getElementById('subcategory-form-container').style.display = 'none';
 }
-document.getElementById("subcategory-form").addEventListener("submit", function (event) {
+
+// ✅ Handle Form Submission for Adding Subcategory
+document.getElementById("subcategory-form").addEventListener("submit", async function (event) {
     event.preventDefault();
 
+    const categoryId = document.getElementById("prod_cat").value;
     const subcategoryName = document.getElementById("sc-name").value.trim();
-    const subcategoryDescription = document.getElementById("sc-desc").value.trim();
-    const categoryId = document.getElementById("parent-category-id").value;
+    const subcategoryDesc = document.getElementById("sc-desc").value.trim();
     const subcategoryImage = document.getElementById("sc-image").files[0];
 
-    if (!subcategoryName || !subcategoryDescription || !categoryId || !subcategoryImage) {
+    // ✅ Validation: Ensure all required fields are filled
+    if (!categoryId || !subcategoryName || !subcategoryDesc || !subcategoryImage) {
         alert("⚠ All fields are required!");
         return;
     }
 
-    let formData = new FormData();
-    formData.append("sub_name", subcategoryName);
-    formData.append("sub_desc", subcategoryDescription);
+    // ✅ Prepare FormData
+    const formData = new FormData();
     formData.append("cy_id", categoryId);
+    formData.append("sub_name", subcategoryName);
+    formData.append("sub_desc", subcategoryDesc);
     formData.append("sub_image", subcategoryImage);
 
-    fetch("/category/subcategories", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert("❌ Error: " + data.error);
+    try {
+        const response = await fetch("/category/subcategories", {
+            method: "POST",
+            body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert("✅ Subcategory Added Successfully!");
+            document.getElementById("subcategory-form").reset();
+            fetchSubcategories(); // Refresh subcategory list
         } else {
-            alert("✅ Subcategory Added: " + data.sub_id);
-            closeSubcategoryModal();
-            fetchCategories(); // Refresh subcategory list without reloading
+            alert("❌ Error: " + result.error);
+        }
+    } catch (error) {
+        console.error("❌ Error adding subcategory:", error);
+        alert("❌ Something went wrong. Try again.");
+    }
+});
+
+
+// ✅ Fetch Subcategories and Display in the Table Based on Selected Category
+function fetchSubcategories() {
+    const categoryId = document.getElementById("prod_cat1").value;
+
+    if (!categoryId) {
+        console.warn("⚠ Please select a category to fetch subcategories.");
+        return;
+    }
+
+    fetch(`/category/subcategories/${categoryId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(subcategories => {
+        console.log("✅ Subcategories:", subcategories); // Debugging
+        const subcategoryTable = document.getElementById("subcat-list");
+        subcategoryTable.innerHTML = ""; 
+
+        if (subcategories.length > 0) {
+            subcategories.forEach(sub => {
+                let row = `
+                    <tr>
+                        <td>${sub.sub_id}</td>
+                        <td>${sub.sub_name}</td>
+                        <td>${sub.sub_desc || 'No description'}</td>
+                        <td><img src="/images/${sub.sub_image}" alt="${sub.sub_name}" width="50"></td> 
+                        <td>${categoryId}</td>
+                        <td>
+                            <button class="btn" onclick="openUpdateSubModal('${sub.sub_id}', '${sub.sub_name}', '${sub.sub_desc}')">Update</button>
+                            <button class="btn" onclick="deleteSubcategory('${sub.sub_id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                subcategoryTable.innerHTML += row;
+            });
+        } else {
+            subcategoryTable.innerHTML = `<tr><td colspan="5">No subcategories found for this category.</td></tr>`;
         }
     })
-    .catch(error => console.error("❌ Error adding subcategory:", error));
-});
+    .catch(error => console.error('❌ Error fetching subcategories:', error));
 
-
-function opensubUpdateModal(subcategoryId, subcategoryName, subcategoryDesc) {
-    const modal = document.getElementById("update-subcategory-modal");
-    if (!modal) {
-        console.error("Modal not found!");
-        return;
-    }
-
-    document.getElementById("update-sub-id").value = subcategoryId;
-    document.getElementById("update-sub-name").value = subcategoryName;
-
-    const descriptionField = document.getElementById("update-sub-desc");
-    if (descriptionField) {
-        descriptionField.value = subcategoryDesc || "";
-    } else {
-        console.error("Description field not found! Make sure your textarea has id='update-sub-desc'");
-    }
-
-    modal.style.display = "block";
 }
 
-function closesubUpdateModal() {
-    document.getElementById("update-subcategory-modal").style.display = "none";
+// ✅ Auto Fetch Subcategories When Category is Selected
+document.getElementById("prod_cat1").addEventListener("change", fetchSubcategories);
+
+
+function openUpdateSubModal(subId, subName, subDesc) {
+    document.getElementById("updateSubcategoryModal").classList.remove("hidden");
+    document.getElementById("updateSubcategoryId").value = subId;
+    document.getElementById("updateSubcategoryName").value = subName;
+    document.getElementById("updateSubcategoryDescription").value = subDesc || "";
 }
 
-document.getElementById("update-subcategory-form").addEventListener("submit", function (event) {
+// Close update subcategory modal
+function closeUpdateSubModal() {
+    document.getElementById("updateSubcategoryModal").classList.add("hidden");
+}
+
+// Handle Form Submission
+document.getElementById('updateSubcategoryForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
-    const subcategoryId = document.getElementById("update-sub-id").value;
-    const subcategoryName = document.getElementById("update-sub-name").value.trim();
-    const subcategoryDescription = document.getElementById("update-sub-desc").value;
-    const subcategoryImage = document.getElementById("update-sub-image").files[0];
+    const subId = document.getElementById('updateSubcategoryId').value;
+    const subName = document.getElementById('updateSubcategoryName').value;
+    const subDesc = document.getElementById('updateSubcategoryDescription').value;
+    const subImage = document.getElementById('updateSubcategoryImage').files[0];
 
-    if (!subcategoryName) {
+    if (!subName.trim()) {
         alert("Subcategory name cannot be empty!");
         return;
     }
 
     const formData = new FormData();
-    formData.append('sub_id', subcategoryId);
-    formData.append("sub_name", subcategoryName);
-    formData.append("sub_desc", subcategoryDescription);
-
-    if (subcategoryImage) {
-        formData.append("sub_image", subcategoryImage);
+    formData.append('sub_name', subName);
+    formData.append('sub_desc', subDesc);
+    if (subImage) {
+        formData.append('sub_image', subImage);
     }
 
-    fetch(`/category/subcategories/${subcategoryId}`, {
-        method: "PUT",
-        body: formData,
-    })
-        .then((response) => {
-            if (!response.ok) {
-                return response.text().then((text) => {
-                    throw new Error(text);
-                });
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log("✅ Update Response:", data);
-            alert(data.message);
-            closesubUpdateModal();
-            fetchCategories(); // Refresh category list
-        })
-        .catch((error) => console.error("❌ Error updating subcategory:", error));
-});
-
-
-
-// Open Update Modal and Pre-fill Fields
-// function openUpdateSubModal(subcategoryId, subcategoryName,subcategoryDesc) {
-//     document.getElementById("update-sub-id").value = subcategoryId;
-//     document.getElementById("update-sub-name").value = subcategoryName;
-//     document.getElementById("update-sub-desc").value = subcategoryDesc;
-
-//     document.getElementById("update-subcategory-modal").style.display = "block";
-// }
-
-// // Close Update Modal
-// function closeUpdateSubModal() {
-//     document.getElementById('update-subcategory-modal').style.display = 'none';
-// }
-
-// // Function to Update Subcategory
-// function updateSubCategory(subcategoryId) {
-//     console.log("Subcategory ID:", subcategoryId);
-    
-//     const subNameElement = document.querySelector(`#sub-name-${subcategoryId}`);
-//     const subDescElement = document.querySelector(`#sub-desc-${subcategoryId}`); // Fetch description
-
-//     if (!subNameElement || !subDescElement) {
-//         alert("Subcategory name or description element not found!");
-//         return;
-//     }
-
-//     const currentName = subNameElement.textContent.trim();
-//     const currentDesc = subDescElement.textContent.trim();
-
-//     console.log("Subcategory Name:", currentName);
-//     console.log("Subcategory Description:", currentDesc);
-
-//     openUpdateSubModal(subcategoryId, currentName, currentDesc);
-// }
-
-
-
-// Submit Update Subcategory Form
-document.getElementById('update-subcategory-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const subcategoryId = document.getElementById('update-sub-id').value;
-    const subcategoryName = document.getElementById('update-sub-name').value;
-    const subcategoryImage = document.getElementById('update-sub-image').files[0];
-
-    if (!subcategoryName || subcategoryName.trim() === "") {
-        alert("Subcategory name cannot be empty!");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('sub_name', subcategoryName);
-
-    if (subcategoryImage) {
-        formData.append('sub_image', subcategoryImage);
-    }
-
-    fetch(`/category/subcategories/${subcategoryId}`, {
+    fetch(`/category/subcategories/${subId}`, {
         method: 'PUT',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        closeUpdateSubModal();
-        fetchCategories(); // Refresh category list
-    })
-    .catch(error => console.error('Error updating subcategory:', error));
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            closeUpdateSubModal();
+            fetchSubcategories(); // Refresh the table
+        })
+        .catch(error => console.error('Error updating subcategory:', error));
 });
+
 
 // Delete Subcategory
 function deleteSubCategory(subId) {
@@ -410,174 +347,219 @@ function deleteSubCategory(subId) {
         })
         .then(data => {
             alert("Subcategory deleted successfully!");
-            fetchCategories(); // Refresh category list
+            fetchsubCategories(); // Refresh category list
         })
         .catch(error => console.error('Error deleting subcategory:', error));
 }
 
   
 // Fetch and Populate Subcategories for a Specific Category
-function fetchSubCategory(categoryId) {
-    console.log('Fetching subcategories for category:', categoryId);
+// function fetchSubCategory(categoryId) {
+//     console.log('Fetching subcategories for category:', categoryId);
+
+//     fetch(`/category/subcategories/${categoryId}`)
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`HTTP error! status: ${response.status}`);
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log('Fetched Subcategories:', data);
+//             const subcategorySelect = document.getElementById('parent-subcategory');
+
+//             // Clear existing options
+//             subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+
+//             // Populate Dropdown with Subcategories
+//             data.forEach(subcategory => {
+//                 const option = document.createElement('option');
+//                 option.value = subcategory.sub_id;
+//                 option.textContent = subcategory.sub_name;
+//                 subcategorySelect.appendChild(option);
+//             });
+//         })
+//         .catch(error => console.error('Error fetching subcategories:', error));
+// }
+function handleSubCategoryChange(dropdownId, subcategoryDropdownId) {
+    const categoryId = document.getElementById(dropdownId).value;
+    const subcategoryDropdown = document.getElementById(subcategoryDropdownId);
+
+    if (!categoryId) {
+        subcategoryDropdown.innerHTML = '<option value="">Select a category first</option>';
+        return;
+    }
 
     fetch(`/category/subcategories/${categoryId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Fetched Subcategories:', data);
-            const subcategorySelect = document.getElementById('parent-subcategory');
-
-            // Clear existing options
-            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-
-            // Populate Dropdown with Subcategories
-            data.forEach(subcategory => {
-                const option = document.createElement('option');
-                option.value = subcategory.sub_id;
-                option.textContent = subcategory.sub_name;
-                subcategorySelect.appendChild(option);
+        .then(response => response.json())
+        .then(subcategories => {
+            subcategoryDropdown.innerHTML = '<option value="">Select Subcategory</option>';
+            subcategories.forEach(sub => {
+                subcategoryDropdown.innerHTML += `<option value="${sub.sub_id}">${sub.sub_name}</option>`;
             });
         })
-        .catch(error => console.error('Error fetching subcategories:', error));
+        .catch(error => console.error('❌ Error fetching subcategories:', error));
 }
 
+// ✅ Fetch Sub-Subcategories for the table based on second subcategory selection
+function fetchSubSubcategories() {
+    const subcategoryId = document.getElementById("prod_subcat1").value;
 
-// Show the Form and Set Selected Subcategory
+    if (!subcategoryId) {
+        console.warn("⚠ Please select a subcategory to fetch sub-subcategories.");
+        return;
+    }
+
+    fetch(`/category/subsubcategories/${subcategoryId}`)
+        .then(response => response.json())
+        .then(subsubcategories => {
+            const subsubTable = document.getElementById("subsubcat-list");
+            subsubTable.innerHTML = ""; // Clear existing rows
+
+            if (subsubcategories.length > 0) {
+                subsubcategories.forEach(ssc => {
+                    let row = `
+                        <tr>
+                            <td>${ssc.ss_id}</td>
+                            <td>${ssc.ss_name}</td>
+                            <td>${ssc.ss_desc || 'No description'}</td>
+                            <td><img src="/images/${ssc.ss_image}" alt="${ssc.ss_name}" width="50"></td>
+                            <td>${subcategoryId}</td>
+                            <td>
+                                <button class="btn" onclick="openUpdateSubSubModal('${ssc.ss_id}', '${ssc.ss_name}', '${ssc.ss_desc}')">Update</button>
+                                <button class="btn" onclick="deleteSubSubcategory('${ssc.ss_id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    subsubTable.innerHTML += row;
+                });
+            } else {
+                subsubTable.innerHTML = `<tr><td colspan="6">No sub-subcategories found for this subcategory.</td></tr>`;
+            }
+        })
+        .catch(error => console.error("❌ Error fetching sub-subcategories:", error));
+}
+
+// ✅ Add event listeners for category selection
+document.getElementById("prod_cate").addEventListener("change", () => {
+    handleSubCategoryChange("prod_cate", "prod_subcat");
+});
+
+document.getElementById("prod_cate_table").addEventListener("change", () => {
+    handleSubCategoryChange("prod_cate_table", "prod_subcat1");
+});
+
+document.getElementById("prod_subcat1").addEventListener("change", fetchSubSubcategories);
+
+
 function openSubSubcategoryModal(subcategoryId) {
-    document.getElementById('parent-sub-id').value = subcategoryId;
-    document.getElementById('subsubcategory-form-container').style.display = 'block';
+    document.getElementById("parent-subcategory-id").value = subcategoryId;
+    document.getElementById("subsubcategory-form-container").style.display = "block";
 }
+
 function closeSubSubcategoryModal() {
-    document.getElementById('subsubcategory-form-container').style.display = 'none';
+    document.getElementById("subsubcategory-form-container").style.display = "none";
 }
 
-document.getElementById('subcategory-form').addEventListener('submit', function(event) {
+document.getElementById("subsubcategory-form").addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const name = document.getElementById('sc-name').value;
-    const description = document.getElementById('sc-desc').value; // ✅ Fetch Description
-    const categoryId = document.getElementById('parent-category-id').value;
-    const image = document.getElementById('sc-image').files[0];
+    const subcategoryId = document.getElementById("prod_subcat").value;
+    const ssName = document.getElementById("ssc-name").value.trim();
+    const ssDesc = document.getElementById("ssc-desc").value.trim();
+    const ssImage = document.getElementById("ssc-image").files[0];
 
-    if (!name || !description || !categoryId || !image) {
-        alert("All fields are required!");
+    if (!subcategoryId || !ssName || !ssDesc || !ssImage) {
+        alert("⚠ All fields are required!");
         return;
     }
 
     const formData = new FormData();
-    formData.append('sub_name', name);
-    formData.append('sub_desc', description); // ✅ Ensure Description is Sent
-    formData.append('cy_id', categoryId);
-    formData.append('sub_image', image);
+    formData.append("sub_id", subcategoryId);
+    formData.append("ss_name", ssName);
+    formData.append("ss_desc", ssDesc);
+    formData.append("ss_image", ssImage);
 
-    fetch('/category/subcategories', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        closeSubcategoryModal();
-        fetchCategories(); // Refresh category list
-        document.getElementById('subcategory-form').reset(); // ✅ Reset form properly
-    })
-    .catch(error => console.error('Error adding subcategory:', error));
+    try {
+        const response = await fetch("/category/subsubcategories", {
+            method: "POST",
+            body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert("✅ Sub-Subcategory Added Successfully!");
+            document.getElementById("subsubcategory-form").reset();
+            fetchSubSubcategories(); // Refresh table
+        } else {
+            alert("❌ Error: " + result.error);
+        }
+    } catch (error) {
+        console.error("❌ Error adding sub-subcategory:", error);
+        alert("❌ Something went wrong. Try again.");
+    }
 });
 
 
-// Function to Open Update Modal for Sub-Subcategory
-function openUpdateSubSubModal(subsubcategoryId, subsubcategoryName) {
-    console.log("Sub-Subcategory ID:", subsubcategoryId);
 
-    // Get modal elements
-    const ssIdElement = document.getElementById('update-ss-id');
-    const ssNameElement = document.getElementById('update-ss-name');
 
-    // Debugging logs
-    console.log("Sub-Subcategory ID Element:", ssIdElement);
-    console.log("Sub-Subcategory Name Element:", ssNameElement);
-
-    // Check if elements exist
-    if (!ssIdElement || !ssNameElement) {
-        console.error("Modal elements not found!");
-        return;
-    }
-
-    // Set values in modal
-    ssIdElement.value = subsubcategoryId;
-    ssNameElement.value = subsubcategoryName;
-
-    // Show the modal
-    document.getElementById('update-subsubcategory-modal').style.display = 'block';
+// ✅ Open Update Modal and Prefill Data
+function openUpdateSubSubModal(subSubcategoryId, subSubcategoryName, subSubcategoryDesc) {
+    document.getElementById("updateSubSubcategoryModal").classList.remove("hidden");
+    document.getElementById("updateSubSubcategoryId").value = subSubcategoryId;
+    document.getElementById("updateSubSubcategoryName").value = subSubcategoryName;
+    document.getElementById("updateSubSubcategoryDescription").value = subSubcategoryDesc || ""; 
 }
 
-
-// Close Update Modal
+// ✅ Close Modal
 function closeUpdateSubSubModal() {
-    document.getElementById('update-subsubcategory-modal').style.display = 'none';
+    document.getElementById("updateSubSubcategoryModal").classList.add("hidden");
 }
 
-
-
-// Handle Update Form Submission
-document.getElementById('update-subsubcategory-form').addEventListener('submit', function(event) {
+// ✅ Handle Update Form Submission
+document.getElementById("updateSubSubcategoryForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const subsubcategoryId = document.getElementById('update-ss-id').value;
-    const subsubcategoryName = document.getElementById('update-ss-name').value;
-    const subsubcategoryImage = document.getElementById('update-ss-image').files[0];
+    const ssId = document.getElementById("updateSubSubcategoryId").value;
+    const ssName = document.getElementById("updateSubSubcategoryName").value.trim();
+    const ssDesc = document.getElementById("updateSubSubcategoryDescription").value.trim();
+    const ssImage = document.getElementById("updateSubSubcategoryImage").files[0];
 
-    // Validation: Check if Sub-Subcategory Name is not empty
-    if (!subsubcategoryName || subsubcategoryName.trim() === "") {
-        alert("Sub-Subcategory name cannot be empty!");
+    if (!ssName) {
+        alert("⚠ Sub-Subcategory name cannot be empty!");
         return;
     }
 
-    // Create FormData to send data including optional image
     const formData = new FormData();
-    formData.append('ss_name', subsubcategoryName);
-
-    // Append Image only if a new one is selected
-    if (subsubcategoryImage) {
-        formData.append('ss_image', subsubcategoryImage);
+    formData.append("ss_name", ssName);
+    formData.append("ss_desc", ssDesc);
+    if (ssImage) {
+        formData.append("ss_image", ssImage);
     }
 
-    // Send PUT request to update the Sub-Subcategory
-    fetch(`/category/subsubcategories/${subsubcategoryId}`, {
-        method: 'PUT',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        closeUpdateSubSubModal(); // Close the Modal
-        fetchCategories(); // Refresh Sub-Subcategory list
-    })
-    .catch(error => console.error('Error updating sub-subcategory:', error));
+    try {
+        console.log(`Updating Sub-Subcategory ID: ${ssId}`);
+        const response = await fetch(`/category/subsubcategories/${ssId}`, {
+            method: "PUT",
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log("Server Response:", result);
+
+        if (response.ok) {
+            alert("✅ Sub-Subcategory Updated Successfully!");
+            closeUpdateSubSubModal();
+            fetchSubSubcategories(); // ✅ Refresh Table
+        } else {
+            alert("❌ Error: " + (result.error || "Failed to update sub-subcategory"));
+        }
+    } catch (error) {
+        console.error("❌ Error updating sub-subcategory:", error);
+        alert("❌ Something went wrong. Try again.");
+    }
 });
 
-// Function to Update Sub-Subcategory
-function updateSubSubCategory(subsubcategoryId) {
-    console.log("Sub-Subcategory ID:", subsubcategoryId);
-
-    const subSubNameElement = document.querySelector(`#subsub-name-${subsubcategoryId}`);
-    console.log("Sub-Subcategory Name Element:", subSubNameElement);
-    
-    if (!subSubNameElement) {
-        alert("Sub-Subcategory name element not found!");
-        return;
-    }
-    
-    const currentName = subSubNameElement.textContent;
-    openUpdateSubSubModal(subsubcategoryId, currentName);
-}
-
-// Make the function globally accessible
-window.updateSubSubCategory = updateSubSubCategory;
 
 
 function deleteSubSubcategory(ssId) {

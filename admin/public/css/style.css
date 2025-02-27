@@ -89,6 +89,27 @@ img { max-width: 50px; height: auto; }
   display: flex;
   flex: 0 0 50%;
 }
+#btnScrollToTop {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(148, 148, 243, 0.5);
+  box-shadow: 0 0 10px rgb(0, 0, 0, 0, 0.25);
+  color: rgb(15, 15, 15);
+  outline: none;
+}
+
+#btnScrollToTop:active {
+  background: rgba(51, 51, 59, 0.2);
+}
+
+#btnScrollToTop:hover {
+  background-color: #000066;
+}
+
 /* START ASIDE */
 aside {
   height: 100vh;
@@ -144,11 +165,11 @@ aside .sidebar p img {
   font-size: 1.6rem;
   transition: all 300ms ease;
 }
-aside .sidebar p:last-child {
+/* aside .sidebar p:last-child {
   position: absolute;
   bottom: 0;
   width: 100%;
-}
+} */
 aside .sidebar p.active-tab{
   background: var(--color-light);
   color: var(--color-primary);
@@ -416,7 +437,7 @@ aside .sidebar p:hover span {
 .tab_body{
   margin-top: 3rem;
 }
-.form-group label {
+/* .form-group label {
   font-size: 1.2rem;
   display: block;
   margin-top: 10px;
@@ -428,7 +449,7 @@ aside .sidebar p:hover span {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
+} */
 
 .btn {
   display: inline-block;
@@ -455,13 +476,11 @@ aside .sidebar p:hover span {
   margin-bottom: 20px;
 } */
 
-table {
+/* table {
   margin-top: 2rem;
   width: 100%;
-  /* border-collapse: collapse; */
   background-color: #FFF;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  /* border: 1px solid #1d163e; */
   font-size: 1.2rem;
   color: var(--color-dark);
 }
@@ -469,15 +488,43 @@ th, td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
-}
-/* input[type=text]{
-  border: 2px solid black;
-  padding: 10px;
-  font-size: 1.2rem;
-  border-radius: var(--border-radius-2);
-  width: 30%;
-  margin-top: 2rem;
 } */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+  box-shadow: var(--box-shadow);
+  border-radius: var(--card-border-radius);
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: var(--color-dark);
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-light);
+}
+
+th {
+  background: var(--color-light);
+  font-weight: 600;
+}
+
+td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--border-radius-1);
+  margin-right: 10px;
+}
+
+tr:hover {
+  background: var(--color-info-light);
+  transition: background 0.3s ease;
+}
+
 .button{
   background-color: #7380ec;
   font-size: 1.2rem;
@@ -678,38 +725,185 @@ table {
   border-color: #007bff;
 }
 
-.form_container{
+
+
+
+
+.hidden{
   display: none;
-  position: fixed; 
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
 }
-
-.btn-2{
-  background-color: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;
+.block{
+  display: block;
 }
-.btn-cancle{
-  background-color: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;
-}
-
-.form-h2{
-  text-align: center; margin-bottom: 20px;
-}
-form label{
-  display: block; margin-bottom: 5px;
-}
-.form-group{
+/* 🔹 Title */
+.section-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 15px;
 }
-.form-input{
-  width: 100%; padding: 5px;
+
+/* 🔹 Form Container */
+.form-container {
+  padding: 20px;
+  /* background: #f9f9f9; */
+  border-radius: 10px;
 }
 
-/* END RIGHT SECTION */
+/* 🔹 Input Group */
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+/* 🔹 Labels */
+.input-group label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+/* 🔹 Inputs */
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+/* 🔹 Input Hover & Focus */
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* 🔹 Textarea */
+.input-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* 🔹 File Upload */
+.file-upload input {
+  padding: 5px;
+}
+
+/* 🔹 Submit Button */
+.btn-submit {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  font-size: 18px;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  background: #0056b3;
+}
+
+.form-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.category-section,.subcategory-section,.subsubcategory-section {
+  width: 48%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Hide Update Category Form Initially */
+.hidden {
+  display: none;
+}
+
+/* Buttons */
+.btn-submit, .btn-cancel {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn-submit {
+  background: #007bff;
+  color: white;
+  border: none;
+}
+
+.btn-submit:hover {
+  background: #0056b3;
+}
+
+.btn-cancel {
+  background: red;
+  color: white;
+  border: none;
+}
+
+.btn-cancel:hover {
+  background: darkred;
+}
+
+.form-container1 {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.form-group  label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.form-group input, .form-group select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.form-group .image-upload-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.form-group .image-upload-container input {
+  width: 100%;
+}
+#categoriesDropdown a,#productDropdown a{
+ margin-left: 4rem;
+}
+#categoriesDropdown a:not(:first-child),#productDropdown a:not(:first-child){
+  margin-top: 1rem;
+}
+/* 🔹 Responsive Design */
+@media (max-width: 600px) {
+  .category-section {
+      max-width: 90%;
+  }
+}
 
 /* START MEDIA QUERIES */
 /* TABLETS AND SMALL LAPTOPS */

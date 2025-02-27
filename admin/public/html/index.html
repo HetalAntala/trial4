@@ -30,29 +30,64 @@
               <!-- <span class="fa-solid fa-house"></span> -->
               <img src="../ad-images/icon/dashboard.png" alt="">Dashboard
             </p>
+            <p class="account__tab"  onclick="toggleDropdown('productDropdown')">
+              <img src="../ad-images/icon/new-product.png" alt=""> Product
+              <i class="fas fa-chevron-down ml-2"></i>
+            </p>
+            <div class="hidden" id="productDropdown">
+              <a class="block" onclick="showSection('viewproduct')" data-target="#viewproduct">
+               View
+              </a>
+              <a class="block" onclick="showSection('addproduct')" data-target="#addproduct">
+              Add
+              </a>
+             </div>
+             <p class="account__tab" data-target="#orders">
+              <img src="../ad-images/icon/order.png" alt=""> Orders
+            </p>
+             <p class="account__tab" onclick="toggleDropdown('categoriesDropdown')">
+              <img src="../ad-images/icon/list.png" alt=""> Category
+              <i class="fas fa-chevron-down ml-2"></i> 
+            </p>
+            <div class="hidden" id="categoriesDropdown">
+              <a class="block" onclick="showSection('category')" data-target="#category">
+               Main Categories
+              </a>
+              <a class="block" onclick="showSection('subcategory')" data-target="#subcategory">
+               Sub Categories
+              </a>
+              <a class="block" onclick="showSection('subsubcategory')" data-target="#subsubcategory">
+               SubSub Categories
+               </a>
+             </div>
+            
             <p class="account__tab" data-target="#customer">
               <img src="../ad-images/icon/user.png" alt="">Customer
             </p>
-            <p class="account__tab" data-target="#orders">
-              <img src="../ad-images/icon/order.png" alt=""> Orders
-            </p>
-            <p class="account__tab" data-target="#analytics">
+           
+            <p class="account__tab" data-target="#sales">
               <img src="../ad-images/icon/statistics.png" alt=""> Analytics
             </p>
-            <p class="account__tab" data-target="#category">
-              <img src="../ad-images/icon/list.png" alt=""> Category
-            </p>
-            <p class="account__tab" data-target="#product">
-              <img src="../ad-images/icon/new-product.png" alt=""> Product
-            </p>
+           
             <p class="account__tab" data-target="#report">
               <img src="../ad-images/icon/report.png" alt="">Report
             </p>
             <p class="account__tab" data-target="#review">
               <img src="../ad-images/icon/review.png" alt="">Review
             </p>
-           
-            <p class="account__tab accordion-menu" data-target="#report" data-accordion-btn>
+            <p class="account__tab" data-target="#inventory">
+              <img src="../ad-images/icon/inventory.png" alt=""> Inventory
+          </p>
+          <p class="account__tab" data-target="#delivery">
+            <img src="../ad-images/icon/shipping.png" alt=""> Delivery
+        </p>
+        <p class="account__tab" data-target="#support">
+            <img src="../ad-images/icon/support.png" alt=""> Customer Support
+        </p>
+        <p class="account__tab" data-target="#inbox">
+            <img src="../ad-images/icon/inbox.png" alt=""> Inbox
+        </p>
+            <!-- <p class="account__tab accordion-menu" data-target="#report" data-accordion-btn>
               <img src="../ad-images/icon/insurance.png" alt="">Authentication
               <ul class="submenu-category-list" data-accordion>
     
@@ -73,10 +108,10 @@
                 </li>
                 </li>
               </ul>
-            </p> 
-            <p class="account__tab" data-target="#logout">
-              <img src="../ad-images/icon/logout.png" alt="">Logout
-            </p>
+            </p>  -->
+            <!-- <p class="account__tab" data-target="#logout">
+              <img src="../ad-images/icon/logout.png" alt="">Logout</button>
+            </p> -->
           </div>
         </div>
       </aside>
@@ -100,7 +135,7 @@
             <div class="nav-item">
                 <i class="fas fa-cog"></i>
             </div>
-            <div class="nav-item profile" onclick="toggleDropdown()">
+            <div class="nav-item profile" onclick="toggleDropdown1()">
               <img src="" alt="Profile Picture" class="profile-photo">
           </div>
           <div class="dropdown-menu" id="dropdownMenu">
@@ -114,7 +149,7 @@
               <ul>
                   <li><i class="fas fa-user"></i> My Profile</li>
                   <li><i class="fas fa-cog"></i> Settings</li>
-                  <li><i class="fas fa-sign-out-alt"></i> Log Out</li>
+                  <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Log Out</li>
               </ul>
           </div>
         </nav>
@@ -226,140 +261,83 @@
                     </ul>
                 </nav>
                 <div id="addcat" class="product-about active">
+                  <!-- <section class="category-section">
+                    <h2 class="section-title">Add Category</h2>
+                    <div class="form-container">
+                        <form id="category-form">
+                            <div class="input-group">
+                                <label for="cy-name">Category Name</label>
+                                <input type="text" id="cy-name" placeholder="Enter Category Name" required>
+                            </div>
+                
+                            <div class="input-group">
+                                <label for="cy-desc"> Description</label>
+                                <textarea id="cy-desc" placeholder="Enter Category Description" required></textarea>
+                            </div>
+                
+                            <div class="input-group file-upload">
+                                <label for="cy-image"> Upload Image</label>
+                                <input type="file" id="cy-image" accept="image/*">
+                            </div>
+                
+                            <button type="submit" class="btn">Add Category</button>
+                        </form>
+                    </div>
+                </section> -->
+                
                   <section>
-                    <h2>Add Category</h2>
-                    <div class="form-group">
-                      <form id="category-form">
-                          <label for="cy-name">Category Name</label>
-                          <input type="text" id="cy-name" placeholder="Enter Category Name" required>
+                    <div class="form-container">
+                      <!-- Add Category Form -->
+                      <section class="category-section">
+                          <h2 class="section-title"> Add Category</h2>
+                          <form id="category-form">
+                              <div class="input-group">
+                                  <label for="cy-name"> Category Name</label>
+                                  <input type="text" id="cy-name" placeholder="Enter Category Name" required>
+                              </div>
                   
-                          <label for="cy-desc">Description</label>
-                          <textarea id="cy-desc" placeholder="Enter Category Description" required></textarea>
+                              <div class="input-group">
+                                  <label for="cy-desc"> Description</label>
+                                  <textarea id="cy-desc" placeholder="Enter Category Description" required></textarea>
+                              </div>
                   
-                          <label for="cy-image">Upload Image</label>
-                          <input type="file" id="cy-image" accept="image/*">
+                              <div class="input-group file-upload">
+                                  <label for="cy-image"> Upload Image</label>
+                                  <input type="file" id="cy-image" accept="image/*">
+                              </div>
                   
-                          <button type="submit" class="btn">Add Category</button>
-                      </form>
-                  </div>    
-                        <!-- Update Category Modal -->
-                    <div id="updateCategoryModal" class="form_container">
-                      <h3 class="form-h2">Update Category</h3>
-                      <form id="updateCategoryForm" enctype="multipart/form-data">
-                          <input type="hidden" id="updateCategoryId">
-                          <div class="form-group">
-                            <label for="updateCategoryName">Category Name:</label>
-                            <input type="text" id="updateCategoryName" name="cy_name" placeholder="Enter Category Name" required style="width: 100%; padding: 5px;">
-                          </div>
-                          <div class="form-group">
-                            <label for="updateCategoryDescription">Category Description:</label>
-                            <textarea id="updateCategoryDescription" name="cy_desc" placeholder="Enter Category Description" style="width: 100%; padding: 5px;"></textarea>
-                        </div>
-                          <div class="form-group">
-                            <label for="updateCategoryImage">Category Image:</label>
-                            <input type="file" id="updateCategoryImage" name="cy_image" accept="image/*" style="width: 100%; padding: 5px;">
-                          </div>
-                          
-                          <button type="submit"class="btn-2"  >Update Category</button>
-                          <button type="button" class="btn-cancle" onclick="closeUpdateModal()">Cancel</button>
-                      </form>
-                    </div>
-    
-                   <!-- HTML for Subcategory Form -->
-                    <div id="subcategory-form-container" class="form_container">
-                      <h2 class="form-h2">Add Subcategory</h2>
-                      <form id="subcategory-form" enctype="multipart/form-data">
-    
-                        <input type="hidden" id="parent-category-id">
-                          <div class="form-group">
-                              <label for="sc-name">Subcategory Name:</label>
-                              <input type="text" id="sc-name" placeholder="Enter Subcategory Name" required style="width: 100%; padding: 5px;">
-                          </div>
-                          
-                          <div class="form-group">
-                            <label for="sc-desc">Subcategory Description:</label>
-                            <textarea id="sc-desc" placeholder="Enter Subcategory Description" required style="width: 100%; padding: 5px;"></textarea>
-                          </div>
-
-                          <div class="form-group">
-                              <label for="sc-image">Subcategory Image:</label>
-                              <input type="file" id="sc-image" accept="image/*" required style="width: 100%; padding: 5px;">
-                          </div>
-    
-                          <button type="submit" class="btn-2">Add Subcategory</button>
-                          <button type="button" class="btn-cancle" onclick="closeSubcategoryModal()">Cancel</button>
-                      </form>
-                    </div>
-    
-                                  <!-- Modal for Updating Subcategory -->
-                    <div id="update-subcategory-modal" class="form_container">
-                      <h2 class="form-h2">Update Subcategory</h2>
-                      <form id="update-subcategory-form" enctype="multipart/form-data">
-                          <input type="hidden" id="update-sub-id">
-                          
-                          <div class="form-group">
-                            <label for="update-sub-name">Subcategory Name:</label>
-                            <input type="text" id="update-sub-name"  name="sub_name" required style="width: 100%; padding: 5px;">
-                          </div>
-                          <div class="form-group">
-                            <label for="update-sub-desc">Category Description:</label>
-                            <textarea id="update-sub-desc" name="sub_desc" placeholder="Enter Category Description" style="width: 100%; padding: 5px;"></textarea>
-                        </div>
-                          <div class="form-group">
-                            <label for="update-sub-image">Change Image:</label>
-                          <input type="file" id="update-sub-image" name="sub_image" accept="image/*" style="width: 100%; padding: 5px;">
-                          </div>
-                         
-                          <button type="submit" class="btn-2">Update</button>
-                          <button type="button" class="btn-cancle" onclick="closeUpdateSubModal()">Cancel</button>
-                      </form>
-                    </div>
-    
-                                    <!-- Sub-Subcategory Form Modal -->
-                    <!-- Sub-Subcategory Form Modal -->
-                    <div id="subsubcategory-form-container" class="form_container">
-                      <h2 class="form-h2">Add Sub-Subcategory</h2>
-                      <form id="subsubcategory-form" enctype="multipart/form-data">
-                          
-                          <input type="hidden" id="parent-sub-id">
-                          
-                          <div class="form-group">
-                              <label for="ssc-name">Sub-Subcategory Name:</label>
-                              <input type="text" id="ssc-name" placeholder="Enter Sub-Subcategory Name" required style="width: 100%; padding: 5px;">
-                          </div>
-    
-                          <div class="form-group">
-                              <label for="ssc-image">Sub-Subcategory Image:</label>
-                              <input type="file" id="ssc-image" accept="image/*" required style="width: 100%; padding: 5px;">
-                          </div>
-    
-                          <div style="text-align: center;">
-                              <button type="submit" class="btn-2">Add Sub-Subcategory</button>
-                              <button type="button" class="btn-cancle" onclick="closeSubSubcategoryModal()" class="btn-cancle">Cancel</button>
-                          </div>
-                      </form>
-                    </div>
-    
-                    <!-- Update Sub-Subcategory Modal -->
-                    <div id="update-subsubcategory-modal" class="form_container">
-                     <h2 class="form-h2">Update Sub-Subcategory</h2>
-                      <form id="update-subsubcategory-form" enctype="multipart/form-data">
-                          <input type="hidden" id="update-ss-id">
-                          
-                          <div class="form-group">
-                            <label for="update-ss-name">Sub-Subcategory Name:</label>
-                            <input type="text" id="update-ss-name" required style="width: 100%; padding: 5px;">
-                          </div>
-                          <div class="form-group">
-                            <label for="update-ss-image">Change Image:</label>
-                            <input type="file" id="update-ss-image" accept="image/*" style="width: 100%; padding: 5px;">
-                          </div>
-                          <button type="submit" class="btn-2">Update</button>
-                          <button type="button" onclick="closeUpdateSubSubModal()"class="btn-cancle">Cancel</button>
-                      </form>
-                    </div>
-    
+                              <button type="submit" class="btn-submit"> Add Category</button>
+                          </form>
+                      </section>
                   
+                      <!-- Update Category Form (Initially Hidden) -->
+                      <section id="updateCategoryModal" class="category-section hidden">
+                        <h2 class="section-title"> Update Category</h2>
+                        <form id="updateCategoryForm" enctype="multipart/form-data">
+                            <input type="hidden" id="updateCategoryId">
+                    
+                            <div class="input-group">
+                                <label for="updateCategoryName">Category Name</label>
+                                <input type="text" id="updateCategoryName" placeholder="Enter Category Name" required>
+                            </div>
+                    
+                            <div class="input-group">
+                                <label for="updateCategoryDescription">Description</label>
+                                <textarea id="updateCategoryDescription" placeholder="Enter Category Description"></textarea>
+                            </div>
+                    
+                            <div class="input-group file-upload">
+                                <label for="updateCategoryImage">Upload Image</label>
+                                <input type="file" id="updateCategoryImage" accept="image/*">
+                                <p id="updateCategoryImageName" style="font-size: 14px; color: gray;"></p> 
+                            </div>
+                    
+                            <button type="submit" class="btn-submit">Update Category</button>
+                            <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+                        </form>
+                    </section>
+                    
+                  </div>
                       <table border="1">
                         <thead>
                             <tr>
@@ -374,9 +352,7 @@
                          
                         </tbody>
                     </table>
-                 
                   </section>
-              
                 </div>
                 <div id="addtbl" class="product-about">
                   <div class="form-group">
@@ -407,23 +383,193 @@
               </div>
              
             </div>
-            <div class="tab__content" content id="product">
-              <div class="wrapper tabbed">
-                <nav class="nav-wrap">
-                    <ul class="ul-wrapper">
-                        <li class="active"><a href="#0" class="tabbed-trigger" data-id="view1"><span>View</span></a></li>
-                        <li><a href="#0" class="tabbed-trigger" data-id="add1"><span>Add</span></a></li>
-                    </ul>
-                </nav>
-                <div id="view1" class="product-about active">
-                  <h3 class="tab__header">Product Details</h3>
-                  <div class="table-actions">
-                    <div> </div>
-                    <div>
-                        <button class="add-customer">+ Add Product</button>
-                    </div>
+            <div class="tab__content" content id="subcategory">
+              <div class="form-container">
+                <!-- Add Subcategory Form -->
+                <section class="subcategory-section">
+                    <h2 class="section-title"> Add Subcategory</h2>
+                    <form id="subcategory-form">
+                        <input type="hidden" id="parent-category-id">
+                        <div class="form-group">
+                          <label>Category:</label>
+                          <select id="prod_cat" class="category-dropdown" required>
+                              <option value="">Loading categories...</option>
+                          </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="sc-name">Subcategory Name</label>
+                            <input type="text" id="sc-name" placeholder="Enter Subcategory Name" required>
+                        </div>
+            
+                        <div class="input-group">
+                            <label for="sc-desc">Description</label>
+                            <textarea id="sc-desc" placeholder="Enter Subcategory Description" required></textarea>
+                        </div>
+            
+                        <div class="input-group file-upload">
+                            <label for="sc-image">Upload Image</label>
+                            <input type="file" id="sc-image" accept="image/*" required>
+                        </div>
+            
+                        <button type="submit" class="btn-submit"> Add Subcategory</button>
+                    </form>
+                </section>
+            
+                <!-- Update Subcategory Form (Initially Hidden) -->
+                <section id="updateSubcategoryModal" class="subcategory-section hidden">
+                    <h2 class="section-title">Update Subcategory</h2>
+                    <form id="updateSubcategoryForm" enctype="multipart/form-data">
+                        <input type="hidden" id="updateSubcategoryId">
+            
+                        <div class="input-group">
+                            <label for="updateSubcategoryName"> Subcategory Name</label>
+                            <input type="text" id="updateSubcategoryName"  name="sub_name" placeholder="Enter Subcategory Name" required>
+                        </div>
+            
+                        <div class="input-group">
+                            <label for="updateSubcategoryDescription"> Description</label>
+                            <textarea id="updateSubcategoryDescription"  name="sub_desc" placeholder="Enter Subcategory Description"></textarea>
+                        </div>
+            
+                        <div class="input-group file-upload">
+                            <label for="updateSubcategoryImage">Upload Image</label>
+                            <input type="file" id="updateSubcategoryImage" name="sub_image" accept="image/*">
+                        </div>
+          
+                        <button type="submit" class="btn-submit"> Update Subcategory</button>
+                        <button type="button" class="btn-cancel" onclick="closeUpdateSubModal()"> Cancel</button>
+                    </form>
+                </section>
+            </div>
+            <div class="form-group">
+              <label>Category:</label>
+              <select id="prod_cat1" class="category-dropdown" required>
+                  <option value="">Loading categories...</option>
+              </select>
+            </div>
+            <table border="1">
+              <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Image</th>
+                      <th>Catgeoy ID</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody id="subcat-list">
+               
+              </tbody>
+          </table>
+            </div>
+            <div class="tab__content" content id="subsubcategory">
+              <div class="form-container">
+                <!-- Add Sub-Subcategory Section -->
+                <div  class="subsubcategory-section">
+                    <h2 class="form-h2">Add Sub-Subcategory</h2>
+                    <form id="subsubcategory-form">
+                        <input type="hidden" id="parent-subcategory-id">
+                        <div class="form-group">
+                          <label>Category:</label>
+                          <select id="prod_cate" class="category-dropdown" required>
+                              <option value="">Loading categories...</option>
+                          </select>
+                      </div>
+                      
+                      <div class="form-group">
+                          <label>SubCategory:</label>
+                          <select id="prod_subcat" class="subcategory-dropdown" required>
+                              <option value="">Select a category first</option>
+                          </select>
+                      </div>
+                      
+                        <div class="input-group">
+                          <label  for="ssc-name">Sub-Subcategory Name</label>
+                          <input type="text" id="ssc-name" placeholder="Enter Subcategory Name" required>
+                      </div>
+          
+                      <div class="input-group">
+                          <label for="ssc-desc">Sub-Subcategory Description</label>
+                          <textarea id="ssc-desc" placeholder="Enter Subcategory Description" required></textarea>
+                      </div>
+          
+                      <div class="input-group file-upload">
+                          <label for="ssc-image"> Sub-Subcategory Image</label>
+                          <input type="file" id="ssc-image" accept="image/*" required>
+                      </div>
+                      
+                        <button type="submit" class="btn-submit">Add Sub-Subcategory</button>
+                    </form>
                 </div>
-                <table id="product-table" class="table table-bordered">
+            
+                <!-- Update Sub-Subcategory Section -->
+                <section id="updateSubSubcategoryModal" class="subsubcategory-section hidden">
+                    <h2 class="form-h2">Update Sub-Subcategory</h2>
+                    <form id="updateSubSubcategoryForm" enctype="multipart/form-data">
+                        <input type="hidden" id="updateSubSubcategoryId">
+            
+                        <div class="input-group">
+                            <label for="updateSubSubcategoryName">Sub-Subcategory Name:</label>
+                            <input type="text" id="updateSubSubcategoryName" name="ss_name" placeholder="Enter Sub-Subcategory Name" required>
+                        </div>
+            
+                        <div class="input-group">
+                            <label for="updateSubSubcategoryDescription">Sub-Subcategory Description:</label>
+                            <textarea id="updateSubSubcategoryDescription" name="ss_desc" placeholder="Enter Sub-Subcategory Description"></textarea>
+                        </div>
+            
+                        <div class="input-group file-upload">
+                            <label for="updateSubSubcategoryImage">Sub-Subcategory Image:</label>
+                            <input type="file" id="updateSubSubcategoryImage" name="ss_image" accept="image/*">
+                        </div>
+            
+                        <button type="submit" class="btn-submit">Update Sub-Subcategory</button>
+                        <button type="button" class="btn-cancel" onclick="closeUpdateSubSubModal()">Cancel</button>
+                    </form>
+                  </section>
+            </div>
+            <div class="form-group">
+              <label>Category:</label>
+              <select id="prod_cate_table" class="category-dropdown" required>
+                  <option value="">Loading categories...</option>
+              </select>
+          </div>
+          
+          <div class="form-group">
+              <label>SubCategory:</label>
+              <select id="prod_subcat1" class="subcategory-dropdown" required>
+                  <option value="">Select a category first</option>
+              </select>
+          </div>
+          
+          
+          <table border="1">
+              <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Image</th>
+                      <th>Subcategory ID</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody id="subsubcat-list">
+                  <!-- Sub-subcategory rows will be inserted here -->
+              </tbody>
+          </table>
+          
+            </div>
+            <div class="tab__content" id="viewproduct">
+              <div class="form-group">
+                  <label for="prod_catt">Select Category:</label>
+                  <select id="prod_catt" onchange="fetchProductsByCategory()" required>
+                      <option value="">Select Category</option>
+                  </select>
+              </div>
+          
+              <table id="product-table" class="table table-bordered">
                   <thead>
                       <tr>
                           <th>Product ID</th>
@@ -434,44 +580,170 @@
                           <th>Category</th>
                       </tr>
                   </thead>
-                  <tbody id="product-details"></tbody>
+                  <tbody id="product-details">
+                      <tr>
+                          <td colspan="6" class="text-center">No products found</td>
+                      </tr>
+                  </tbody>
               </table>
-              
+          
               <!-- Pagination Controls -->
               <nav>
                   <ul class="pagination" id="pagination-controls"></ul>
               </nav>
-              
+          </div>
+          
+            <!-- <div class="tab__content" content id="viewproduct">
+              <div class="form-group">
+                <label>Category:</label>
+                <select id="prod_catt" required>
+                    <option value="">Loading categories...</option>
+                </select>
+              </div>
+              <table id="product-table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Image</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody id="product-details"></tbody>
+            </table>
+
+            <nav>
+                <ul class="pagination" id="pagination-controls"></ul>
+            </nav>
+            </div> -->
+            <div class="tab__content" content id="addproduct">
+              <h3>Add / Update Product</h3>
+              <form id="addProductForm">
+                  <div class="form-group">
+                    <label>Category:</label>
+                    <select id="prodcat" required>
+                        <option value="">Loading categories...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Sub Category:</label>
+                    <select id="prodsubcat" required>
+                      <option value="">Loading categories...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                      <label>Sub SubCategory:</label>
+                      <select id="prodsubsubcat" required>
+                        <option value="">Loading categories...</option>
+                      </select>
+                  </div>
+                  <div id="product-form-container">
+                    <!-- The dynamic form will be inserted here -->
                 </div>
-                <div id="add1" class="product-about">
-                  <h3>Add / Update Product</h3>
-                  <form id="addProductForm">
+                
+              </form>
+            </div>
+            <div class="tab__content" content id="inventory">
+              <h1>Inventory Management</h1>
+              <table id="inventory-table">
+                  <thead>
+                      <tr>
+                          <th>Product</th>
+                          <th>Stock Level</th>
+                          <th>Low Stock Alert</th>
+                          <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody id="inventory-table-body">
+                      <!-- Inventory data will be dynamically added here -->
+                  </tbody>
+              </table>
+          </div>
+          <div class="tab__content" content id="sales">
+            <h1>Sales & Analytics</h1>
+            <div class="analytics-filters">
+                <label for="date-range">Date Range:</label>
+                <select id="date-range">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+                <button class="btn primary" onclick="generateReport()">Generate Report</button>
+            </div>
+            <canvas id="salesChartAnalytics"></canvas>
+            <div class="best-sellers">
+                <h3>Best-Selling Products</h3>
+                <ul id="best-sellers-list"></ul>
+            </div>
+        </div>
+        <div class="tab__content" content id="delivery">
+          <h1>Delivery Management</h1>
+          <table id="delivery-table">
+              <thead>
+                  <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>Delivery Person</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody id="delivery-table-body"></tbody>
+          </table>
+          <div id="assignDeliveryModal" class="modal">
+              <div class="modal-content">
+                  <h2>Assign Delivery</h2>
+                  <span class="modal-close" onclick="closeAssignDeliveryModal()">×</span>
+                  <form id="assignDeliveryForm" class="modal-form">
                       <div class="form-group">
-                        <label>Category:</label>
-                        <select id="prod_cat"  onchange="handleCategoryChange()" required>
-                            <option value="">Loading categories...</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                        <label>Sub Category:</label>
-                        <select id="prod_subcat" required>
-                          <option value="">Loading categories...</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                          <label>Sub SubCategory:</label>
-                          <select id="prod_subsubcat" required>
-                            <option value="">Loading categories...</option>
+                          <label for="delivery-person">Delivery Person</label>
+                          <select id="delivery-person" required>
+                              <option value="">Select Delivery Person</option>
+                              <option value="dp1">John Doe</option>
+                              <option value="dp2">Jane Smith</option>
                           </select>
                       </div>
-                      <div id="product-form-container">
-                        <!-- The dynamic form will be inserted here -->
-                    </div>
+                      <button type="submit" class="btn primary">Assign</button>
+                      <button type="button" class="btn-cancel" onclick="closeAssignDeliveryModal()">Cancel</button>
                   </form>
-                </div>
               </div>
-            </div>
-  
+          </div>
+      </div>
+      <div class="tab__content" content id="support">
+          <h1>Customer Support</h1>
+          <table id="support-table">
+              <thead>
+                  <tr>
+                      <th>Request ID</th>
+                      <th>Customer</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody id="support-table-body"></tbody>
+          </table>
+          <div id="supportRequestModal" class="modal">
+              <div class="modal-content">
+                  <h2>Handle Request</h2>
+                  <span class="modal-close" onclick="closeSupportRequestModal()">×</span>
+                  <form id="supportRequestForm" class="modal-form">
+                      <div class="form-group">
+                          <label for="request-status">Status</label>
+                          <select id="request-status" required>
+                              <option value="pending">Pending</option>
+                              <option value="processed">Processed</option>
+                              <option value="rejected">Rejected</option>
+                          </select>
+                      </div>
+                      <button type="submit" class="btn primary">Save</button>
+                      <button type="button" class="btn-cancel" onclick="closeSupportRequestModal()">Cancel</button>
+                  </form>
+              </div>
+          </div>
+      </div>
             <div class="tab__content" content id="report">
               <h3 class="tab__header">Reports</h3>
               <div class="tab__body">
@@ -543,6 +815,9 @@
         </div>
       </div>
     </section>
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="../js/index.js" ></script>
@@ -552,6 +827,34 @@
     <script src="../js/category.js"></script>
     <!-- <script src="../js/category2.js"></script> -->
 <script>
+const btnScrollToTop = document.querySelector("#btnScrollToTop");
+const icon = btnScrollToTop.querySelector("i");
+
+btnScrollToTop.addEventListener("click", function () {
+    if (window.scrollY === 0) {
+        // Scroll to bottom and change arrow direction
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        icon.classList.add("fa-arrow-up");
+        icon.classList.remove("fa-arrow-down");
+    } else {
+        // Scroll to top and change arrow direction
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        icon.classList.add("fa-arrow-down");
+        icon.classList.remove("fa-arrow-up");
+    }
+});
+
+// Update icon on scroll event (optional for better UX)
+window.addEventListener("scroll", function () {
+    if (window.scrollY === 0) {
+        icon.classList.add("fa-arrow-down");
+        icon.classList.remove("fa-arrow-up");
+    } else {
+        icon.classList.add("fa-arrow-up");
+        icon.classList.remove("fa-arrow-down");
+    }
+});
+
   const ctx = document.getElementById('salesChart').getContext('2d');
   new Chart(ctx, {
       type: 'line',
@@ -565,7 +868,60 @@
           }]
       }
   });
+  function showSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    
+    if (!section) {
+        console.error(`❌ Error: Section with ID "${sectionId}" not found.`);
+        return;
+    }
+
+    // Hide all sections
+    document.querySelectorAll(".tab__content").forEach(sec => sec.classList.add("hidden"));
+
+    // Show the selected section
+    section.classList.remove("hidden");
+}
+
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('hidden');
+        }
+       
 </script>
+<script>
+  fetch("/auth/check-session")
+    .then(response => response.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = "html/login.html"; // Redirect to login if not authenticated
+        }
+    })
+    .catch(error => console.error("Error checking session:", error));
+
+    document.getElementById("logoutBtn").addEventListener("click", async function() {
+    try {
+        const response = await fetch("/auth/logout", { method: "POST" });
+
+        if (!response.ok) {
+            throw new Error(`Logout failed: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log(result.message); // Debugging log
+
+        if (result.success) {
+            window.location.href = "html/login.html"; // Redirect only on success
+        } else {
+            alert("Logout failed. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error logging out:", error);
+        alert("Error logging out. Please try again.");
+    }
+});
+
+  </script>
 
   </body>
 </html>

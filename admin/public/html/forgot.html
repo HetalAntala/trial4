@@ -20,7 +20,7 @@
 <body>
     <!-- ########## START: Login Form ########## -->
     <section class="login-wrapper">
-        <a href="index.html" class="logo"><img src="./ad-images/logo/logo.png" alt="MS Admin Panel" width="150" style="border-radius: 50%;"/></a>
+        <a href="index.html" class="logo"><img src="../ad-images/logo/logo.png" alt="MS Admin Panel" width="150" style="border-radius: 50%;"/></a>
         <div class="login-form">
             <div class="row">
                 <div class="row1">
@@ -42,12 +42,37 @@
                     </form>
                 </div>
                 <div class="row2">
-                    <img src="./ad-images/login-mockup.svg" width="300" alt="">
+                    <img src="../ad-images/login-mockup.svg" width="300" alt="">
                 </div>
             </div>
         </div>
     </section>
     <!-- ########## END: Login Form ########## -->
+    <form id="forgotPasswordForm">
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="password" id="newPassword" placeholder="Enter new password" required>
+        <button type="submit">Reset Password</button>
+    </form>
+    
+    <script>
+    document.getElementById("forgotPasswordForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+    
+        const email = document.getElementById("email").value;
+        const newPassword = document.getElementById("newPassword").value;
+    
+        const response = await fetch("/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, newPassword })
+        });
+    
+        const result = await response.json();
+        alert(result.message);
+        if (result.success) window.location.href = "login.html";
+    });
+    </script>
+    
 </body>
 
 </html>

@@ -26,9 +26,12 @@ const upload = multer({
 
 router.get('/products', productController.getAllProducts);
 
+
+router.get('/categories2', productController.getCategories);
 router.get('/categories1', productController.getAllCategories);
 router.get('/category/:cy_id/subcategories', productController.getSubcategories);
 router.get('/subcategory/:sub_id/subsubcategories', productController.getSubSubcategories);
+
 router.post('/add', productController.addProduct);
 router.get('/get-fields', productController.getField);
 router.get('/last-id', productController.lastId);

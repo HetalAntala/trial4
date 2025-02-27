@@ -9,60 +9,159 @@
     <meta name="author" content="">
 
     <title>Register Panel</title>
-    <!-- Font awsome link -->
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-    <!-- Custom Css -->
-    <link rel="stylesheet"  href="../css/login.css">
-    <script  type="text/javascript" src="../../server.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/login.css">
 </head>
 
 <body>
-    <!-- ########## START: Login Form ########## -->
+    <!-- ########## START: Registration Form ########## -->
     <section class="login-wrapper">
-        <a href="index.html" class="logo"><img src="./ad-images/logo.png" alt=" Admin Panel" width="150" style="border-radius: 50%;margin-top: 6rem;"/></a>
+        <a href="index.html" class="logo">
+            <img src="../ad-images/logo.png" alt="Admin Panel" width="150" style="border-radius: 50%; margin-top: 6rem;"/>
+        </a>
+        
         <div class="login-form">
             <div class="row">
                 <div class="row1">
                     <div class="pagetitle">
                         <h2>Create Account</h2>
-                        <span>Fill the below form to create a new account.</span>
+                        <span>Fill the form to create a new account.</span>
                     </div>
-                    <form action="/register" method="POST">
+
+                    <form id="registerForm" method="POST">
                         <div class="form-group">
                             <label>Username</label>
                             <input type="text" class="form-control" placeholder="Username" name="username" required>
                         </div>
+
                         <div class="form-group mb-4">
                             <label>Email Id</label>
-                            <input type="text" class="form-control" placeholder="john.doe@domain.com" name="email" required>
+                            <input type="email" class="form-control" placeholder="john.doe@domain.com" name="email" required>
                         </div>
+
                         <div class="form-group mb-4">
                             <label>Password</label>
-                            <input type="password" class="form-control" placeholder="Password" aria-label="Password"  name="password" required>
+                            <input type="password" class="form-control" placeholder="Password" name="password" required>
                         </div>
+
                         <div class="form-group mb-4">
                             <label>Confirm Password</label>
-                            <input type="text" class="form-control" placeholder="Confirm Password" aria-label="Password" name="cpassword" required>
+                            <input type="password" class="form-control" placeholder="Confirm Password" name="cpassword" required>
                         </div>
-                        <div class="form-group checkbox">
-                            <input type="checkbox" name="checkbox" id="check1">
+
+                        <!-- <div class="form-group checkbox">
+                            <input type="checkbox" name="checkbox" id="check1" required>
                             <label for="check1">I accept the terms & conditions.</label>
-                        </div>
+                        </div> -->
+
+                        <div id="response-message" class="form-group" style="color: red; font-weight: bold;"></div>
+
                         <div class="forgot">
                             <a href="login.html" class="btn btn-login">Login</a>
                             <button type="submit" class="btn btn-register">Register</button>
                         </div>
                     </form>
                 </div>
+
                 <div class="row2">
-                    <img src="./ad-images/login-mockup.svg" alt="">
+                    <img src="../ad-images/login-mockup.svg" alt="">
                 </div>
             </div>
         </div>
     </section>
-    <!-- ########## END: Login Form ########## -->
-     
-</body>
 
+    <!-- <script>
+        document.getElementById("registerForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const responseMessage = document.getElementById("response-message");
+
+            const username = this.username.value.trim();
+            const email = this.email.value.trim();
+            const password = this.password.value;
+            const cpassword = this.cpassword.value;
+
+            // ✅ Check if passwords match
+            if (password !== cpassword) {
+                responseMessage.innerText = "Passwords do not match!";
+                return;
+            }
+
+            const formData = { username, email, password };
+
+            try {
+                const response = await fetch("/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    responseMessage.style.color = "green";
+                    responseMessage.innerText = "Registration successful! Redirecting to login...";
+                    setTimeout(() => window.location.href = "login.html", 2000);
+                } else {
+                    responseMessage.innerText = result.error || "Registration failed. Please try again.";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                responseMessage.innerText = "Server error. Please try again.";
+            }
+        });
+    </script> -->
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const responseMessage = document.getElementById("response-message");
+    
+            const username = this.username.value.trim();
+            const email = this.email.value.trim();
+            const password = this.password.value;
+            const cpassword = this.cpassword.value;
+    
+            // ✅ Check if all fields are filled
+            if (!username || !email || !password || !cpassword) {
+                responseMessage.innerText = "All fields are required!";
+                return;
+            }
+    
+            // ✅ Check if passwords match
+            if (password !== cpassword) {
+                responseMessage.innerText = "Passwords do not match!";
+                return;
+            }
+    
+            const formData = { username, email, password, cpassword }; // ✅ Now sending cpassword too
+    
+            try {
+                const response = await fetch("/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+    
+                const result = await response.json();
+    
+                if (result.success) {
+                    responseMessage.style.color = "green";
+                    responseMessage.innerText = "Registration successful! Redirecting to login...";
+                    setTimeout(() => window.location.href = "login.html", 2000);
+                } else {
+                    responseMessage.style.color = "red";
+                    responseMessage.innerText = result.message || "Registration failed. Please try again.";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                responseMessage.style.color = "red";
+                responseMessage.innerText = "Server error. Please try again.";
+            }
+        });
+    </script>
+    
+</body>
 </html>
