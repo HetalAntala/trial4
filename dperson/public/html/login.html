@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content='IE=edge' http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Login Panel</title>
+    <!-- Font Awesome link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="../css/login.css">
+</head>
+<body>
+    <!-- ########## START: Login Form ########## -->
+    <section class="login-wrapper">
+        <a href="index.html" class="logo"><img src="../ad-images/logo/logo.png" alt="Admin Panel" width="150" style="border-radius: 50%;" /></a>
+        <div class="login-form">
+            <div class="row">
+                <div class="row1">
+                    <div class="pagetitle">
+                        <h2>Login to Your Account</h2>
+                    </div>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input id="email" type="email" class="form-control" placeholder="" required>
+                                <label for="email" class="floating-label">Email Id</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input id="password" type="password" class="form-control password__box" placeholder="" required>
+                                <label for="password" class="floating-label">Password</label>
+                            </div>
+                        </div>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <div id="error-message" style="color: red; display: none;"></div>
+                        <div class="forgot">
+                            <a href="html/forgot.html" class="btn-link">Forgot password?</a>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                        <hr>
+                        <a href="html/register.html" class="btn btn-outline-primary" style="font-size: 1.2rem;">Create an account</a>
+                    </form>
+                </div>
+                <div class="row2">
+                    <img src="../ad-images/login-mockup.png" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Check session on page load, but do not auto-login
+        fetch("/delivery/check-session")
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to check session");
+                return response.json();
+            })
+            .then(data => {
+                const logoutBtn = document.getElementById("logoutBtn");
+                if (data.loggedIn) {
+                    logoutBtn.style.display = "block"; // Show logout button if logged in
+                } else {
+                    logoutBtn.style.display = "none"; // Hide logout button if not logged in
+                }
+            })
+            .catch(error => {
+                console.error("Error checking session:", error);
+                document.getElementById("logoutBtn").style.display = "none";
+            });
+
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+    
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const rememberMe = document.getElementById("rememberMe").checked;
+            const errorMessage = document.getElementById("error-message");
+    
+            errorMessage.style.display = "none"; // Hide error message initially
+    
+            if (!email || !password) {
+                errorMessage.textContent = "Both fields are required!";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMessage.textContent = "Invalid email format!";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            if (password.length < 8) {
+                errorMessage.textContent = "Password must be at least 8 characters long!";
+                errorMessage.style.display = "block";
+                return;
+            }
+    
+            try {
+                const response = await fetch("/delivery/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password, rememberMe })
+                });
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+    
+                const result = await response.json();
+    
+                if (result.success) {
+                    alert("Login Successful!");
+                    localStorage.setItem("deliveryPersonId", result.id);
+                    window.location.href = result.redirect; // Redirect to index.html
+                } else {
+                    errorMessage.textContent = result.message || "Login failed. Please try again.";
+                    errorMessage.style.display = "block";
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                errorMessage.textContent = error.message || "An error occurred. Please try again.";
+                errorMessage.style.display = "block";
+            }
+        });
+
+        // Logout handler
+        document.getElementById("logoutBtn").addEventListener("click", async function() {
+            try {
+                const response = await fetch("/delivery/logout", { 
+                    method: "POST",
+                    credentials: 'include' // Include session cookie
+                });
+                if (!response.ok) {
+                    throw new Error("Logout failed");
+                }
+                const result = await response.json();
+                if (result.success) {
+                    alert("Logged out successfully!");
+                    window.location.href = result.redirect; // Redirect to login.html
+                } else {
+                    alert("Logout failed. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error logging out:", error);
+                alert("Error logging out. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>

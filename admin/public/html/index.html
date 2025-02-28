@@ -59,6 +59,9 @@
               <a class="block" onclick="showSection('subsubcategory')" data-target="#subsubcategory">
                SubSub Categories
                </a>
+               <a class="block" onclick="showSection('createtbl')" data-target="#createtbl">
+                Crate Table
+                </a>
              </div>
             
             <p class="account__tab" data-target="#customer">
@@ -76,17 +79,17 @@
               <img src="../ad-images/icon/review.png" alt="">Review
             </p>
             <p class="account__tab" data-target="#inventory">
-              <img src="../ad-images/icon/inventory.png" alt=""> Inventory
+              <img src="../ad-images/icon/checklists.png" alt=""> Inventory
           </p>
           <p class="account__tab" data-target="#delivery">
-            <img src="../ad-images/icon/shipping.png" alt=""> Delivery
+            <img src="../ad-images/icon/delivery-truck.png" alt=""> Delivery
         </p>
-        <p class="account__tab" data-target="#support">
+        <!-- <p class="account__tab" data-target="#support">
             <img src="../ad-images/icon/support.png" alt=""> Customer Support
         </p>
         <p class="account__tab" data-target="#inbox">
             <img src="../ad-images/icon/inbox.png" alt=""> Inbox
-        </p>
+        </p> -->
             <!-- <p class="account__tab accordion-menu" data-target="#report" data-accordion-btn>
               <img src="../ad-images/icon/insurance.png" alt="">Authentication
               <ul class="submenu-category-list" data-accordion>
@@ -167,20 +170,6 @@
             <div class="tab__content" content id="customer">
               <div class="container1">
                 <h2>Customer Table</h2>
-                <div class="table-actions">
-                    <div> </div>
-                    <div>
-                        <button class="add-customer">+ Add Customer</button>
-                        <button class="export-btn">Export <i class="fas fa-caret-down"></i></button>
-                        <ul class="export-menu">
-                            <li><a href="#" class="export-option" data-type="print"><i class="fas fa-print"></i> Print</a></li>
-                            <li><a href="#" class="export-option" data-type="csv"><i class="fas fa-file-csv"></i> Csv</a></li>
-                            <li><a href="#" class="export-option" data-type="excel"><i class="fas fa-file-excel"></i> Excel</a></li>
-                            <li><a href="#" class="export-option" data-type="pdf"><i class="fas fa-file-pdf"></i> Pdf</a></li>
-                            <li><a href="#" class="export-option" data-type="copy"><i class="fas fa-copy"></i> Copy</a></li>
-                        </ul>
-                    </div>
-                </div>
                 <div  id="table-container">
                   <table>
                     <thead>
@@ -206,45 +195,46 @@
                     <button id="next-page" onclick="nextPage()">Next &#62;</button>
                   </div> -->
                 </div>
-            </div>
+              </div>
             </div>      
             <div class="tab__content" content id="orders">
-              <h3 class="tab__header">Order Details</h3>
+              <h3 class="tab__header">Orders</h3>
               <div class="tab__body">
-              <table id="orders-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Order Date</th>
-                        <th>Status</th>
-                        <th>Customer ID</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Orders will be displayed here -->
-                </tbody>
-
-                <table id="order-details-table">
+                <table id="orders-table">
                   <thead>
                       <tr>
-                          <th>Order Detail ID</th>
-                          <th>Product Name</th>
-                          <th>Description</th>
-                          <th>Image</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                          <th>Category</th>
+                          <th>Order ID</th>
+                          <th>Date</th>
+                          <th>Status</th>
+                          <th>Customer ID</th>
+                          <th>Action</th>
                       </tr>
                   </thead>
-                  <tbody id="order-details">
-                      <!-- Rows will be populated here -->
-                  </tbody>
+                  <tbody></tbody>
               </table>
-              
-              
-            </table>
+          
+              <!-- Order Details Modal -->
+              <div id="order-details-modal" class="modal">
+                  <div class="modal-content">
+                      <span class="close" onclick="closeModal()">&times;</span>
+                      <h2>Order Details</h2>
+                      <table>
+                          <thead>
+                              <tr>
+                                  <th>ID</th>
+                                  <th>Product Name</th>
+                                  <th>Description</th>
+                                  <th>Image</th>
+                                  <th>Quantity</th>
+                                  <th>Price</th>
+                                  <th>Category</th>
+                              </tr>
+                          </thead>
+                          <tbody id="order-details"></tbody>
+                      </table>
+                  </div>
               </div>
+            </div>
             </div>
             <div class="tab__content" content id="analytics">
               <h3 class="tab__header">Analytics</h3>
@@ -252,40 +242,33 @@
                 
               </div>
             </div>
+            <div class="tab__content" content id="createtbl">
+              <div class="form-group">
+                <label>Category:</label>
+                <select id="prod-cat" required>
+                    <option value="">Loading categories...</option>
+                </select>
+            </div>
+            <div class="form-column">
+              <div class="form-group">
+                <label for="field-name">Field Name:</label>
+                <input type="text" id="field-name" name="fieldName" required>
+            </div>
+            <div class="form-group">
+                <label for="field-type">Field Type:</label>
+                <select id="field-type" name="fieldType" required>
+                    <option value="VARCHAR(255)">Text (VARCHAR)</option>
+                    <option value="INT">Integer</option>
+                    <option value="DECIMAL(10, 2)">Decimal</option>
+                </select>
+            </div>
+            </div>
+            
+            <button type="button" class="btn" id="add-field">Add Field</button>
+            <div id="field-list"></div>
+            <button type="submit" class="btn-cancel" id="create-table" style="width: 10%;">Create Table</button>
+            </div>
             <div class="tab__content" content id="category">
-              <div class="wrapper tabbed">
-                <nav class="nav-wrap">
-                    <ul class="ul-wrapper">
-                        <li class="active"><a href="#" class="tabbed-trigger" data-id="addcat"><span>View</span></a></li>
-                        <li><a href="#" class="tabbed-trigger" data-id="addtbl"><span>Add</span></a></li>
-                    </ul>
-                </nav>
-                <div id="addcat" class="product-about active">
-                  <!-- <section class="category-section">
-                    <h2 class="section-title">Add Category</h2>
-                    <div class="form-container">
-                        <form id="category-form">
-                            <div class="input-group">
-                                <label for="cy-name">Category Name</label>
-                                <input type="text" id="cy-name" placeholder="Enter Category Name" required>
-                            </div>
-                
-                            <div class="input-group">
-                                <label for="cy-desc"> Description</label>
-                                <textarea id="cy-desc" placeholder="Enter Category Description" required></textarea>
-                            </div>
-                
-                            <div class="input-group file-upload">
-                                <label for="cy-image"> Upload Image</label>
-                                <input type="file" id="cy-image" accept="image/*">
-                            </div>
-                
-                            <button type="submit" class="btn">Add Category</button>
-                        </form>
-                    </div>
-                </section> -->
-                
-                  <section>
                     <div class="form-container">
                       <!-- Add Category Form -->
                       <section class="category-section">
@@ -352,36 +335,6 @@
                          
                         </tbody>
                     </table>
-                  </section>
-                </div>
-                <div id="addtbl" class="product-about">
-                  <div class="form-group">
-                    <label>Category:</label>
-                    <select id="prod-cat" required>
-                        <option value="">Loading categories...</option>
-                    </select>
-                </div>
-                <div class="form-column">
-                  <div class="form-group">
-                    <label for="field-name">Field Name:</label>
-                    <input type="text" id="field-name" name="fieldName" required>
-                </div>
-                <div class="form-group">
-                    <label for="field-type">Field Type:</label>
-                    <select id="field-type" name="fieldType" required>
-                        <option value="VARCHAR(255)">Text (VARCHAR)</option>
-                        <option value="INT">Integer</option>
-                        <option value="DECIMAL(10, 2)">Decimal</option>
-                    </select>
-                </div>
-                </div>
-                
-                <button type="button" class="btn" id="add-field">Add Field</button>
-                <div id="field-list"></div>
-                <button type="submit" class="btn-2" id="create-table">Create Table</button>
-                </div>
-              </div>
-             
             </div>
             <div class="tab__content" content id="subcategory">
               <div class="form-container">
@@ -593,31 +546,6 @@
               </nav>
           </div>
           
-            <!-- <div class="tab__content" content id="viewproduct">
-              <div class="form-group">
-                <label>Category:</label>
-                <select id="prod_catt" required>
-                    <option value="">Loading categories...</option>
-                </select>
-              </div>
-              <table id="product-table" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Image</th>
-                        <th>Category</th>
-                    </tr>
-                </thead>
-                <tbody id="product-details"></tbody>
-            </table>
-
-            <nav>
-                <ul class="pagination" id="pagination-controls"></ul>
-            </nav>
-            </div> -->
             <div class="tab__content" content id="addproduct">
               <h3>Add / Update Product</h3>
               <form id="addProductForm">
@@ -692,17 +620,18 @@
               </thead>
               <tbody id="delivery-table-body"></tbody>
           </table>
+          
+          <!-- Assign Delivery Modal -->
           <div id="assignDeliveryModal" class="modal">
               <div class="modal-content">
                   <h2>Assign Delivery</h2>
                   <span class="modal-close" onclick="closeAssignDeliveryModal()">×</span>
-                  <form id="assignDeliveryForm" class="modal-form">
+                  <form id="assignDeliveryForm">
+                      <input type="hidden" id="assign-order-id">
                       <div class="form-group">
-                          <label for="delivery-person">Delivery Person</label>
+                          <label for="delivery-person">Select Delivery Person</label>
                           <select id="delivery-person" required>
-                              <option value="">Select Delivery Person</option>
-                              <option value="dp1">John Doe</option>
-                              <option value="dp2">Jane Smith</option>
+                              <option value="">Loading...</option>
                           </select>
                       </div>
                       <button type="submit" class="btn primary">Assign</button>
@@ -711,6 +640,8 @@
               </div>
           </div>
       </div>
+      
+    
       <div class="tab__content" content id="support">
           <h1>Customer Support</h1>
           <table id="support-table">
@@ -825,6 +756,7 @@
     <script src="../js/orderdet.js"></script>
     <script src="../js/product.js"></script>
     <script src="../js/category.js"></script>
+    <script src="../js/inventory.js"></script>
     <!-- <script src="../js/category2.js"></script> -->
 <script>
 const btnScrollToTop = document.querySelector("#btnScrollToTop");

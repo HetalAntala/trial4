@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content='IE=edge' http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Register Panel</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <!-- ########## START: Registration Form ########## -->
+    <section class="login-wrapper">
+        <a href="index.html" class="logo">
+            <img src="../ad-images/logo.png" alt="Admin Panel" width="150" style="border-radius: 50%; margin-top: 6rem;"/>
+        </a>
+        
+        <div class="login-form">
+            <div class="row">
+                <div class="row1">
+                    <div class="pagetitle">
+                        <h2>Create Account</h2>
+                        <span>Fill the form to create a new account.</span>
+                    </div>
+
+                    <form id="registerForm" method="POST">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" placeholder="Username" name="username" required>
+                        </div>
+                    
+                        <div class="form-group mb-4">
+                            <label>Email Id</label>
+                            <input type="email" class="form-control" placeholder="john.doe@domain.com" name="email" required>
+                        </div>
+                    
+                        <div class="form-group mb-4">
+                            <label>Password</label>
+                            <input type="password" class="form-control" placeholder="Password (min 8 characters)" name="password" required>
+                        </div>
+                    
+                        <div class="form-group mb-4">
+                            <label>Confirm Password</label>
+                            <input type="password" class="form-control" placeholder="Confirm Password" name="cpassword" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label>Phone Number</label>
+                            <input type="tel" class="form-control" placeholder="Phone Number (10 digits)" name="phone" pattern="\d{10}" required>
+                        </div>
+                    
+                        <div id="response-message" class="form-group" style="color: red; font-weight: bold;"></div>
+                    
+                        <div class="forgot">
+                            <a href="html/login.html" class="btn btn-login">Login</a>
+                            <button type="submit" class="btn btn-register">Register</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row2">
+                    <img src="../ad-images/login-mockup.svg" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    // Check if user is already logged in
+    fetch("/delivery/check-session", { credentials: 'include' })
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to check session");
+            return response.json();
+        })
+        .then(data => {
+            if (data.loggedIn) {
+                alert("You are already logged in! Please log out to register a new account.");
+                window.location.href = "html/login.html";
+            }
+        })
+        .catch(error => {
+            console.error("Error checking session:", error);
+            // Proceed to registration if session check fails (e.g., server down)
+        });
+
+    document.getElementById("registerForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const responseMessage = document.getElementById("response-message");
+
+        const username = this.username.value.trim();
+        const email = this.email.value.trim();
+        const password = this.password.value;
+        const cpassword = this.cpassword.value;
+        const phone = this.phone.value.trim();
+
+        // Client-side validation
+        if (!username || !email || !password || !cpassword || !phone) {
+            responseMessage.innerText = "All fields are required!";
+            return;
+        }
+
+        if (password !== cpassword) {
+            responseMessage.innerText = "Passwords do not match!";
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            responseMessage.innerText = "Invalid email format!";
+            return;
+        }
+
+        if (password.length < 8) {
+            responseMessage.innerText = "Password must be at least 8 characters long!";
+            return;
+        }
+
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phone)) {
+            responseMessage.innerText = "Phone number must be 10 digits!";
+            return;
+        }
+
+        const formData = { username, email, password, cpassword, phone };
+
+        try {
+            const response = await fetch("/delivery/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                responseMessage.style.color = "green";
+                responseMessage.innerText = result.message;
+                setTimeout(() => window.location.href = result.redirect, 2000);
+            } else {
+                responseMessage.style.color = "red";
+                responseMessage.innerText = result.message || "Registration failed. Please try again.";
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            responseMessage.style.color = "red";
+            responseMessage.innerText = "Server error. Please try again.";
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Panel</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="top">
+                <div class="logo">
+                    <img src="../ad-images/logo.png" alt="Logo" />
+                    <h2>Nature's <span class="danger">Palette</span></h2>
+                </div>
+            </div>
+            <div class="sidebar">
+                <p class="account__tab active-tab" data-target="#dashboard"><i class="fas fa-home"></i> Dashboard</p>
+                <p class="account__tab" data-target="#orders"><i class="fas fa-truck"></i> Orders</p>
+                <p class="account__tab" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section id="dashboard" class="tab__content">
+                <h2>Welcome, <span id="deliveryPersonName">Delivery Person</span></h2>
+                <p>Manage your assigned deliveries efficiently.</p>
+                <div class="dashboard-cards">
+                    <div class="card">Total Deliveries: <span id="total-deliveries">0</span></div>
+                    <div class="card">Pending Deliveries: <span id="pending-deliveries">0</span></div>
+                    <div class="card">Completed Deliveries: <span id="completed-deliveries">0</span></div>
+                </div>
+            </section>
+
+            <section id="orders" class="tab__content active">
+                <h2>Delivery Orders</h2>
+                <input type="text" id="searchOrders" placeholder="Search Orders..." onkeyup="searchOrders()">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delivery-list"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deliveryPersonId = localStorage.getItem("deliveryPersonId");
+            if (!deliveryPersonId) {
+                window.location.href = "html/login.html"; // Redirect if not logged in
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", fetchDeliveries);
+
+        async function fetchDeliveries() {
+            try {
+                const deliveryPersonId = localStorage.getItem("deliveryPersonId") || 1; // Dummy ID for testing
+                const response = await fetch(`/delivery/deliveries/${deliveryPersonId}`);
+                const deliveries = await response.json();
+
+                if (!Array.isArray(deliveries)) throw new Error("Invalid response format");
+
+                let total = deliveries.length;
+                let pending = deliveries.filter(d => d.status !== "Delivered").length;
+                let completed = deliveries.filter(d => d.status === "Delivered").length;
+
+                console.log("Total Orders:", total, "Pending:", pending, "Completed:", completed);
+
+                const tableBody = document.getElementById("delivery-list");
+                tableBody.innerHTML = "";
+                deliveries.forEach(delivery => {
+                    const row = `<tr>
+                        <td>${delivery.id}</td>
+                        <td>${delivery.customer_name}</td>
+                        <td>${delivery.status}</td>
+                        <td>${delivery.payment_status || "Pending"}</td>
+                        <td>
+                            <button class="update-btn" onclick="updateStatus(${delivery.id}, 'Delivered')">Mark as Delivered</button>
+                            <button class="update-btn" onclick="updatePayment(${delivery.id}, 'Paid')">Mark as Paid</button>
+                        </td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error fetching deliveries:", error);
+            }
+        }
+
+
+        async function updateStatus(deliveryId, status) {
+            await fetch("/delivery/update-status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ deliveryId, status })
+            });
+            fetchDeliveries();
+        }
+
+        async function updatePayment(deliveryId, paymentStatus) {
+            await fetch("/delivery/update-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ deliveryId, paymentStatus })
+            });
+            fetchDeliveries();
+        }
+
+        function searchOrders() {
+            let input = document.getElementById("searchOrders").value.toLowerCase();
+            let rows = document.querySelectorAll("#delivery-list tr");
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+            });
+        }
+
+        // ✅ Logout Functionality
+        document.getElementById("logoutBtn").addEventListener("click", async function() {
+            await fetch("/logout", { method: "POST" });
+            window.location.href = "login.html";
+        });
+
+    </script>
+</body>
+</html>

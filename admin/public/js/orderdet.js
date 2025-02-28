@@ -71,6 +71,7 @@ function viewOrderDetails(orderId) {
                         `;
                         document.getElementById("order-details").innerHTML += row;
                 });
+                document.getElementById('order-details-modal').style.display = 'block';
             } else {
                 orderDetailsContainer.innerHTML = `<tr><td colspan="7">No details found for this order.</td></tr>`;
             }
@@ -82,8 +83,91 @@ function viewOrderDetails(orderId) {
 
 
 
-// Close Modal
 function closeModal() {
-    const modal = document.getElementById('order-details-modal');
-    modal.style.display = 'none';
+    document.getElementById('order-details-modal').style.display = 'none';
 }
+
+// Fetch orders on page load
+document.addEventListener('DOMContentLoaded', fetchOrders);
+
+
+// ✅ Fetch Orders (Admin Panel)
+async function fetchOrders1() {
+    try {
+        const response = await fetch('/admin/orders');
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+            throw new Error("Invalid response format: Expected an array");
+        }
+
+        const tableBody = document.getElementById("delivery-table-body");
+        tableBody.innerHTML = "";
+
+        data.forEach(order => {
+            const assigned = order.d_name ? order.d_name : "Not Assigned";
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${order.O_id}</td>
+                    <td>${order.customer_name || "Unknown"}</td>
+                    <td>${order.status}</td>
+                    <td>${assigned}</td>
+                    <td>
+                        ${assigned === "Not Assigned" ? 
+                            `<button onclick="openAssignDeliveryModal('${order.O_id}')">Assign</button>` 
+                            : "Assigned"}
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+    }
+}
+
+// Call the function
+fetchOrders1();
+
+
+// ✅ Open Assign Delivery Modal
+async function openAssignDeliveryModal(orderId) {
+    document.getElementById("assign-order-id").value = orderId;
+
+    const response = await fetch('/admin/delivery-persons');
+    const persons = await response.json();
+    const deliverySelect = document.getElementById("delivery-person");
+
+    deliverySelect.innerHTML = `<option value="">Select Delivery Person</option>`;
+    persons.forEach(person => {
+        deliverySelect.innerHTML += `<option value="${person.d_id}">${person.d_name}</option>`;
+    });
+
+    document.getElementById("assignDeliveryModal").style.display = "block";
+}
+
+// ✅ Close Modal
+function closeAssignDeliveryModal() {
+    document.getElementById("assignDeliveryModal").style.display = "none";
+}
+
+// ✅ Assign Delivery Person
+document.getElementById("assignDeliveryForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const orderId = document.getElementById("assign-order-id").value;
+    const deliveryPersonId = document.getElementById("delivery-person").value;
+
+    await fetch("/admin/assign-delivery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, deliveryPersonId })
+    });
+
+    closeAssignDeliveryModal();
+    fetchOrders1();
+});
