@@ -19,6 +19,10 @@
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="../css/style.css" />
     <style>
+      img#order_image {
+        height: 150px;
+        width: 150px;
+      }
       /*=============== ACCOUNTS ===============*/
       .accounts {
         margin-top: 5rem;
@@ -134,7 +138,6 @@
           grid-template-columns: 3fr 9fr;
         }
       }
-
       /* For medium devices */
       @media screen and (max-width: 992px) {
         .accounts__container {
@@ -222,19 +225,48 @@
             </div>
             <div class="tab__content" content id="orders">
               <h3 class="tab__header">Your Orders</h3>
-              <div class="tab__body">
-                <table class="placed__order-table">
-                  <thead>
-                    <tr>
-                      <th>Orders</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Totals</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="orderTableBody"></tbody>
-                </table>
+              <div style="min-height: 100vh; width: 100%">
+                <div style="max-width: 768px; margin: 0 auto; padding: 20px">
+                  <div
+                    style="
+                      background-color: white;
+                      height: 20rem;
+                      width: 19cm;
+                      border-radius: 0.5rem;
+                      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                      display: flex;
+                      align-items: left !important;
+                    "
+                  >
+                    <div style="width: 50%; padding: 1rem !important">
+                      <img
+                        id="order_image"
+                        alt="image of the ordered product"
+                      />
+                    </div>
+                    <div
+                      style="
+                        width: 50%;
+                        padding: 1rem !important;
+                        margin-left: -3cm !important;
+                        margin-top: 10px !important;
+                      "
+                    >
+                      <h3
+                        style="
+                          font-size: 2rem !important;
+                          font-weight: bold !important;
+                          margin-bottom: 20px !important;
+                        "
+                        id="order_name"
+                      ></h3>
+                      <p id="order_price">Price : &#8377;</p>
+                      <p id="order_id">Order Id :</p>
+                      <p id="order_date">Order Date :</p>
+                      <p id="order_status">Order Status :</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="tab__content" content id="update-profile">
@@ -302,7 +334,9 @@
                     id="cnpass"
                   />
                   <div class="form__btn">
-                    <button class="btn btn--md" onclick="changepass()">Save</button>
+                    <button class="btn btn--md" onclick="changepass()">
+                      Save
+                    </button>
                   </div>
                 </form>
               </div>
@@ -347,7 +381,8 @@
       nomodule
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
-    <script src="../js2/main.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/search.js"></script>
     <script src="../js2/myaccount.js"></script>
   </body>
 </html>

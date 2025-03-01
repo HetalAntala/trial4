@@ -3,7 +3,7 @@ const mysql = require("mysql");
 const conn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Hardi@sql8705",
+  password: "Hetalsql@1405",
   database: "main_project",
 });
 
@@ -28,7 +28,7 @@ const getProductDetails = (req, res) => {
       IMAGE.PATH3 AS image3, 
       PLANTS.P_DESC AS description 
     FROM 
-      PLANTS 
+      PLANTS_table as plants
     JOIN 
       IMAGE 
     ON 
@@ -45,7 +45,7 @@ const getProductDetails = (req, res) => {
       IMAGE.PATH3 AS image3, 
       BOUQUET.B_DESC AS description 
     FROM 
-      BOUQUET 
+      BOUQUET_table as bouquet 
     JOIN 
       IMAGE 
     ON 
@@ -62,7 +62,7 @@ const getProductDetails = (req, res) => {
       IMAGE.PATH3 AS image3, 
       POTS.PT_DESC AS description 
     FROM 
-      POTS 
+      POTS_table as pots
     JOIN 
       IMAGE 
     ON 
@@ -79,7 +79,7 @@ const getProductDetails = (req, res) => {
       IMAGE.PATH3 AS image3, 
       FERTILIZERS.Ft_DESC AS description 
     FROM 
-      FERTILIZERS 
+      FERTILIZERS_table as fertilizers 
     JOIN 
       IMAGE 
     ON 
@@ -96,7 +96,7 @@ const getProductDetails = (req, res) => {
       IMAGE.PATH3 AS image3, 
       TOOLS.T_DESC AS description 
     FROM 
-      TOOLS 
+      TOOLS_table as tools 
     JOIN 
       IMAGE 
     ON 
@@ -111,12 +111,12 @@ const getProductDetails = (req, res) => {
     (err, results) => {
       if (err) {
         console.error("Error executing product query: " + err.message);
-        res.status(500).send("Error executing product query");
+        res.status(500).json({ error: "Error executing product query" });
         return;
       }
 
       if (results.length === 0) {
-        res.status(404).send("Product not found");
+        res.status(404).json({ error: "Product not found" });
         return;
       }
 
@@ -139,7 +139,7 @@ const getProductDetails = (req, res) => {
       conn.query(feedbackQuery, [product.productId], (err, feedbackResults) => {
         if (err) {
           console.error("Error executing feedback query: " + err.message);
-          res.status(500).send("Error executing feedback query");
+          res.status(500).json({ error: "Error executing feedback query" });
           return;
         }
 

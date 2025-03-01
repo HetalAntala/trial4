@@ -1,4 +1,4 @@
-const express = require("express");
+const { sendMail } = require("./mailer");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql");
 // console.log(secret);
@@ -6,7 +6,7 @@ const mysql = require("mysql");
 const conn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Hardi@sql8705",
+  password: "Hetalsql@1405",
   database: "main_project",
 });
 
@@ -40,7 +40,9 @@ const registerUser = async (req, res) => {
       if (err) throw err;
 
       if (result.length > 0) {
-        return res.status(400).send("Email or username already in use.");
+        return res
+          .status(400)
+          .json({ error: "Email or username already in use." });
       }
 
       // Validate pincode
@@ -49,7 +51,7 @@ const registerUser = async (req, res) => {
         if (err) throw err;
 
         if (pincodeResult.length === 0) {
-          return res.status(400).send("Invalid pincode.");
+          return res.status(400).json({ error: "Invalid pincode." });
         }
 
         // Hash the password before saving it to the database
@@ -57,7 +59,10 @@ const registerUser = async (req, res) => {
 
         // Generate new customer ID
         generateCustomerId((err, newId) => {
-          if (err) return res.status(500).send("Error generating customer ID.");
+          if (err)
+            return res
+              .status(500)
+              .json({ error: "Error generating customer ID." });
 
           // Create a new user
           const insertUserSql =
@@ -67,14 +72,24 @@ const registerUser = async (req, res) => {
             [newId, username, email, hashedPassword, address, pincode, mobile],
             (err, result) => {
               if (err) throw err;
-              res.status(201).send("User registered successfully!");
+
+              // Send welcome email
+              sendMail(
+                email,
+                "Welcome to Nature's Palette",
+                `Hello ${username},\n\nThank you for registering with us! We're glad to have you on board.\n\nBest regards,\nThe Team`
+              );
+
+              res
+                .status(201)
+                .json({ message: "User registered successfully!" });
             }
           );
         });
       });
     });
   } catch (error) {
-    res.status(500).send("Error registering user: " + error.message);
+    res.status(500).json({ error: "Error registering user: " + error.message });
   }
 };
 
@@ -107,11 +122,13 @@ const loginUser = (req, res) => {
 // Get User Profile
 const getUserProfile = (req, res) => {
   if (!req.session.userId) {
-    return res.status(401).send("Please login to access this information.");
+    return res
+      .status(401)
+      .json({ error: "Please login to access this information." });
   }
 
   const sql =
-    "SELECT c_username, c_email, c_address, c_pincode, c_mobile FROM customer WHERE c_id = ?";
+    "SELECT c.c_username, c.c_email,c.c_address,c.c_pincode,c.c_mobile,a.city,a.PostOfficeName FROM customer c JOIN area a ON c.c_pincode = a.pincode WHERE c.c_id = ?;";
   conn.query(sql, [req.session.userId], (err, result) => {
     if (err) throw err;
     res.status(200).json(result[0]);
@@ -238,8 +255,86 @@ const updatePassword = (req, res) => {
 // Logout User
 const logoutUser = (req, res) => {
   req.session.destroy((err) => {
-    if (err) return res.status(500).send("Error logging out.");
-    res.status(200).send("Logout successful.");
+    if (err) return res.status(500).json({ error: "Error logging out." });
+    res.status(200).json({ message: "Logout successful." });
+  });
+};
+
+const verifyPassword = (req, res) => {
+  const { email, password } = req.body;
+  const sql = "SELECT c_password FROM customer WHERE c_email = ?";
+
+  conn.query(sql, [email], async (err, result) => {
+    if (err) {
+      console.error("Database query error: ", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    if (result.length === 0) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const user = result[0];
+    const validPassword = await bcrypt.compare(password, user.c_password);
+
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    res.status(200).json({ message: "Password verified successfully" });
+  });
+};
+
+// Forgot Password
+const forgotPassword = (req, res) => {
+  const { email } = req.body;
+
+  // Validate email exists in the database
+  const sql = "SELECT C_ID FROM customer WHERE C_EMAIL = ?";
+  conn.query(sql, [email], (err, result) => {
+    if (err) {
+      console.error("Database query error: ", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    if (result.length === 0) {
+      return res.status(400).json({ error: "Email not found." });
+    }
+
+    // Send the password reset email
+    const resetLink = `http://localhost:4000/user/reset-password?email=${email}`;
+    sendMail(
+      email,
+      "Password Reset Request",
+      `Hello,\n\nPlease click the following link to reset your password: ${resetLink}\n\nBest regards,\nThe Team`
+    );
+
+    res.json({ message: "Password reset email sent." });
+  });
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const { email, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match." });
+  }
+
+  // Update the password in the database
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const updateSql = "UPDATE customer SET C_PASSWORD = ? WHERE C_EMAIL = ?";
+
+  conn.query(updateSql, [hashedPassword, email], (err) => {
+    if (err) {
+      console.error("Error updating password: ", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    res.status(200).json({
+      message:
+        "Password reset successful! Please log in with your new password.",
+    });
   });
 };
 
@@ -250,4 +345,7 @@ module.exports = {
   getUserProfile,
   logoutUser,
   updatePassword,
+  verifyPassword,
+  forgotPassword,
+  resetPassword,
 };

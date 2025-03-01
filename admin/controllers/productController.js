@@ -17,88 +17,202 @@ db.connect(err => {
     console.log('Connected to MySQL database');
 });
 
-const getAllProducts = (req, res) => {
-    const page = parseInt(req.query.page) || 1;  // Get current page number, default to 1
-    const limit = 10;  // Number of products per page
-    const offset = (page - 1) * limit;  // Calculate offset
+const getProductsByTable = (req, res) => {
+    const tableName = req.params.tableName;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // Number of products per page
+    const offset = (page - 1) * limit;
 
-    const query = `
-        SELECT 
-            P.P_ID as Product_id, 
-            P.P_NAME as product_name, 
-            P.P_DESC as description, 
-            P.P_PRICE as price, 
-            I.PATH1 as image, 
-            'Plant' as category
-        FROM plants P
-        LEFT JOIN image I ON P.P_ID = I.PRODUCT_ID
-        
-        UNION ALL
-        
-        SELECT 
-            B.B_ID as Product_id, 
-            B.B_NAME as product_name, 
-            B.B_DESC as description, 
-            B.B_PRICE as price, 
-            I.PATH1 as image, 
-            'Bouquet' as category
-        FROM bouquet B
-        LEFT JOIN image I ON B.B_ID = I.PRODUCT_ID
-        
-        UNION ALL
-        
-        SELECT 
-            PT.PT_ID as Product_id, 
-            PT.PT_NAME as product_name, 
-            PT.PT_DESC as description, 
-            PT.PT_PRICE as price, 
-            I.PATH1 as image, 
-            'Pot' as category
-        FROM pots PT
-        LEFT JOIN image I ON PT.PT_ID = I.PRODUCT_ID
-        
-        ORDER BY Product_id
-        LIMIT ${limit} OFFSET ${offset};
-    `;
+    // Validate table name to prevent SQL injection (basic validation)
+    if (!/^[a-z_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid table name" });
+    }
 
-    const countQuery = `
-        SELECT (
-            (SELECT COUNT(*) FROM plants) +
-            (SELECT COUNT(*) FROM bouquet) +
-            (SELECT COUNT(*) FROM pots)
-        ) as total
-    `;
+    // Check if the table exists
+    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, tableResult) => {
+        if (err) {
+            console.error("Error checking table existence:", err);
+            return res.status(500).json({ error: "Database error", details: err.message });
+        }
 
+        if (tableResult.length === 0) {
+            return res.status(404).json({ error: `Table '${tableName}' does not exist.` });
+        }
 
-    Promise.all([
-        new Promise((resolve, reject) => {
-            db.query(query, (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
+        // Dynamically determine the primary key
+        db.query(`SHOW KEYS FROM ${tableName} WHERE Key_name = 'PRIMARY'`, (err, keyResults) => {
+            if (err) {
+                console.error("Error fetching primary key:", err);
+                return res.status(500).json({ error: "Database error", details: err.message });
+            }
+
+            if (keyResults.length === 0) {
+                return res.status(400).json({ error: `No primary key found for table '${tableName}'` });
+            }
+
+            const primaryKey = keyResults[0].Column_name;
+
+            // Fetch the schema of the table to map columns
+            db.query(`SHOW COLUMNS FROM ${tableName}`, (err, columns) => {
+                if (err) {
+                    console.error("Error fetching table schema:", err);
+                    return res.status(500).json({ error: "Database error", details: err.message });
+                }
+
+                // Map columns to expected fields
+                const columnMap = {
+                    id: primaryKey, // Use the primary key as Product_id
+                    name: null,
+                    desc: null,
+                    price: null
+                };
+
+                columns.forEach(col => {
+                    const field = col.Field.toLowerCase();
+                    if (field.includes('name')) columnMap.name = col.Field;
+                    else if (field.includes('desc')) columnMap.desc = col.Field;
+                    else if (field.includes('price')) columnMap.price = col.Field;
+                });
+
+                if (!columnMap.name || !columnMap.price) {
+                    return res.status(400).json({ error: `Required columns (name, price) not found in table '${tableName}'` });
+                }
+
+                // Construct the query with fallbacks for missing columns
+                const productQuery = `
+                    SELECT 
+                        t.${columnMap.id} AS Product_id, 
+                        t.${columnMap.name} AS product_name, 
+                        ${columnMap.desc ? `t.${columnMap.desc}` : 'NULL'} AS description, 
+                        t.${columnMap.price} AS price, 
+                        i.PATH1 AS image
+                    FROM ${tableName} t
+                    LEFT JOIN image i ON t.${columnMap.id} = i.PRODUCT_ID
+                    LIMIT ${limit} OFFSET ${offset}
+                `;
+                const countQuery = `
+                    SELECT COUNT(*) as total
+                    FROM ${tableName}
+                `;
+
+                Promise.all([
+                    new Promise((resolve, reject) => {
+                        db.query(productQuery, (err, results) => {
+                            if (err) reject(err);
+                            else {
+                                console.log(`Fetched products from ${tableName}:`, results); // Debugging
+                                resolve(results);
+                            }
+                        });
+                    }),
+                    new Promise((resolve, reject) => {
+                        db.query(countQuery, (err, results) => {
+                            if (err) reject(err);
+                            else resolve(results[0].total);
+                        });
+                    })
+                ])
+                .then(results => {
+                    const products = results[0];
+                    const totalProducts = results[1];
+                    res.json({
+                        products: products,
+                        totalProducts,
+                        totalPages: Math.ceil(totalProducts / limit),
+                        currentPage: page
+                    });
+                })
+                .catch(err => {
+                    console.error("Error fetching products:", err);
+                    res.status(500).json({ error: "Internal server error", details: err.message });
+                });
             });
-        }),
-        new Promise((resolve, reject) => {
-            db.query(countQuery, (err, results) => {
-                if (err) reject(err);
-                else resolve(results[0].total);
-            });
-        })
-    ])
-    .then(results => {
-        const allProducts = results[0];
-        const totalProducts = results[1];
-        res.json({
-            products: allProducts,
-            totalProducts,
-            totalPages: Math.ceil(totalProducts / limit),
-            currentPage: page
         });
-    })
-    .catch(err => {
-        console.error("Error fetching products:", err);
-        res.status(500).json({ error: "Internal server error" });
     });
 };
+
+// const getAllProducts = (req, res) => {
+//     const page = parseInt(req.query.page) || 1;  // Get current page number, default to 1
+//     const limit = 10;  // Number of products per page
+//     const offset = (page - 1) * limit;  // Calculate offset
+
+//     const query = `
+//         SELECT 
+//             P.P_ID as Product_id, 
+//             P.P_NAME as product_name, 
+//             P.P_DESC as description, 
+//             P.P_PRICE as price, 
+//             I.PATH1 as image, 
+//             'Plant' as category
+//         FROM plants P
+//         LEFT JOIN image I ON P.P_ID = I.PRODUCT_ID
+        
+//         UNION ALL
+        
+//         SELECT 
+//             B.B_ID as Product_id, 
+//             B.B_NAME as product_name, 
+//             B.B_DESC as description, 
+//             B.B_PRICE as price, 
+//             I.PATH1 as image, 
+//             'Bouquet' as category
+//         FROM bouquet B
+//         LEFT JOIN image I ON B.B_ID = I.PRODUCT_ID
+        
+//         UNION ALL
+        
+//         SELECT 
+//             PT.PT_ID as Product_id, 
+//             PT.PT_NAME as product_name, 
+//             PT.PT_DESC as description, 
+//             PT.PT_PRICE as price, 
+//             I.PATH1 as image, 
+//             'Pot' as category
+//         FROM pots PT
+//         LEFT JOIN image I ON PT.PT_ID = I.PRODUCT_ID
+        
+//         ORDER BY Product_id
+//         LIMIT ${limit} OFFSET ${offset};
+//     `;
+
+//     const countQuery = `
+//         SELECT (
+//             (SELECT COUNT(*) FROM plants) +
+//             (SELECT COUNT(*) FROM bouquet) +
+//             (SELECT COUNT(*) FROM pots)
+//         ) as total
+//     `;
+
+
+//     Promise.all([
+//         new Promise((resolve, reject) => {
+//             db.query(query, (err, results) => {
+//                 if (err) reject(err);
+//                 else resolve(results);
+//             });
+//         }),
+//         new Promise((resolve, reject) => {
+//             db.query(countQuery, (err, results) => {
+//                 if (err) reject(err);
+//                 else resolve(results[0].total);
+//             });
+//         })
+//     ])
+//     .then(results => {
+//         const allProducts = results[0];
+//         const totalProducts = results[1];
+//         res.json({
+//             products: allProducts,
+//             totalProducts,
+//             totalPages: Math.ceil(totalProducts / limit),
+//             currentPage: page
+//         });
+//     })
+//     .catch(err => {
+//         console.error("Error fetching products:", err);
+//         res.status(500).json({ error: "Internal server error" });
+//     });
+// };
 const getCategories = (req, res) => {
     db.query('SELECT CY_ID,CY_NAME FROM category', (err, results) => {
         if (err) {
@@ -396,13 +510,14 @@ function generateProductId(lastId, primaryKey) {
 
 
 module.exports = {
+    generateProductId,
     getCategories,
     getField,
-    getAllProducts,
     getAllCategories,
     getSubcategories,
     getSubSubcategories,
     addProduct,
     lastId,
     getPK,
+    getProductsByTable,
 };

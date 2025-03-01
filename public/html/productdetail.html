@@ -20,6 +20,37 @@
     <!-- custom css link -->
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/style copy.css" />
+    <style>
+      #message {
+        margin-bottom: 10px;
+        font-size: large;
+        color: rgb(18, 137, 40);
+      }
+      #product-description {
+        font-family: QuickSand, sans-serif;
+        margin-bottom: 15px;
+        font-size: large;
+        text-align: justify;
+        letter-spacing: 4px;
+        word-spacing: 15px;
+        line-height: 25px;
+      }
+      .review {
+        background: linear-gradient(
+          to left,
+          rgb(186, 223, 237),
+          rgb(173, 221, 255)
+        );
+        border: 2px solid black;
+        padding: 20px;
+        margin: 10px;
+      }
+      .ul-wrapper > li:hover {
+        padding-left: 5px;
+        padding-right: 5px;
+        background-color: skyblue;
+      }
+    </style>
   </head>
   <body>
     <div id="nav"></div>
@@ -40,35 +71,53 @@
         <div class="product-info">
           <h3 id="product-title"></h3>
           <h5 id="product-price">Price :&nbsp;&nbsp;</h5>
-          <!-- <p id="product-description"></p> -->
-
-          <!-- Quantity Input -->
           <label for="quantity">Quantity:</label>
           <div class="product__quantity">
-            <input type="number" id="quantity" value="1" min="1" />
+            <input type="number" id="quantity" min="1" />
           </div>
           <br /><br />
+          <div id="message"></div>
 
           <!-- Buttons -->
           <div class="cart-btn">
-            <button class="cart__btn wishlist" id="add-to-wishlist">
+            <button
+              class="cart__btn wishlist"
+              id="add-to-wishlist"
+              onclick="wishlist();updateWishlistCount();"
+            >
               Add to Wishlist
             </button>
-            <button class="cart__btn cart" id="add-to-cart">Add to Cart</button>
+            <button
+              class="cart__btn cart"
+              id="add-to-cart"
+              onclick="addtocart();updateCartCount();"
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
     </section>
     <div class="product-desc container">
       <div class="wrapper tabbed">
-        <!-- Navigation -->
+        <!-- Nav Links -->
         <nav class="nav-wrap">
           <ul class="ul-wrapper">
-            <li class="tab-link active" data-id="product-description">
-              Product Details
+            <li class="active">
+              <a
+                href="#product-description"
+                class="tabbed-trigger"
+                data-id="product-description"
+                ><span>Product Details</span></a
+              >
             </li>
-            <li class="tab-link" data-id="product-review">
-              Reviews <span id="review-count"></span>
+            <li>
+              <a
+                href="#product-review"
+                class="tabbed-trigger"
+                data-id="product-review"
+                ><span>Reviews</span></a
+              >
             </li>
           </ul>
         </nav>
@@ -119,9 +168,9 @@
           }
           const data = await response.text();
           document.getElementById("nav").innerHTML = data;
-          console.log("Navigation loaded successfully");
+          // ("Navigation loaded successfully");
         } catch (error) {
-          console.error("Error loading navigation:", error);
+          // console.error("Error loading navigation:", error);
           // Optionally, you can show an error message to the user
           document.getElementById("nav").innerHTML =
             "<p>Failed to load navigation.</p>";
@@ -135,9 +184,9 @@
           }
           const data = await response.text();
           document.getElementById("footer").innerHTML = data;
-          console.log("Footer loaded successfully");
+          // console.log("Footer loaded successfully");
         } catch (error) {
-          console.error("Error loading footer:", error);
+          // console.error("Error loading footer:", error);
           // Optionally, you can show an error message to the user
           document.getElementById("footer").innerHTML =
             "<p>Failed to load footer.</p>";
@@ -145,226 +194,24 @@
       }
       document.addEventListener("DOMContentLoaded", loadNav);
       document.addEventListener("DOMContentLoaded", loadFooter);
-      // Sample product data (Can be loaded from API or database)
 
-      const product = {
-        title: "Delicate Beauty Orchids & Roses Arrangement",
-        description:
-          "A beautiful blend of orchids and roses to add elegance to any space.",
-        reviews: [
-          {
-            name: "Sarah",
-            rating: 5,
-            date: "November 7, 2024",
-            comment: "Awesome Product!",
-            desc: "cabsuvhaeofwajkvnakljoiib",
-          },
-          {
-            name: "John",
-            rating: 4,
-            date: "December 10, 2024",
-            comment: "Good quality but slightly expensive.",
-            desc: "cabsuvhaeofwajkvnakljoiib",
-          },
-          {
-            name: "Emily",
-            rating: 5,
-            date: "January 5, 2025",
-            comment: "Absolutely love it!",
-            desc: "cabsuvhaeofwajkvnakljoiib",
-          },
-        ],
-      };
-
-      document.addEventListener("DOMContentLoaded", function () {
-        // Product Data
-        const product = {
-          title: "Delicate Beauty Orchids & Roses Arrangement",
-          description:
-            "A beautiful blend of orchids and roses to add elegance to any space.",
-        };
-
-        // Ensure elements exist before updating
-        const titleElement = document.getElementById("product-title");
-        const descElement = document.getElementById("product-desc");
-
-        if (titleElement && descElement) {
-          titleElement.textContent = product.title;
-          descElement.textContent = product.description;
-        } else {
-          console.error("Product title or description element not found!");
-        }
-      });
-
-      // Populate reviews dynamically
-      const reviewContainer = document.getElementById("review-container");
-      let totalRating = 0;
-
-      product.reviews.forEach((review) => {
-        totalRating += review.rating;
-        const reviewElement = document.createElement("div");
-        reviewElement.classList.add("profile");
-        reviewElement.innerHTML = `
-            <div class="thumb-name">
-              <img src=  "../Database(image)/Plant/P0001/1.jpg" alt="">
-                <div class="grouping">
-                    <strong>${review.name}</strong>
-                    <div class="ratingg">${"⭐".repeat(review.rating)}</div>
-                    <div class="date">${review.date}</div>
-                </div>
-            </div>
-            <div class="comment">${review.comment}</div>
-            <p class="gray">${review.desc}</p>
-            `;
-        reviewContainer.appendChild(reviewElement);
-      });
-
-      // Calculate average rating
-      const averageRating = (totalRating / product.reviews.length).toFixed(1);
-      document.getElementById(
-        "average-rating"
-      ).textContent = `${averageRating} ⭐`;
-      document.getElementById(
-        "total-reviews"
-      ).textContent = `${product.reviews.length} Reviews`;
-      document.getElementById("review-count").textContent =
-        product.reviews.length;
-
-      // Tab switching functionality (Fixed)
-      document.querySelectorAll(".tab-link").forEach((tab) => {
-        tab.addEventListener("click", () => {
-          // Remove active class from all tabs & sections
-          document
-            .querySelectorAll(".tab-link")
-            .forEach((t) => t.classList.remove("active"));
-          document
-            .querySelectorAll(".product-about")
-            .forEach((content) => content.classList.remove("active"));
-
-          // Activate clicked tab and corresponding section
-          tab.classList.add("active");
-          document.getElementById(tab.dataset.id).classList.add("active");
+      document
+        .getElementById("quantity")
+        .addEventListener("keydown", function (e) {
+          // Allow arrow keys (left, up, right, down)
+          if (
+            e.key === "ArrowUp" ||
+            e.key === "ArrowDown" ||
+            e.key === "ArrowLeft" ||
+            e.key === "ArrowRight"
+          ) {
+            return;
+          }
+          // Prevent other keys
+          e.preventDefault();
         });
-      });
-
-      const products1 = [
-        {
-          id: 1,
-          name: "aaa",
-          price: 599,
-          category: "Plant",
-          image: "../Database(image)/Plant/P0001/1.jpg",
-          rating: 4.5,
-          isBestseller: true,
-          isNewArrival: false,
-        },
-        {
-          id: 2,
-          name: "bbb",
-          price: 999,
-          category: "Plant",
-          image: "../Database(image)/Plant/P0001/2.jpg",
-          rating: 4.7,
-          isBestseller: true,
-          isNewArrival: false,
-        },
-        {
-          id: 3,
-          name: "bbb",
-          price: 999,
-          category: "Plant",
-          image: "../Database(image)/Plant/P0001/2.jpg",
-          rating: 4.7,
-          isBestseller: true,
-          isNewArrival: true,
-        },
-        {
-          id: 5,
-          name: "ccc",
-          price: 20,
-          category: "Bouquet",
-          image: "../Database(image)/Bouquet/B0001/1.jpg",
-          rating: 4.2,
-          isBestseller: true,
-          isNewArrival: true,
-        },
-        {
-          id: 6,
-          name: "ddd",
-          price: 40,
-          category: "Bouquet",
-          image: "../Database(image)/Bouquet/B0002/2.jpg",
-          rating: 4.3,
-          isBestseller: true,
-          isNewArrival: false,
-        },
-        {
-          id: 7,
-          name: "ddd",
-          price: 40,
-          category: "Bouquet",
-          image: "../Database(image)/Bouquet/B0003/1.png",
-          rating: 4.3,
-          isBestseller: true,
-          isNewArrival: false,
-        },
-        {
-          id: 8,
-          name: "eee",
-          price: 199,
-          category: "Garden Decor",
-          image: "../Database(image)/Pot/PT0001/1.png",
-          rating: 4.3,
-          isBestseller: false,
-          isNewArrival: true,
-        },
-        {
-          id: 9,
-          name: "eee",
-          price: 199,
-          category: "Garden Decor",
-          image: "../Database(image)/Pot/PT0001/1.png",
-          rating: 4.3,
-          isBestseller: true,
-          isNewArrival: false,
-        },
-        {
-          id: 10,
-          name: "eee",
-          price: 199,
-          category: "Garden Decor",
-          image: "../Database(image)/Pot/PT0001/1.png",
-          rating: 4.3,
-          isBestseller: false,
-          isNewArrival: true,
-        },
-      ];
-      function displayProducts1(containerId) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ""; // Clear previous products
-
-        products1.forEach((product) => {
-          const productCard = document.createElement("div");
-          productCard.className = "product-card";
-          productCard.innerHTML = `
-          <img src="${product.image}" alt="${product.name}">
-          <h3>${product.name}</h3>
-          <p>Rating: ${product.rating} ⭐</p>
-          <p>Price: $${product.price}</p>
-          <div class="product-icons">
-             <a href="/wishlist/add" class="action__btn" aria-label="Add to Wishlist">
-                    <i class="fa-regular fa-heart"></i>
-                  </a>
-                  <a href="/cart/add" class="action__btn" aria-label="ADD TO CART">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                  </a>
-          </div>
-        `;
-          container.appendChild(productCard);
-        });
-      }
-      displayProducts1("newarrival-container");
     </script>
+    <script src="../js2/search.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js2/prodetail.js"></script>
     <script

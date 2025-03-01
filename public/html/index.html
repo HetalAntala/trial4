@@ -46,46 +46,63 @@
 
     <!-- Container section stats -->
     <section class="icons__container container flex">
-      <img src="../images/imagetrial2_1.png" width="1100px" height="200px" />
+      <div class="Indexcontainer">
+        <div class="Indexcard" data-index="1">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/free shipping.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">Free shipping</div>
+        </div>
+        <div class="Indexcard" data-index="2">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/online order.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">Online Order</div>
+        </div>
+        <div class="Indexcard" data-index="3">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/save money.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">Save Money</div>
+        </div>
+        <div class="Indexcard" data-index="4">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/payment secure.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">Secure</div>
+        </div>
+        <div class="Indexcard" data-index="5">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/happy sell.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">Happy Sell</div>
+        </div>
+        <div class="Indexcard" data-index="6">
+          <div class="face face1">
+            <div class="content">
+              <img src="../images/24-7.jpeg" alt="" />
+            </div>
+          </div>
+          <div class="face face2">24/7 Support</div>
+        </div>
+      </div>
     </section>
     <!-- Container section ends -->
 
     <!-- Category section starts -->
     <section class="categories container section" id="category">
       <h3 class="section__title"><span>Popular</span> Categories</h3>
-      <div class="categories__container flex">
-        <div class="">
-          <a href="/plants" class="category__item">
-            <img src="../images/plant.jpeg" alt="" class="category__img" />
-            <h3 class="category__title">Plant&rarr;</h3>
-          </a>
-        </div>
-
-        <div class="">
-          <a href="/bouquets" class="category__item">
-            <img src="../images/bouquet.jpeg" alt="" class="category__img" />
-            <h3 class="category__title">Bouquet &rarr;</h3>
-          </a>
-        </div>
-        <div class="">
-          <a href="/pots" class="category__item">
-            <img src="../images/3.avif" alt="" class="category__img" />
-            <h3 class="category__title">Pot &rarr;</h3>
-          </a>
-        </div>
-        <div class="">
-          <a href="/fertilizers" class="category__item">
-            <img src="../images/fertilizer.jpeg" alt="" class="category__img" />
-            <h3 class="category__title">Fertilizer &rarr;</h3>
-          </a>
-        </div>
-        <div class="">
-          <a href="/tools" class="category__item">
-            <img src="../images/5.webp" alt="" class="category__img" />
-            <h3 class="category__title">Tool &rarr;</h3>
-          </a>
-        </div>
-      </div>
+      <div class="categories__container flex" id="categories-container"></div>
     </section>
     <!-- Category section ends -->
 
@@ -151,9 +168,7 @@
         <div class="rating-div" id="testimonials"></div>
 
         <!-- View More Button -->
-        <div class="flex">
-          <button class="rate__btn">View More</button>
-        </div>
+        <div class="flex" id="feedback"></div>
       </div>
     </section>
     <!-- Rating section ends -->
@@ -210,7 +225,7 @@
       nomodule
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
+    <script src="../js2/search.js"></script>
     <script src="../js/main.js"></script>
-    <!-- <script src="../js/dataindex.js"></script> -->
   </body>
 </html>

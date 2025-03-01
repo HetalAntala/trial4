@@ -516,35 +516,33 @@
             </div>
             <div class="tab__content" id="viewproduct">
               <div class="form-group">
-                  <label for="prod_catt">Select Category:</label>
-                  <select id="prod_catt" onchange="fetchProductsByCategory()" required>
-                      <option value="">Select Category</option>
-                  </select>
+                <label for="prod_catt">Select Category:</label>
+                <select id="prod_catt" onchange="fetchProductsByCategory()">
+                  <option value="">Select Category</option>
+                </select>
               </div>
-          
               <table id="product-table" class="table table-bordered">
-                  <thead>
-                      <tr>
-                          <th>Product ID</th>
-                          <th>Product Name</th>
-                          <th>Description</th>
-                          <th>Price</th>
-                          <th>Image</th>
-                          <th>Category</th>
-                      </tr>
-                  </thead>
-                  <tbody id="product-details">
-                      <tr>
-                          <td colspan="6" class="text-center">No products found</td>
-                      </tr>
-                  </tbody>
+                <thead>
+                  <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                    <th>Category</th>
+                  </tr>
+                </thead>
+                <tbody id="product-details">
+                  <tr>
+                    <td colspan="6" class="text-center">Please select a category to view products</td>
+                  </tr>
+                </tbody>
               </table>
-          
               <!-- Pagination Controls -->
               <nav>
-                  <ul class="pagination" id="pagination-controls"></ul>
+                <ul class="pagination" id="pagination-controls"></ul>
               </nav>
-          </div>
+            </div>
           
             <div class="tab__content" content id="addproduct">
               <h3>Add / Update Product</h3>

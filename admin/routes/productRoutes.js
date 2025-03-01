@@ -23,9 +23,7 @@ const upload = multer({
     { name: 'prod_img3', maxCount: 1 }
 ]);
 
-
-router.get('/products', productController.getAllProducts);
-
+router.get('/table/:tableName/products', productController.getProductsByTable);
 
 router.get('/categories2', productController.getCategories);
 router.get('/categories1', productController.getAllCategories);

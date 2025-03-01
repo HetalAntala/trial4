@@ -8,8 +8,6 @@
     <!-- custom css link -->
     <link rel="stylesheet" href="../css/style.css" />
     <style>
-      /* Same CSS styles as before */
-      /* body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f8f8; } */
       .header {
         text-align: center;
         padding: 20px;
@@ -19,6 +17,7 @@
         width: 80%;
         margin: 0 auto;
         padding-top: 20px;
+        margin-bottom: 100px;
       }
       table {
         width: 100%;
@@ -90,6 +89,13 @@
           font-size: 16px;
         }
       }
+      #message {
+        font-size: large;
+        margin-top: 40px;
+        margin-left: 130px;
+        margin-bottom: -20px;
+        color: rgba(255, 0, 0, 0.555);
+      }
     </style>
   </head>
   <body>
@@ -99,7 +105,7 @@
     <div class="header">
       <h1>My Cart</h1>
     </div>
-
+    <div id="message"></div>
     <div class="cart-container">
       <table id="cartTable">
         <thead>
@@ -109,16 +115,17 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Total</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="cart-container"></tbody>
-        <!-- <tbody class="cart-items" id="cart-items"></tbody> -->
+        <tbody class="cart-items" id="cart-items"></tbody>
       </table>
       <div class="cart-summary">
-        <p class="summary-subtotal">Subtotal: <strong>Rs. 540</strong></p>
-        <p class="summary-shipping">Shipping: <strong>Rs. 50</strong></p>
-        <h4 class="summary-total">Total: <strong>Rs. 590</strong></h4>
-        <button class="checkout-btn">Proceed to Checkout</button>
+        <h4 class="summary-total" id="total"></h4>
+        <a href="/checkout.html"
+          ><button class="checkout-btn">Proceed to Checkout</button></a
+        >
       </div>
     </div>
     <div id="footer"></div>
@@ -166,6 +173,8 @@
       nomodule
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
+    <script src="../js2/search.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js2/cart.js"></script>
   </body>
 </html>

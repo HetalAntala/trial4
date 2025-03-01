@@ -1,153 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shop</title>
     <!-- Font awsome link -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
     <!-- Google Font link -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
     <!-- custom css link -->
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/style copy.css">
-  
-</head>
-<body>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/style copy.css" />
+  </head>
+  <body>
     <!-- Header section starts -->
-      <div id="nav"></div>
+    <div id="nav"></div>
     <!-- Header section ends -->
 
-  <!--=============== BREADCRUMB ===============-->
-  <section class="breadcrumb">
-    <ul class="breadcrumb__list container">
-      <li><a href="index.html" class="breadcrumb__link">Home</a></li>
-      <li><span class="breadcrumb__link">></span></li>
-      <li><span class="breadcrumb__link" id="breadcrumb1"></span></li>
-    </ul>
-  </section>
+    <!--=============== BREADCRUMB ===============-->
+    <section class="breadcrumb">
+      <ul class="breadcrumb__list container">
+        <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><span class="breadcrumb__link" id="breadcrumb1"></span></li>
+      </ul>
+    </section>
 
-  <!-- Hero section  starts-->
-  <section class="hero container">
-    <h1 id="heading"></h1>
-    <p>Result: <span id="tp"></span><p id="info1"></p></p>
-    <div class="category-option">
-        <div class="options flex">
-            <div class="option-div">
-                <div class="option-items">
-                    <a href="" id="a1">
-                      <img id="sub_cat_img1" alt="">
-                    </a>
-                    <a href="" class="cat" id="sub_cat1"></a> 
-                </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a2">
-                  <img id="sub_cat_img2"" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat2"></a> 
-              </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a3">
-                  <img id="sub_cat_img3" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat3"></a> 
-            </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a4">
-                  <img id="sub_cat_img4" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat4"></a> 
-            </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a5">
-                  <img id="sub_cat_img5" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat5"></a> 
-            </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a6">
-                  <img id="sub_cat_img6" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat6"></a> 
-            </div>
-            </div>
-            <div class="option-div">
-              <div class="option-items">
-                <a href="" id="a7">
-                  <img id="sub_cat_img7" alt="">
-                </a>
-                <a href="" class="cat" id="sub_cat7"></a> 
-            </div>
-            </div>  
-        </div>
-    </div>
-</section>
-<!-- Hero section  ends-->
+    <!-- Hero section  starts-->
+    <section class="hero container">
+      <h1 id="heading"></h1>
+      <p>Result: <span id="tp"></span></p>
+      <p id="info1"></p>
+      <div class="category-option">
+        <div class="options flex" id="options-container"></div>
+      </div>
+    </section>
+    <!-- Hero section  ends-->
 
-<!-- Products  section starts-->
-  <section class="shop-page">
-    <div class="container">
-      <div class="shop-sorting-data">
-        <div class="shop-page-text">
-          <p>All Plants</p>
-        </div>
-        <!-- Search by Terms -->
-        <div class="top">
-          <form>
+    <!-- Products  section starts-->
+    <section class="shop-page">
+      <div class="container">
+        <div class="shop-sorting-data">
+          <div class="shop-page-text">
+            <p>All Products</p>
+          </div>
+          <!-- Search by Terms -->
+          <div class="top">
+            <form>
               <select id="sizeFilter"></select>
-          </form>
-          <form>
+            </form>
+            <form>
               <select id="colorFilter"></select>
-          </form>
-          <form>
+            </form>
+            <form>
               <select id="defaultSorting"></select>
-          </form>
+            </form>
+            <button id="resetFilters">Reset Filters</button>
+          </div>
+        </div>
       </div>
-      </div>
-      </div>
-    </div>
-  </section>
-  <!-- product section Ends  -->
-  <!-- product display section starts-->
-  <section class="container section">
-    <div id="product-container" class="product-container"></div>
-  </section>
-  
-    <div class="flex">
-      <button class="rate__btn" onclick="view_more()">View More</button>
-    </div>
+    </section>
+    <!-- product section Ends  -->
+    <!-- product display section starts-->
+    <section class="container section">
+      <div id="product-container" class="grid-container"></div>
+    </section>
 
     <h1 id="heading1">You may also like them</h1>
     <div class="slider">
-      <button class="slide-btn" id="slide-left-newarrival">&lt;</button>
       <div id="newarrival-container" class="product-container container"></div>
-      <button class="slide-btn" id="slide-right-newarrival">&gt;</button>
     </div>
-  <!-- new arrival section ends -->
-   <!-- Footer section  starts-->
-   <div id="footer"></div>
-  <!-- Footer section  ends-->
-   <button id = "btnScrollToTop">
-    <i class="fa-solid fa-arrow-up"></i>
-   </button>
-   <!-- <script src="../js2/index.js"></script> -->
-  <script>
+    <!-- new arrival section ends -->
+    <!-- Footer section  starts-->
+    <div id="footer"></div>
+    <!-- Footer section  ends-->
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+    <!-- <script src="../js2/index.js"></script> -->
+    <script>
       const btnScrollToTop = document.querySelector("#btnScrollToTop");
       btnScrollToTop.addEventListener("click", function () {
-          window.scrollTo(0,0); }
-      );
+        window.scrollTo(0, 0);
+      });
       async function loadNav() {
         try {
           const response = await fetch("/header");
@@ -177,49 +120,22 @@
           console.error("Error loading footer:", error);
           // Optionally, you can show an error message to the user
           document.getElementById("footer").innerHTML =
-          "<p>Failed to load footer.</p>";
+            "<p>Failed to load footer.</p>";
         }
       }
       document.addEventListener("DOMContentLoaded", loadNav);
       document.addEventListener("DOMContentLoaded", loadFooter);
-
-    const options = [
-        { value: "1", text: "Sort By Size" },
-        { value: "2", text: "Sort By Price" },
-        { value: "3", text: "Sort By Popularity" },
-        { value: "4", text: "Sort By Sale" },
-        { value: "5", text: "Sort By Rating" }
-    ];
-
-    const dropdowns = {
-        sizeFilter: ["Size", ...options],
-        colorFilter: ["Color", ...options],
-        defaultSorting: ["Default Sorting", ...options]
-    };
-
-    // Function to populate select elements
-    function populateDropdown(id, options) {
-        const select = document.getElementById(id);
-        options.forEach(option => {
-            const opt = document.createElement("option");
-            opt.value = option.value;
-            opt.textContent = option.text;
-            select.appendChild(opt);
-        });
-    }
-
-    // Populate all dropdowns
-    Object.keys(dropdowns).forEach(id => {
-        populateDropdown(id, dropdowns[id].map((text, index) => ({
-            value: index.toString(),
-            text
-        })));
-    });
-    
-  </script>
-  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js2/shop.js"></script>
-</body>
+    </script>
+    <script src="../js2/search.js"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/shop.js"></script>
+  </body>
 </html>

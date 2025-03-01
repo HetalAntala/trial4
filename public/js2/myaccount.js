@@ -10,64 +10,29 @@ fetch("/user/profile")
       login.textContent = "Login";
       userdesc.innerHTML += "<br><br>";
       userdesc.appendChild(login);
-      throw new Error("Unauthorized"); // Stop further processing
+      throw new Error("Unauthorized");
     } else {
-      return response.json(); // Parse the response as JSON
+      return response.json();
     }
   })
   .then((data) => {
-    // Check if data is defined and has the expected structure
     if (data && data.c_username) {
       username.innerHTML += data.c_username;
-      fetch("/orders/customer/orders") // Replace with your actual API endpoint
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok.");
-          }
-          return response.json();
-        })
-        .then((orders) => {
-          // Clear any existing rows in the table
-          const orderTableBody = document.getElementById("orderTableBody");
-          orderTableBody.innerHTML = "";
 
-          // Iterate over the orders and create table rows
-          orders.forEach((order) => {
-            const row = document.createElement("tr");
-
-            // Create table cells
-            const orderIdCell = document.createElement("td");
-            orderIdCell.textContent = `#${order.O_ID}`;
-
-            const dateCell = document.createElement("td");
-            dateCell.textContent = new Date(order.O_DATE).toLocaleDateString();
-
-            const statusCell = document.createElement("td");
-            statusCell.textContent = order.O_STATUS;
-
-            const totalCell = document.createElement("td");
-            totalCell.textContent = `Rs. ${order.ODETAILS_PRICE.toFixed(2)}`;
-
-            const actionsCell = document.createElement("td");
-            const viewLink = document.createElement("a");
-            viewLink.href = `#`; // Replace with actual link if needed
-            viewLink.classList.add("view__order");
-            viewLink.textContent = "View";
-            actionsCell.appendChild(viewLink);
-
-            // Append cells to the row
-            row.appendChild(orderIdCell);
-            row.appendChild(dateCell);
-            row.appendChild(statusCell);
-            row.appendChild(totalCell);
-            row.appendChild(actionsCell);
-
-            // Append row to the table body
-            orderTableBody.appendChild(row);
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching orders:", error);
+      fetch("/order/customer/orders")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("order_image").src = "../" + data.image;
+          document.getElementById("order_name").innerHTML = data.name.replace(
+            /_/g,
+            " "
+          );
+          document.getElementById("order_price").innerHTML += data.price;
+          document.getElementById("order_id").innerHTML += data.o_id;
+          document.getElementById("order_date").innerHTML += new Date(
+            data.o_date
+          ).toLocaleDateString("en-GB");
+          document.getElementById("order_status").innerHTML += data.o_status;
         });
     } else {
       console.error("Invalid data structure:", data);
@@ -94,7 +59,6 @@ function logout() {
     })
     .then((data) => {
       alert("Logout successful: " + data);
-      // Optionally, redirect to the login page or another page
       window.location.href = "/";
     })
     .catch((error) => {
@@ -137,7 +101,7 @@ function updateUser() {
       // Ensure the data contains the expected fields
       if (data.message) {
         var up = document.getElementById("updateprofile");
-        up.textContent = "Profile Updated Successfully!"; // Update the message
+        alert("Profile Updated Successfully!"); // Update the message
       } else {
         throw new Error("Unexpected response format");
       }
@@ -174,7 +138,7 @@ function changepass() {
       return response.json(); // Parse the response as JSON
     })
     .then((data) => {
-        alert("Password Updated Successfully!");
+      alert("Password Updated Successfully!");
     })
     .catch((error) => {
       console.log("Error:", error);

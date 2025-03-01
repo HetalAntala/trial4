@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Checkout</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Wish shop project" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../css/checkout.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <div class="super_container">
+      <!-- Checkout -->
+      <div class="checkout container">
+        <!-- Billing Details -->
+        <div class="billing__details">
+          <div class="billing">
+            <div class="checkout_title">billing details</div>
+            <div class="checkout_form_container">
+              <form action="#" id="checkout_form">
+                <div class="box1">
+                  <input
+                    type="text"
+                    class="checkout_input"
+                    placeholder="Name"
+                    required="required"
+                    id="name"
+                  />
+                </div>
+                <input
+                  type="text"
+                  class="checkout_input"
+                  placeholder="E-mail"
+                  required="required"
+                  id="email"
+                />
+                <textarea
+                  name="checkout_address"
+                  id="checkout_address"
+                  class="checkout_address"
+                  placeholder="Address"
+                  required="required"
+                ></textarea>
+
+                <div class="box1">
+                  <input
+                    type="text"
+                    class="checkout_input checkout_input_50"
+                    placeholder="City"
+                    required="required"
+                    id="city"
+                  />
+                  <input
+                    type="text"
+                    class="checkout_input checkout_input_50"
+                    placeholder="Area"
+                    required="required"
+                    id="state"
+                  />
+                </div>
+                <!-- <input type="text" class="checkout_input" placeholder="state" required="required"> -->
+                <div class="box1">
+                  <input
+                    type="text"
+                    class="checkout_input checkout_input_50"
+                    placeholder="Pincode"
+                    required="required"
+                    id="pincode"
+                  />
+                  <input
+                    type="text"
+                    class="checkout_input checkout_input_50"
+                    placeholder="Phone No"
+                    required="required"
+                    id="mobile"
+                  />
+                </div>
+
+                <div class="billing_button">
+                  <button class="cart_total_button" id="continueForPayment">
+                    Continue for payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Details -->
+        <div class="cart__details">
+          <div class="checkout_title">Bill Summary</div>
+          <div class="cart_total">
+            <ul id="item_summary"></ul>
+            <ul>
+              <li class="box2">
+                <div class="cart_total_title"><h3>Total</h3></div>
+                <div class="cart_total_price" id="total_amount"></div>
+              </li>
+            </ul>
+            <div class="billing_button">
+              <button class="cart_total_button">
+                <a href="./cart.html">View Cart</a>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer section  starts-->
+    <div id="footer"></div>
+    <!-- Footer section  ends-->
+    <button id="btnScrollToTop">
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+      const btnScrollToTop = document.querySelector("#btnScrollToTop");
+      btnScrollToTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+          console.log("Footer loaded successfully");
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="../js2/search.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/checkout.js"></script>
+  </body>
+</html>

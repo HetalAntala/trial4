@@ -99,6 +99,12 @@
       .wishlist-item-actions button:hover {
         background: #ff1a1a;
       }
+      #message {
+        font-size: large;
+        margin-top: 30px;
+        margin-left: 20px;
+        color: rgba(255, 0, 0, 0.555);
+      }
     </style>
   </head>
 
@@ -108,14 +114,13 @@
     <!-- Header section ends -->
     <!-- Whishlsit section starts -->
     <section id="wishlist-items" class="wishlist-items conatiner">
-      <h1>Your Whishlist:</h1>
+      <h1 id="message">Your Whishlist:</h1>
       <table>
         <thead>
           <tr>
             <th>Item</th>
             <th>Name</th>
             <th>Price</th>
-            <th>Stock</th>
             <th>Action</th>
             <th>Add</th>
           </tr>
@@ -173,84 +178,9 @@
       }
       document.addEventListener("DOMContentLoaded", loadNav);
       document.addEventListener("DOMContentLoaded", loadFooter);
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const wishlistContainer = document.getElementById("wishlist-container");
-
-        if (!wishlistContainer) {
-          console.error("Wishlist container not found!");
-          return;
-        }
-
-        const wishlist = [
-          {
-            id: 1,
-            name: "Monstera Deliciosa",
-            price: "Rs. 250",
-            stock: "In Stock",
-            image: "../../Database(image)/Plant/P0001/1.jpg",
-          },
-          {
-            id: 2,
-            name: "Fiddle Leaf Fig",
-            price: "Rs. 350",
-            stock: "Low Stock",
-            image: "../../Database(image)/Plant/P0002/1.jpg",
-          },
-          {
-            id: 3,
-            name: "Snake Plant",
-            price: "Rs. 200",
-            stock: "In Stock",
-            image: "../../Database(image)/Plant/P0003/1.jpg",
-          },
-        ];
-
-        function loadWishlist() {
-          wishlistContainer.innerHTML = "";
-          wishlist.forEach((product) => {
-            wishlistContainer.innerHTML += `
-                <tr>
-                    <td><img src="${product.image}" alt="${product.name}" width="50"></td>
-                    <td>${product.name}</td>
-                    <td>${product.price}</td>
-                    <td>${product.stock}</td>
-                    <td><button onclick="removeFromWishlist(${product.id})">Remove</button></td>
-                    <td><button class="add-btn" onclick="addToCart(${product.id})">Add to Cart</button></td>
-                </tr>
-            `;
-          });
-        }
-
-        function removeFromWishlist(id) {
-          const index = wishlist.findIndex((item) => item.id === id);
-          if (index !== -1) {
-            wishlist.splice(index, 1);
-            loadWishlist();
-          }
-        }
-
-        loadWishlist();
-      });
-      function addToCart(id) {
-        const product = products.find((p) => p.id === id);
-        if (product.stock <= 0) {
-          alert("Sorry, this product is out of stock!");
-          return;
-        }
-
-        // Check if product is already in cart
-        const productIndex = cart.findIndex((item) => item.id === id);
-        if (productIndex !== -1) {
-          cart[productIndex].quantity++;
-        } else {
-          cart.push({ ...product, quantity: 1 });
-        }
-
-        alert(`${product.name} has been added to your cart!`);
-      }
     </script>
     <!-- Custom JS -->
+    <script src="../js2/search.js"></script>
     <script
       type="module"
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
@@ -260,5 +190,6 @@
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     ></script>
     <script src="../js/main.js"></script>
+    <script src="../js2/wishlist.js"></script>
   </body>
 </html>

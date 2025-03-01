@@ -406,3 +406,18 @@ body {
   background-color: gray;
 }
 /* Product Page ends */
+#resetFilters {
+  padding: 5px;
+  margin-top: -20px;
+  margin-left: 20px;
+  font-size: large;
+  border: 5px solid #27ae60;
+}
+#resetFilters:hover {
+  color: white;
+  margin-top: -20px;
+  margin-left: 20px;
+  background-color: #27ae60;
+  font-size: large;
+  border: 5px solid #27ae60;
+}

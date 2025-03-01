@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORDER PLACED</title>
+
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      #orderContainer {
+        width: 80%;
+        padding-top: 150px;
+        padding-bottom: 150px;
+        margin: auto;
+        text-align: center;
+      }
+      .check img {
+        color: rgb(5, 187, 5);
+        padding-bottom: 30px;
+        font-size: 10em;
+      }
+      #aboutCheck p {
+        font-size: 2rem;
+        font-weight: 100;
+        letter-spacing: 1px;
+      }
+      #aboutCheck h1 {
+        font-size: 5rem;
+        letter-spacing: 0.2rem;
+        line-height: 2;
+        /* letter-spacing: 1px; */
+        word-spacing: 1px;
+      }
+      #aboutCheck a {
+        font-size: 1.5rem;
+        background-color: rgb(85, 184, 105);
+        padding: 10px;
+        margin-top: 2rem;
+        border-radius: 15px;
+        color: black;
+        font-weight: 600;
+      }
+
+      /* ----------------------------- MEDIA QUERY --------------------------- */
+
+      @media (max-width: 700px) {
+        .check img {
+          padding-bottom: 30px;
+        }
+        #aboutCheck h1 {
+          font-size: 18px;
+        }
+        #aboutCheck p {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <!-- OREDER PLACED -->
+    <div id="orderContainer">
+      <div id="check">
+        <img src="./images/icon/checked.png" alt="" height="100px" />
+      </div>
+
+      <div id="aboutCheck">
+        <h1>Order Placed Successfully!</h1>
+        <!-- <p>We've sent you an email with the Order details.</p> -->
+        <a href="/">Go back to home page</a>
+      </div>
+    </div>
+    <script>
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+    </script>
+    <script src="../js/main.js"></script>
+    <script src="../js2/search.js"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

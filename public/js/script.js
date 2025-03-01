@@ -25,17 +25,6 @@ async function fetchAndDisplayProducts(endpoint, containerId) {
                         <img src="${product.PATH1}" alt="${product.P_NAME}" class="product__img default"/>
                         <img src="${product.PATH2}" alt="${product.P_NAME}" class="product__img hover"/>
                     </a>
-                    <div class="product__actions">
-                        <a href="#" class="action__btn" aria-label="Quick View">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                        <a href="#" class="action__btn" aria-label="Add to Wishlist">
-                            <i class="fa-regular fa-heart"></i>
-                        </a>
-                        <a href="#" class="action__btn" aria-label="ADD TO CART">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </a>
-                    </div>
                 </div>
                 <div class="product__content">
                     <a href="productdetails.html">

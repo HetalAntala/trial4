@@ -1,0 +1,157 @@
+/*********************************
+6. Checkout
+*********************************/
+
+.checkout {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  padding-bottom: 111px;
+  background: #ffffff;
+}
+.checkout_title {
+  font-family: "Lucida", serif;
+  font-size: 30px;
+  color: #232323;
+  text-transform: uppercase;
+  line-height: 0.75;
+}
+
+/*********************************
+6.1 Billing
+*********************************/
+.billing__details {
+  width: 50%;
+}
+.box1 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.billing {
+  padding-top: 40px;
+}
+.checkout_form_container {
+  margin-top: 64px;
+}
+.checkout_input {
+  width: 100%;
+  height: 57px;
+  border: solid 1px #b5b5b5;
+  margin-bottom: 22px;
+  padding-left: 34px;
+  outline: none;
+}
+.checkout_input_50 {
+  width: calc((100% - 30px) / 2);
+}
+.checkout_input::input-placeholder,
+.checkout_comment::input-placeholder {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #232323 !important;
+}
+
+.checkout_address {
+  width: 100%;
+  border: solid 1px #b5b5b5;
+  outline: none;
+  height: 150px;
+  padding-left: 34px;
+  padding-top: 20px;
+  margin-bottom: 22px;
+}
+
+/*********************************
+6.2 Cart
+*********************************/
+/* Align items perfectly within the container */
+.box2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Center items vertically */
+  padding: 10px 0; /* Add padding for better readability */
+  border: none; /* Keeping borders as you prefer */
+}
+
+.cart_total {
+  width: 100%;
+  margin-top: 64px;
+}
+
+.cart_total ul {
+  width: 100%;
+  margin-top: 20px;
+  border-bottom: 2px solid black;
+}
+
+.cart_total ul li {
+  display: flex; /* Align items properly */
+  justify-content: space-between; /* Align items perfectly within the container */
+  width: 100%;
+  font-size: 14px;
+  color: #2f2f2f;
+  border-bottom: solid 1px #000000;
+  padding: 50px 0; /* Adjust padding for better readability */
+}
+
+.cart_total_price {
+  margin-left: auto;
+}
+
+.cart_total_button {
+  width: 100%;
+  height: 47px;
+  border: solid 1px #b5b5b5;
+  outline: none;
+  background: #937c6f;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-top: 42px; /* Adjusted to one value */
+  cursor: pointer;
+  transition: all 200ms ease;
+  margin-bottom: 3rem;
+}
+
+.cart_total_button a {
+  font-size: 15px;
+  color: #ffffff; /* Ensure text color is white for contrast */
+  text-decoration: none; /* Remove underline */
+}
+
+.cart_total_button:hover {
+  background: #ffffff;
+  color: #937c6f;
+}
+
+.cart_total_button:hover a {
+  color: #937c6f;
+}
+
+/************
+6. 991px
+************/
+@media only screen and (max-width: 1200px) {
+  .billing__details {
+    display: block;
+    width: 100%;
+  }
+}
+@media only screen and (max-width: 991px) {
+  .box1 {
+    display: block;
+  }
+
+  .checkout_input_50 {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .cart__details {
+    display: block;
+    width: 100%;
+    margin-left: 1rem;
+  }
+}

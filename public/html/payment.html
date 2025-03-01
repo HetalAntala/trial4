@@ -1,0 +1,226 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+
+    <!-- Font awsome link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <!-- Google Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400..700&family=Roboto+Condensed:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <!-- <link rel="stylesheet" href="./css/style.css"> -->
+    <link rel="stylesheet" href="./css/payment.css" />
+  </head>
+  <body>
+    <div id="nav"></div>
+    <!-- Header section ends -->
+    <div class="container mt-5">
+      <div class="row pt-5">
+        <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 mt-3">
+          <div id="accordion">
+            <div class="card">
+              <div class="card-header">
+                <div class="row pt-3">
+                  <div class="col-2 text-center">
+                    <span
+                      style="
+                        padding: 2% 8%;
+                        border: 1px solid transparent;
+                        background-color: rgb(197, 191, 191);
+                      "
+                      >1</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <span
+                      style="
+                        font-size: 15px;
+                        font-weight: 600;
+                        color: grey;
+                        text-transform: uppercase;
+                      "
+                      >delivery address</span
+                    >
+                    <div id="address"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="row pt-3 pb-3">
+                    <div class="col-2 text-center">
+                      <span
+                        style="
+                          padding: 2% 8%;
+                          border: 1px solid transparent;
+                          background-color: rgb(197, 191, 191);
+                        "
+                        >2</span
+                      >
+                    </div>
+                    <div class="col-10">
+                      <span
+                        style="
+                          font-size: 15px;
+                          font-weight: 600;
+                          color: grey;
+                          text-transform: uppercase;
+                        "
+                        >Order Summary</span
+                      >
+                      <div id="order-summary"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="row pt-3 pb-3">
+                    <div class="col-2 text-center">
+                      <span
+                        style="
+                          padding: 2% 8%;
+                          border: 1px solid transparent;
+                          background-color: rgb(197, 191, 191);
+                        "
+                        >3</span
+                      >
+                    </div>
+                    <div class="col-10">
+                      <span
+                        style="
+                          font-size: 15px;
+                          font-weight: 600;
+                          color: grey;
+                          text-transform: uppercase;
+                        "
+                        >Payment Options</span
+                      >
+                      <form id="payment-form">
+                        <input
+                          type="radio"
+                          id="cod"
+                          name="payment"
+                          value="cod"
+                        />
+                        <label for="cod">Cash on Delivery</label><br />
+
+                        <input type="radio" id="qr" name="payment" value="qr" />
+                        <label for="qr">QR Code</label><br />
+                      </form>
+
+                      <div id="password-container" style="display: none">
+                        <label for="password">Enter Password:</label>
+                        <input type="password" id="password" />
+                        <button type="button" id="submit-password">
+                          Submit
+                        </button>
+                      </div>
+
+                      <div id="qr-code-container" style="display: none">
+                        <img
+                          id="qr-code-image"
+                          src=""
+                          alt="QR Code for Payment"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-12 col-md-12 col-sm-12 col-12 mt-3 pt-4">
+          <div class="container">
+            <div class="card">
+              <div class="card-header">PRICE DETAILS</div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col text-left">Price :</div>
+                  <div class="col text-right" id="price"></div>
+                </div>
+                <hr />
+                <div class="row">
+                  <div class="col text-left">Total Amount :</div>
+                  <div class="col text-right" id="total"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        class="btn order__btn"
+        id="confirm-order"
+        onclick="handleConfirmOrder()"
+        disabled
+      >
+        Confirm Order
+      </button>
+    </div>
+    <div id="footer"></div>
+    <!-- Footer section  ends-->
+    <script>
+      async function loadNav() {
+        try {
+          const response = await fetch("/header");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("nav").innerHTML = data;
+          console.log("Navigation loaded successfully");
+        } catch (error) {
+          console.error("Error loading navigation:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("nav").innerHTML =
+            "<p>Failed to load navigation.</p>";
+        }
+      }
+      async function loadFooter() {
+        try {
+          const response = await fetch("/footer");
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.text();
+          document.getElementById("footer").innerHTML = data;
+          console.log("Footer loaded successfully");
+        } catch (error) {
+          console.error("Error loading footer:", error);
+          // Optionally, you can show an error message to the user
+          document.getElementById("footer").innerHTML =
+            "<p>Failed to load footer.</p>";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", loadNav);
+      document.addEventListener("DOMContentLoaded", loadFooter);
+    </script>
+    <script src="../js2/search.js"></script>
+    <script src="../js/main.js"></script>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../js2/payment.js"></script>
+  </body>
+</html>

@@ -38,42 +38,38 @@ function fetchOrders() {
         .catch(error => console.error('Error fetching orders:', error));
 }
 
-document.addEventListener('DOMContentLoaded', fetchOrders);
-
-
-
 // View order details
 function viewOrderDetails(orderId) {
-    // Clear existing order details
-    document.getElementById("order-details").innerHTML= ""; 
+    document.getElementById("order-details").innerHTML = "";
 
     fetch(`/order/orderdets/${orderId}/details`)
         .then((response) => response.json())
         .then((details) => {
-            const uniqueDetails = details.filter((value, index, self) => 
+            const uniqueDetails = details.filter((value, index, self) =>
                 index === self.findIndex((t) => (
                     t.Odetails_id === value.Odetails_id
                 ))
             );
-            console.log("Order Details:", details);
-            if (Array.isArray(details) && details.length > 0) {
+            console.log("Order Details:", uniqueDetails);
+            if (Array.isArray(uniqueDetails) && uniqueDetails.length > 0) {
                 uniqueDetails.forEach((detail) => {
                     let row = `
-                            <tr>
-                                <td>${detail.Odetails_id}</td>
-                                <td>${detail.product_name || 'N/A'}</td>
-                                <td>${detail.description || 'N/A'}</td>
-                                <td> <img src="${detail.image || 'default.jpg'}" alt="${detail.product_name}" width="100"></td>
-                                <td>${detail.O_Qty}</td>
-                                <td>${detail.O_price}</td>
-                                <td>${detail.category_name || 'N/A'}</td>
-                            </tr>
-                        `;
-                        document.getElementById("order-details").innerHTML += row;
+                        <tr>
+                            <td>${detail.Odetails_id}</td>
+                            <td>${detail.product_name || 'N/A'}</td>
+                            <td>${detail.description || 'N/A'}</td>
+                            <td> <img src="${detail.image || 'http://localhost:3000/images/default.jpg'}" alt="${detail.product_name || 'Product'}" width="100"></td>
+                            <td>${detail.O_Qty}</td>
+                            <td>${detail.O_price}</td>
+                            <td>${detail.category_name || 'N/A'}</td>
+                        </tr>
+                    `;
+                    console.log(`Rendering image for product ${detail.Odetails_id}: ${detail.image}`);
+                    document.getElementById("order-details").innerHTML += row;
                 });
                 document.getElementById('order-details-modal').style.display = 'block';
             } else {
-                orderDetailsContainer.innerHTML = `<tr><td colspan="7">No details found for this order.</td></tr>`;
+                document.getElementById("order-details").innerHTML = `<tr><td colspan="7">No details found for this order.</td></tr>`;
             }
         })
         .catch((error) => {
@@ -81,15 +77,12 @@ function viewOrderDetails(orderId) {
         });
 }
 
-
-
 function closeModal() {
     document.getElementById('order-details-modal').style.display = 'none';
 }
 
 // Fetch orders on page load
 document.addEventListener('DOMContentLoaded', fetchOrders);
-
 
 // ✅ Fetch Orders (Admin Panel)
 async function fetchOrders1() {
@@ -132,7 +125,6 @@ async function fetchOrders1() {
 
 // Call the function
 fetchOrders1();
-
 
 // ✅ Open Assign Delivery Modal
 async function openAssignDeliveryModal(orderId) {

@@ -4,7 +4,7 @@ const mysql = require("mysql");
 const conn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Hardi@sql8705",
+  password: "Hetalsql@1405",
   database: "main_project",
 });
 
@@ -31,13 +31,20 @@ const generateWishlistId = (callback) => {
 // Add Item to Wishlist
 const addItemToWishlist = (req, res) => {
   if (!req.session.userId) {
-    return res.status(401).send("Please login to add items to the wishlist.");
+    return res
+      .status(401)
+      .json({ error: "Please login to add items to the wishlist." });
   }
 
-  const { productId } = req.body;
+  const productId = req.body.prodid;
+
+  if (!productId) {
+    return res.status(400).json({ error: "Product ID is required." });
+  }
 
   generateWishlistId((err, newWishlistId) => {
-    if (err) return res.status(500).send("Error generating wishlist ID.");
+    if (err)
+      return res.status(500).json({ error: "Error generating wishlist ID." });
 
     const sql =
       "INSERT INTO wishlist (w_id, c_id, product_id) VALUES (?, ?, ?)";
@@ -45,8 +52,9 @@ const addItemToWishlist = (req, res) => {
       sql,
       [newWishlistId, req.session.userId, productId],
       (err, result) => {
-        if (err) throw err;
-        res.status(200).send("Item added to wishlist.");
+        if (err) return res.status(500).json({ error: "Database error." });
+
+        res.status(200).json({ message: "Item added to wishlist." });
       }
     );
   });
@@ -55,50 +63,43 @@ const addItemToWishlist = (req, res) => {
 // Get User Wishlist
 const getUserWishlist = (req, res) => {
   if (!req.session.userId) {
-    return res.status(401).send("Please login to view your wishlist.");
+    return res
+      .status(401)
+      .json({ message : "Please login to view your wishlist." });
   }
 
-  const sql = `
-      SELECT w.w_id, w.c_id, w.product_id, p.P_NAME AS name, p.P_PRICE AS price, p.P_DESC AS description
-      FROM wishlist w
-      JOIN PLANTS p ON w.product_id = p.P_ID
-      WHERE w.c_id = ?
-      UNION ALL
-      SELECT w.w_id, w.c_id, w.product_id, b.B_NAME AS name, b.B_PRICE AS price, b.B_DESC AS description
-      FROM wishlist w
-      JOIN BOUQUET b ON w.product_id = b.B_ID
-      WHERE w.c_id = ?
-      UNION ALL
-      SELECT w.w_id, w.c_id, w.product_id, pt.PT_NAME AS name, pt.PT_PRICE AS price, pt.PT_DESC AS description
-      FROM wishlist w
-      JOIN POTS pt ON w.product_id = pt.PT_ID
-      WHERE w.c_id = ?
-      UNION ALL
-      SELECT w.w_id, w.c_id, w.product_id, f.Ft_NAME AS name, f.Ft_PRICE AS price, f.Ft_DESC AS description
-      FROM wishlist w
-      JOIN FERTILIZERS f ON w.product_id = f.Ft_ID
-      WHERE w.c_id = ?
-      UNION ALL
-      SELECT w.w_id, w.c_id, w.product_id, t.T_NAME AS name, t.T_PRICE AS price, t.T_DESC AS description
-      FROM wishlist w
-      JOIN TOOLS t ON w.product_id = t.T_ID
-      WHERE w.c_id = ?
-    `;
+  const viewsQuery = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = 'main_project'`;
 
-  conn.query(
-    sql,
-    [
-      req.session.userId,
-      req.session.userId,
-      req.session.userId,
-      req.session.userId,
-      req.session.userId,
-    ],
-    (err, result) => {
-      if (err) throw err;
-      res.status(200).json(result);
-    }
-  );
+  conn.query(viewsQuery, (err, views) => {
+    if (err) return res.status(500).json({ error: "Database error." });
+
+    const userId = req.session.userId;
+    const searchQueries = views
+      .map((view) => {
+        return `
+        SELECT w.w_id, w.c_id, w.product_id, v.name, v.price, img.PATH1 AS image
+        FROM wishlist w
+        JOIN ${view.TABLE_NAME} v ON w.product_id = v.id
+        JOIN IMAGE img ON v.id = img.PRODUCT_ID
+        WHERE w.c_id = ?
+      `;
+      })
+      .join(" UNION ALL ");
+
+    const query = `${searchQueries}`;
+
+    conn.query(query, new Array(views.length).fill(userId), (err, results) => {
+      if (err) return res.status(500).json({ error: "Database error." });
+
+      results.forEach((result) => {
+        if (result.image) {
+          result.image = result.image.toString();
+        }
+      });
+
+      res.status(200).json(results);
+    });
+  });
 };
 
 // Remove Item from Wishlist
@@ -106,21 +107,24 @@ const removeItemFromWishlist = (req, res) => {
   if (!req.session.userId) {
     return res
       .status(401)
-      .send("Please login to remove items from your wishlist.");
+      .json({ error: "Please login to remove items from your wishlist." });
   }
 
   const { wishlistId } = req.body;
   const sql = "DELETE FROM wishlist WHERE w_id = ? AND c_id = ?";
   conn.query(sql, [wishlistId, req.session.userId], (err, result) => {
-    if (err) throw err;
-    res.status(200).send("Item removed from wishlist.");
+    if (err) return res.status(500).json({ error: "Database error." });
+
+    res.status(200).json({ message: "Item removed from wishlist." });
   });
 };
 
 // Move Item from Wishlist to Cart
 const moveItemToCart = (req, res) => {
   if (!req.session.userId) {
-    return res.status(401).send("Please login to move items to the cart.");
+    return res
+      .status(401)
+      .json({ error: "Please login to move items to the cart." });
   }
 
   const { wishlistId, quantity } = req.body;
@@ -132,10 +136,10 @@ const moveItemToCart = (req, res) => {
     getProductIDSql,
     [wishlistId, req.session.userId],
     (err, result) => {
-      if (err) return res.status(500).send("Error executing query");
+      if (err) return res.status(500).json({ error: "Error executing query" });
 
       if (result.length === 0) {
-        return res.status(404).send("Wishlist item not found");
+        return res.status(404).json({ error: "Wishlist item not found" });
       }
 
       const productId = result[0].product_id;
@@ -143,11 +147,12 @@ const moveItemToCart = (req, res) => {
       // Remove the item from the wishlist
       const removeSql = "DELETE FROM wishlist WHERE w_id = ?";
       conn.query(removeSql, [wishlistId], (err, result) => {
-        if (err) throw err;
+        if (err) return res.status(500).json({ error: "Database error." });
 
         // Add the item to the cart
         generateCartId((err, newCartId) => {
-          if (err) return res.status(500).send("Error generating cart ID.");
+          if (err)
+            return res.status(500).json({ error: "Error generating cart ID." });
 
           const sql =
             "INSERT INTO cart (ca_id, c_id, product_id, ca_qty) VALUES (?, ?, ?, ?)";
@@ -155,8 +160,10 @@ const moveItemToCart = (req, res) => {
             sql,
             [newCartId, req.session.userId, productId, quantity],
             (err, result) => {
-              if (err) throw err;
-              res.status(200).send("Item moved to cart.");
+              if (err)
+                return res.status(500).json({ error: "Database error." });
+
+              res.status(200).json({ message: "Item moved to cart." });
             }
           );
         });
@@ -165,6 +172,7 @@ const moveItemToCart = (req, res) => {
   );
 };
 
+// Generate a unique cart ID
 const generateCartId = (callback) => {
   const sql = "SELECT MAX(ca_id) AS maxId FROM cart";
   conn.query(sql, (err, result) => {
@@ -184,9 +192,25 @@ const generateCartId = (callback) => {
   });
 };
 
+// Get Wishlist Count for a Specific User
+const getWishlistCount = (req, res) => {
+  if (!req.session.userId) {
+    return res.json({count:"0" });
+  }
+
+  const sql = "SELECT COUNT(*) AS count FROM wishlist WHERE c_id = ?";
+  conn.query(sql, [req.session.userId], (err, result) => {
+    if (err) return res.status(500).json({ error: "Database error." });
+
+    const count = result[0].count;
+    res.status(200).json({ count });
+  });
+};
+
 module.exports = {
   addItemToWishlist,
   getUserWishlist,
   removeItemFromWishlist,
   moveItemToCart,
+  getWishlistCount,
 };

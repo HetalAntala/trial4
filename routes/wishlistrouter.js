@@ -6,5 +6,6 @@ router.post("/add", wishlistController.addItemToWishlist);
 router.get("/user", wishlistController.getUserWishlist);
 router.delete("/remove", wishlistController.removeItemFromWishlist);
 router.post("/moveToCart", wishlistController.moveItemToCart);
+router.get("/wishlistCount", wishlistController.getWishlistCount);
 
 module.exports = router;
