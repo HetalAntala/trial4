@@ -61,7 +61,8 @@ const getProductsByTable = (req, res) => {
                     id: primaryKey,
                     name: null,
                     desc: null,
-                    price: null
+                    price: null,
+                    stock: null
                 };
 
                 columns.forEach(col => {
@@ -69,10 +70,15 @@ const getProductsByTable = (req, res) => {
                     if (field.includes('name')) columnMap.name = col.Field;
                     else if (field.includes('desc')) columnMap.desc = col.Field;
                     else if (field.includes('price')) columnMap.price = col.Field;
+                    else if (field.includes('stock')) columnMap.stock = col.Field;
                 });
 
                 if (!columnMap.name || !columnMap.price) {
                     return res.status(400).json({ error: `Required columns (name, price) not found in table '${tableName}'` });
+                }
+                // Warn if stock column is missing (optional if stock isn't mandatory)
+                if (!columnMap.stock) {
+                    console.warn(`Stock column not found in table '${tableName}'. Returning NULL for stock.`);
                 }
 
                 const productQuery = `
@@ -81,6 +87,7 @@ const getProductsByTable = (req, res) => {
                         t.${columnMap.name} AS product_name, 
                         ${columnMap.desc ? `t.${columnMap.desc}` : 'NULL'} AS description, 
                         t.${columnMap.price} AS price, 
+                        ${columnMap.stock ? `t.${columnMap.stock}` : 'NULL'} AS stock,
                         CONCAT(?, SUBSTRING_INDEX(i.PATH1, 'images/', -1)) AS image,
                         c.CY_NAME AS category
                     FROM ${tableName} t
@@ -644,6 +651,7 @@ const deleteProduct = (req, res) => {
         });
     });
 };
+
 module.exports = {
     generateProductId,
     getCategories,

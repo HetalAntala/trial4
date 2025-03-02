@@ -36,27 +36,23 @@ function fetchProductsByCategory(page = 1) {
     const categoryId = categorySelect.value;
     const categoryName = categorySelect.options[categorySelect.selectedIndex]?.getAttribute('data-name') || '';
 
-    currentCategoryId = categoryId; // Update the current category
-    currentPage = page; // Update the current page
+    currentCategoryId = categoryId;
+    currentPage = page;
 
     if (!categoryId || !categoryName) {
-        // Clear the table if no category is selected
         const productTable = document.getElementById("product-details");
         productTable.innerHTML = `
-            <tr><td colspan="6" class="text-center">Please select a category to view products</td></tr>
+            <tr><td colspan="7" class="text-center">Please select a category to view products</td></tr>
         `;
         document.getElementById("pagination-controls").innerHTML = "";
         return;
     }
 
-    // Derive the table name from the category name (e.g., "Plants" -> "plants")
     currentTableName = categoryName.toLowerCase().replace(/\s+/g, '_');
 
     fetch(`/product/table/${currentTableName}/products?page=${page}`, { credentials: 'include' })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
@@ -65,18 +61,21 @@ function fetchProductsByCategory(page = 1) {
 
             if (data.products && data.products.length > 0) {
                 data.products.forEach(product => {
+                    // Safely handle stock value for the onclick handler
+                    const stockValue = product.stock !== null && product.stock !== undefined ? product.stock : 'N/A';
                     const row = `
                         <tr>
-                            <td>${product.Product_id || product.P_ID || 'N/A'}</td>
-                            <td>${product.product_name || product.P_NAME || 'N/A'}</td>
-                            <td>${product.description || product.P_DESC || 'N/A'}</td>
-                            <td>${product.price || product.P_PRICE || 'N/A'}</td>
+                            <td>${product.Product_id || 'N/A'}</td>
+                            <td>${product.product_name || 'N/A'}</td>
+                            <td>${product.description || 'N/A'}</td>
+                            <td>${product.price || 'N/A'}</td>
+                            <td>${stockValue}</td>
                             <td>
-                                <img src="${product.image || product.P_IMAGE || 'default.jpg'}" alt="${product.product_name || product.P_NAME || 'Product'}" width="50">
+                                <img src="${product.image || 'default.jpg'}" alt="${product.product_name || 'Product'}" width="50">
                             </td>
                             <td>${categoryName}</td>
                             <td>
-                                <button class="btn" onclick="openEditModal('${product.Product_id}', '${product.product_name}', '${product.description || ''}', '${product.price}')">Edit</button>
+                                <button class="btn" onclick="openEditModal('${product.Product_id}', '${product.product_name}', '${product.description || ''}', '${product.price}', '${stockValue}')">Edit</button>
                                 <button class="btn" onclick="deleteProduct('${product.Product_id}')">Delete</button>
                             </td>
                         </tr>
@@ -85,14 +84,14 @@ function fetchProductsByCategory(page = 1) {
                 });
                 updatePagination(data.totalPages, data.currentPage);
             } else {
-                productTable.innerHTML = `<tr><td colspan="6" class="text-center">No products found for this category</td></tr>`;
+                productTable.innerHTML = `<tr><td colspan="7" class="text-center">No products found for this category</td></tr>`;
                 document.getElementById("pagination-controls").innerHTML = "";
             }
         })
         .catch(error => {
             console.error("Error fetching products:", error);
             document.getElementById("product-details").innerHTML = `
-                <tr><td colspan="6" class="text-center">Error loading products: ${error.message}</td></tr>
+                <tr><td colspan="7" class="text-center">Error loading products: ${error.message}</td></tr>
             `;
             document.getElementById("pagination-controls").innerHTML = "";
         });
@@ -132,12 +131,13 @@ function updatePagination(totalPages, currentPage) {
 }
 
 // Open edit modal
-function openEditModal(productId, name, description, price) {
+function openEditModal(productId, name, description, price,stock = 'N/A') {
     const modal = document.getElementById("editProductModal");
     document.getElementById("edit-product-id").value = productId;
     document.getElementById("edit-product-name").value = name;
     document.getElementById("edit-product-desc").value = description;
     document.getElementById("edit-product-price").value = price;
+    document.getElementById("edit-product-stock").value = stock !== 'N/A' ? stock : ''; // Pre-fill stock
     modal.style.display = "block";
 }
 
@@ -154,7 +154,8 @@ document.getElementById("editProductForm")?.addEventListener("submit", async fun
     const productData = {
         product_name: document.getElementById("edit-product-name").value,
         description: document.getElementById("edit-product-desc").value,
-        price: document.getElementById("edit-product-price").value
+        price: document.getElementById("edit-product-price").value,
+        stock: document.getElementById("edit-product-stock").value
     };
     const images = [
         document.getElementById("edit-prod-img1").files[0]?.name || null,

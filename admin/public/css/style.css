@@ -1364,6 +1364,13 @@ table {
 .out-of-stock {
   background-color: #e2e3e5; /* Gray for out of stock */
 }
+.report-subsection {
+  display: none; /* Hidden by default */
+}
+
+.report-subsection.active {
+  display: block; /* Shown when active */
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .modal-content {

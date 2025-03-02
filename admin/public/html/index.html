@@ -71,6 +71,7 @@
             <p class="account__tab" data-target="#sales">
               <img src="../ad-images/icon/statistics.png" alt=""> Analytics
             </p>
+            
            
             <p class="account__tab" data-target="#report">
               <img src="../ad-images/icon/report.png" alt="">Report
@@ -536,6 +537,7 @@
                           <th>Product Name</th>
                           <th>Description</th>
                           <th>Price</th>
+                          <th>Stock</th>
                           <th>Image</th>
                           <th>Category</th>
                           <th>Actions</th> <!-- New column -->
@@ -571,6 +573,10 @@
                               <label for="edit-product-price">Price:</label>
                               <input type="number" id="edit-product-price" step="0.01" required>
                           </div>
+                          <div class="form-group">
+                            <label for="edit-product-stock">Stock:</label>
+                            <input type="number" id="edit-product-stock" min="0" required>
+                        </div>
                           <div class="form-group">
                               <label for="edit-prod-img1">Image 1:</label>
                               <input type="file" id="edit-prod-img1" accept="image/*">
@@ -618,6 +624,7 @@
                 
               </form>
             </div>
+            
             <div class="tab__content" content id="inventory">
                     <!-- Inventory Status -->
                     <div class="report-section">
@@ -927,19 +934,6 @@ window.addEventListener("scroll", function () {
     }
 });
 
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  new Chart(ctx, {
-      type: 'line',
-      data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-          datasets: [{
-              label: 'Sales',
-              data: [1000, 1500, 1800, 2200, 2600],
-              borderColor: '#7380ec',
-              backgroundColor: 'rgba(115, 128, 236, 0.2)'
-          }]
-      }
-  });
   function showSection(sectionId) {
     const section = document.getElementById(sectionId);
     
