@@ -7,7 +7,7 @@ const path = require('path');
 // Configure Multer Storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../public/uploads'));
+        cb(null, path.join(__dirname, '../public/images'));
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
@@ -35,4 +35,6 @@ router.get('/get-fields', productController.getField);
 router.get('/last-id', productController.lastId);
 router.get('/get-primary-key', productController.getPK);
 
+router.put('/update', productController.updateProduct);
+router.delete('/delete/:tableName/:productId', productController.deleteProduct);
 module.exports = router;

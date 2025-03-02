@@ -272,66 +272,6 @@
                   </div>
               </div>
           </div>
-            <div class="tab__content" content id="orders">
-              <h3 class="tab__header">Orders</h3>
-              <div class="tab__body">
-                <table id="orders-table">
-                  <thead>
-                      <tr>
-                          <th>Order ID</th>
-                          <th>Date</th>
-                          <th>Status</th>
-                          <th>Customer ID</th>
-                          <th>Action</th>
-                      </tr>
-                  </thead>
-                  <tbody></tbody>
-              </table>
-          
-              <!-- Order Details Modal -->
-              <!-- <div id="order-details-modal" class="modal">
-                  <div class="modal-content">
-                      <span class="close" onclick="closeModal()">&times;</span>
-                      <h2>Order Details</h2>
-                      <table>
-                          <thead>
-                              <tr>
-                                  <th>ID</th>
-                                  <th>Product Name</th>
-                                  <th>Description</th>
-                                  <th>Image</th>
-                                  <th>Quantity</th>
-                                  <th>Price</th>
-                                  <th>Category</th>
-                              </tr>
-                          </thead>
-                          <tbody id="order-details"></tbody>
-                      </table>
-                  </div>
-              </div> -->
-              <!-- Order Details Modal -->
-              <div id="order-details-modal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <h2>Order Details</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Product Name</th>
-                                <th>Description</th>
-                                <th>Image</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Category</th>
-                            </tr>
-                        </thead>
-                        <tbody id="order-details"></tbody>
-                    </table>
-                </div>
-              </div>
-            </div>
-            </div>
             <div class="tab__content" content id="analytics">
               <h3 class="tab__header">Analytics</h3>
               <div class="tab__body">
@@ -610,6 +550,73 @@
           </table>
           
             </div>
+            <div class="tab__content" id="viewproduct">
+              <div class="form-group">
+                  <label for="prod_catt">Select Category:</label>
+                  <select id="prod_catt" onchange="fetchProductsByCategory()">
+                      <option value="">Select Category</option>
+                  </select>
+              </div>
+              <table id="product-table" class="table table-bordered">
+                  <thead>
+                      <tr>
+                          <th>Product ID</th>
+                          <th>Product Name</th>
+                          <th>Description</th>
+                          <th>Price</th>
+                          <th>Image</th>
+                          <th>Category</th>
+                          <th>Actions</th> <!-- New column -->
+                      </tr>
+                  </thead>
+                  <tbody id="product-details">
+                      <tr>
+                          <td colspan="7" class="text-center">Please select a category to view products</td>
+                      </tr>
+                  </tbody>
+              </table>
+              <!-- Pagination Controls -->
+              <nav>
+                  <ul class="pagination" id="pagination-controls"></ul>
+              </nav>
+          
+              <!-- Edit Product Modal -->
+              <div id="editProductModal" class="modal" style="display: none;">
+                  <div class="modal-content">
+                      <span class="close" onclick="closeEditModal()">×</span>
+                      <h2>Edit Product</h2>
+                      <form id="editProductForm">
+                          <input type="hidden" id="edit-product-id">
+                          <div class="form-group">
+                              <label for="edit-product-name">Product Name:</label>
+                              <input type="text" id="edit-product-name" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="edit-product-desc">Description:</label>
+                              <textarea id="edit-product-desc"></textarea>
+                          </div>
+                          <div class="form-group">
+                              <label for="edit-product-price">Price:</label>
+                              <input type="number" id="edit-product-price" step="0.01" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="edit-prod-img1">Image 1:</label>
+                              <input type="file" id="edit-prod-img1" accept="image/*">
+                          </div>
+                          <div class="form-group">
+                              <label for="edit-prod-img2">Image 2:</label>
+                              <input type="file" id="edit-prod-img2" accept="image/*">
+                          </div>
+                          <div class="form-group">
+                              <label for="edit-prod-img3">Image 3:</label>
+                              <input type="file" id="edit-prod-img3" accept="image/*">
+                          </div>
+                          <button type="submit" class="btn primary">Update</button>
+                          <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                      </form>
+                  </div>
+              </div>
+          </div>
             <div class="tab__content" id="viewproduct">
               <div class="form-group">
                 <label for="prod_catt">Select Category:</label>

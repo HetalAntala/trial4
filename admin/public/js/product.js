@@ -75,6 +75,10 @@ function fetchProductsByCategory(page = 1) {
                                 <img src="${product.image || product.P_IMAGE || 'default.jpg'}" alt="${product.product_name || product.P_NAME || 'Product'}" width="50">
                             </td>
                             <td>${categoryName}</td>
+                            <td>
+                                <button class="btn" onclick="openEditModal('${product.Product_id}', '${product.product_name}', '${product.description || ''}', '${product.price}')">Edit</button>
+                                <button class="btn" onclick="deleteProduct('${product.Product_id}')">Delete</button>
+                            </td>
                         </tr>
                     `;
                     productTable.innerHTML += row;
@@ -127,6 +131,80 @@ function updatePagination(totalPages, currentPage) {
     }
 }
 
+// Open edit modal
+function openEditModal(productId, name, description, price) {
+    const modal = document.getElementById("editProductModal");
+    document.getElementById("edit-product-id").value = productId;
+    document.getElementById("edit-product-name").value = name;
+    document.getElementById("edit-product-desc").value = description;
+    document.getElementById("edit-product-price").value = price;
+    modal.style.display = "block";
+}
+
+// Close edit modal
+function closeEditModal() {
+    document.getElementById("editProductModal").style.display = "none";
+}
+
+// Handle edit form submission
+document.getElementById("editProductForm")?.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const productId = document.getElementById("edit-product-id").value;
+    const productData = {
+        product_name: document.getElementById("edit-product-name").value,
+        description: document.getElementById("edit-product-desc").value,
+        price: document.getElementById("edit-product-price").value
+    };
+    const images = [
+        document.getElementById("edit-prod-img1").files[0]?.name || null,
+        document.getElementById("edit-prod-img2").files[0]?.name || null,
+        document.getElementById("edit-prod-img3").files[0]?.name || null
+    ].filter(img => img); // Filter out null values
+
+    try {
+        const response = await fetch('/product/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tableName: currentTableName, productId, productData, images }),
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert("Product updated successfully!");
+            closeEditModal();
+            fetchProductsByCategory(currentPage); // Refresh table
+        } else {
+            alert("Error: " + result.error);
+        }
+    } catch (error) {
+        console.error("Error updating product:", error);
+        alert("Failed to update product.");
+    }
+});
+// Delete product
+function deleteProduct(productId) {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    fetch(`/product/delete/${currentTableName}/${productId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert("Product deleted successfully!");
+            fetchProductsByCategory(currentPage); // Refresh table
+        } else {
+            alert("Error: " + result.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error deleting product:", error);
+        alert("Failed to delete product.");
+    });
+}
 // Unchanged functions below
 function fetchCategories1() {
     fetch('/product/categories1', { credentials: 'include' })

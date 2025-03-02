@@ -507,7 +507,145 @@ function generateProductId(lastId, primaryKey) {
 }
 
 
+// Update product details
+// Update product details
+const updateProduct = (req, res) => {
+    const { tableName, productId, productData, images } = req.body;
 
+    if (!tableName || !productId || !productData || Object.keys(productData).length === 0) {
+        return res.status(400).json({ error: "Missing required fields: tableName, productId, or productData" });
+    }
+
+    // Check if table exists
+    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, tableResult) => {
+        if (err || tableResult.length === 0) {
+            return res.status(404).json({ error: `Table '${tableName}' does not exist` });
+        }
+
+        // Get primary key
+        db.query(`SHOW KEYS FROM ${tableName} WHERE Key_name = 'PRIMARY'`, (err, keyResults) => {
+            if (err || keyResults.length === 0) {
+                return res.status(500).json({ error: "No primary key found" });
+            }
+
+            const primaryKey = keyResults[0].Column_name;
+
+            // Get table schema to map fields
+            db.query(`SHOW COLUMNS FROM ${tableName}`, (err, columns) => {
+                if (err) {
+                    console.error("Error fetching table schema:", err);
+                    return res.status(500).json({ error: "Database error", details: err.message });
+                }
+
+                // Map generic field names to actual column names
+                const columnMap = {
+                    product_name: null,
+                    description: null,
+                    price: null
+                };
+
+                columns.forEach(col => {
+                    const field = col.Field.toLowerCase();
+                    if (field.includes('name')) columnMap.product_name = col.Field;
+                    else if (field.includes('desc')) columnMap.description = col.Field;
+                    else if (field.includes('price')) columnMap.price = col.Field;
+                });
+
+                // Check if required columns exist
+                if (!columnMap.product_name || !columnMap.price) {
+                    return res.status(400).json({ error: `Required columns (name, price) not found in table '${tableName}'` });
+                }
+
+                // Transform productData to match table column names
+                const updatedProductData = {};
+                if (productData.product_name) updatedProductData[columnMap.product_name] = productData.product_name;
+                if (productData.description && columnMap.description) updatedProductData[columnMap.description] = productData.description;
+                if (productData.price) updatedProductData[columnMap.price] = productData.price;
+
+                // Remove fields that shouldn't be updated (e.g., primary key, category ID)
+                delete updatedProductData[primaryKey];
+                delete updatedProductData.categoryId;
+
+                const updateQuery = `UPDATE ${tableName} SET ? WHERE ${primaryKey} = ?`;
+                db.query(updateQuery, [updatedProductData, productId], (err, result) => {
+                    if (err) {
+                        console.error("Error updating product:", err);
+                        return res.status(500).json({ error: "Database error", details: err.message });
+                    }
+
+                    if (result.affectedRows === 0) {
+                        return res.status(404).json({ error: "Product not found" });
+                    }
+
+                    // Update images if provided
+                    if (images && images.length > 0) {
+                        updateImages(productId, images, res);
+                    } else {
+                        res.json({ success: true, message: "Product updated successfully" });
+                    }
+                });
+            });
+        });
+    });
+};
+// Function to update images
+function updateImages(productId, images, res) {
+    // First, delete existing images for this product
+    db.query(`DELETE FROM image WHERE PRODUCT_ID = ?`, [productId], (err) => {
+        if (err) {
+            return res.status(500).json({ error: "Error deleting old images" });
+        }
+
+        // Then insert new images
+        insertImages(productId, images, res);
+    });
+}
+// Delete product
+const deleteProduct = (req, res) => {
+    const { tableName, productId } = req.params;
+
+    if (!tableName || !productId) {
+        return res.status(400).json({ error: "Missing tableName or productId" });
+    }
+
+    // Check if table exists
+    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, tableResult) => {
+        if (err || tableResult.length === 0) {
+            return res.status(404).json({ error: `Table '${tableName}' does not exist` });
+        }
+
+        // Get primary key
+        db.query(`SHOW KEYS FROM ${tableName} WHERE Key_name = 'PRIMARY'`, (err, keyResults) => {
+            if (err || keyResults.length === 0) {
+                return res.status(500).json({ error: "No primary key found" });
+            }
+
+            const primaryKey = keyResults[0].Column_name;
+
+            // Delete associated images first
+            db.query(`DELETE FROM image WHERE PRODUCT_ID = ?`, [productId], (err) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error deleting product images" });
+                }
+
+                // Delete the product
+                const deleteQuery = `DELETE FROM ${tableName} WHERE ${primaryKey} = ?`;
+                db.query(deleteQuery, [productId], (err, result) => {
+                    if (err) {
+                        console.error("Error deleting product:", err);
+                        return res.status(500).json({ error: "Database error", details: err.message });
+                    }
+
+                    if (result.affectedRows === 0) {
+                        return res.status(404).json({ error: "Product not found" });
+                    }
+
+                    res.json({ success: true, message: "Product deleted successfully" });
+                });
+            });
+        });
+    });
+};
 module.exports = {
     generateProductId,
     getCategories,
@@ -519,4 +657,6 @@ module.exports = {
     lastId,
     getPK,
     getProductsByTable,
+    updateProduct,  
+    deleteProduct,
 };
