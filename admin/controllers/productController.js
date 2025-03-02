@@ -17,18 +17,18 @@ db.connect(err => {
     console.log('Connected to MySQL database');
 });
 
+const CLIENT_IMAGE_BASE_URL = 'http://localhost:4000/images/'; // Client server URL
+
 const getProductsByTable = (req, res) => {
     const tableName = req.params.tableName;
     const page = parseInt(req.query.page) || 1;
-    const limit = 10; // Number of products per page
+    const limit = 10;
     const offset = (page - 1) * limit;
 
-    // Validate table name to prevent SQL injection (basic validation)
     if (!/^[a-z_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid table name" });
     }
 
-    // Check if the table exists
     db.query(`SHOW TABLES LIKE ?`, [tableName], (err, tableResult) => {
         if (err) {
             console.error("Error checking table existence:", err);
@@ -39,7 +39,6 @@ const getProductsByTable = (req, res) => {
             return res.status(404).json({ error: `Table '${tableName}' does not exist.` });
         }
 
-        // Dynamically determine the primary key
         db.query(`SHOW KEYS FROM ${tableName} WHERE Key_name = 'PRIMARY'`, (err, keyResults) => {
             if (err) {
                 console.error("Error fetching primary key:", err);
@@ -52,16 +51,14 @@ const getProductsByTable = (req, res) => {
 
             const primaryKey = keyResults[0].Column_name;
 
-            // Fetch the schema of the table to map columns
             db.query(`SHOW COLUMNS FROM ${tableName}`, (err, columns) => {
                 if (err) {
                     console.error("Error fetching table schema:", err);
                     return res.status(500).json({ error: "Database error", details: err.message });
                 }
 
-                // Map columns to expected fields
                 const columnMap = {
-                    id: primaryKey, // Use the primary key as Product_id
+                    id: primaryKey,
                     name: null,
                     desc: null,
                     price: null
@@ -78,16 +75,17 @@ const getProductsByTable = (req, res) => {
                     return res.status(400).json({ error: `Required columns (name, price) not found in table '${tableName}'` });
                 }
 
-                // Construct the query with fallbacks for missing columns
                 const productQuery = `
                     SELECT 
                         t.${columnMap.id} AS Product_id, 
                         t.${columnMap.name} AS product_name, 
                         ${columnMap.desc ? `t.${columnMap.desc}` : 'NULL'} AS description, 
                         t.${columnMap.price} AS price, 
-                        i.PATH1 AS image
+                        CONCAT(?, SUBSTRING_INDEX(i.PATH1, 'images/', -1)) AS image,
+                        c.CY_NAME AS category
                     FROM ${tableName} t
                     LEFT JOIN image i ON t.${columnMap.id} = i.PRODUCT_ID
+                    LEFT JOIN category c ON t.CY_ID = c.CY_ID
                     LIMIT ${limit} OFFSET ${offset}
                 `;
                 const countQuery = `
@@ -97,10 +95,10 @@ const getProductsByTable = (req, res) => {
 
                 Promise.all([
                     new Promise((resolve, reject) => {
-                        db.query(productQuery, (err, results) => {
+                        db.query(productQuery, [CLIENT_IMAGE_BASE_URL], (err, results) => {
                             if (err) reject(err);
                             else {
-                                console.log(`Fetched products from ${tableName}:`, results); // Debugging
+                                console.log(`Fetched products from ${tableName}:`, results);
                                 resolve(results);
                             }
                         });
@@ -130,6 +128,7 @@ const getProductsByTable = (req, res) => {
         });
     });
 };
+
 
 // const getAllProducts = (req, res) => {
 //     const page = parseInt(req.query.page) || 1;  // Get current page number, default to 1

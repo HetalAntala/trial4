@@ -40,40 +40,52 @@ function fetchOrders() {
 
 // View order details
 function viewOrderDetails(orderId) {
-    document.getElementById("order-details").innerHTML = "";
+    const orderDetailsContainer = document.getElementById("order-details");
+    orderDetailsContainer.innerHTML = "";
 
     fetch(`/order/orderdets/${orderId}/details`)
-        .then((response) => response.json())
-        .then((details) => {
-            const uniqueDetails = details.filter((value, index, self) =>
-                index === self.findIndex((t) => (
-                    t.Odetails_id === value.Odetails_id
-                ))
-            );
-            console.log("Order Details:", uniqueDetails);
-            if (Array.isArray(uniqueDetails) && uniqueDetails.length > 0) {
-                uniqueDetails.forEach((detail) => {
-                    let row = `
-                        <tr>
-                            <td>${detail.Odetails_id}</td>
-                            <td>${detail.product_name || 'N/A'}</td>
-                            <td>${detail.description || 'N/A'}</td>
-                            <td> <img src="${detail.image || 'http://localhost:3000/images/default.jpg'}" alt="${detail.product_name || 'Product'}" width="100"></td>
-                            <td>${detail.O_Qty}</td>
-                            <td>${detail.O_price}</td>
-                            <td>${detail.category_name || 'N/A'}</td>
-                        </tr>
-                    `;
-                    console.log(`Rendering image for product ${detail.Odetails_id}: ${detail.image}`);
-                    document.getElementById("order-details").innerHTML += row;
-                });
-                document.getElementById('order-details-modal').style.display = 'block';
-            } else {
-                document.getElementById("order-details").innerHTML = `<tr><td colspan="7">No details found for this order.</td></tr>`;
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status} - ${response.statusText}`);
             }
+            return response.json();
+        })
+        .then((details) => {
+            console.log("Order Details:", details);
+
+            if (!Array.isArray(details)) {
+                orderDetailsContainer.innerHTML = `<tr><td colspan="7">${details.error || 'Unexpected response'}</td></tr>`;
+                document.getElementById('order-details-modal').style.display = 'block';
+                return;
+            }
+
+            if (details.length === 0) {
+                orderDetailsContainer.innerHTML = `<tr><td colspan="7">No details found for this order.</td></tr>`;
+                document.getElementById('order-details-modal').style.display = 'block';
+                return;
+            }
+
+            details.forEach((detail) => {
+                const row = `
+                    <tr>
+                        <td>${detail.Odetails_id}</td>
+                        <td>${detail.product_name || 'N/A'}</td>
+                        <td>${detail.description || 'N/A'}</td>
+                        <td><img src="${detail.image}" alt="${detail.product_name || 'Product'}" width="100" onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';"></td>
+                        <td>${detail.O_Qty}</td>
+                        <td>${detail.O_price}</td>
+                        <td>${detail.category_name || 'N/A'}</td>
+                    </tr>
+                `;
+                console.log(`Rendering image for product ${detail.Odetails_id}: ${detail.image}`);
+                orderDetailsContainer.innerHTML += row;
+            });
+            document.getElementById('order-details-modal').style.display = 'block';
         })
         .catch((error) => {
             console.error("Error fetching order details:", error);
+            orderDetailsContainer.innerHTML = `<tr><td colspan="7">Error loading details: ${error.message}</td></tr>`;
+            document.getElementById('order-details-modal').style.display = 'block';
         });
 }
 

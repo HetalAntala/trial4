@@ -1,6 +1,7 @@
 const path = require("path");
 const mysql = require("mysql2");
 const express = require("express");
+const cors = require('cors');
 const app = express(); // Create an Express app
 const session = require("express-session");
 const sendfileController = require("./controllers/filecontroller");
@@ -25,8 +26,8 @@ connection.connect((err) => {
 
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({ origin: 'http://localhost:3000' })); // Allow admin server to access
-app.use('/images', express.static('images'));
+app.use(cors({ origin: 'http://localhost:3000' })); // Allow admin server
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 app.use(express.json());
 app.use("/index", express.static(path.join(__dirname, "index")));

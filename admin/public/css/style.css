@@ -671,26 +671,7 @@ td a{
   display: block;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 9999;
-}
-.modal-content {
-  text-align: center;
-}
-.close {
-  float: right;
-  cursor: pointer;
-  font-size: 20px;
-  margin-top: -10px;
-}
+
 table {
   display: table !important;
   visibility: visible !important;
@@ -897,6 +878,293 @@ table {
 }
 #categoriesDropdown a:not(:first-child),#productDropdown a:not(:first-child){
   margin-top: 1rem;
+}
+/* Modal Background and Container */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 900px;
+  position: relative;
+  overflow-x: auto; /* Allow horizontal scroll on small screens */
+}
+
+/* Modal Header */
+.modal-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+/* Close Button */
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-content .close:hover {
+  color: #ff4d4d; /* Red on hover */
+}
+
+/* Table Styling */
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+.modal-content table thead {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.modal-content table th,
+.modal-content table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Center-align numeric columns */
+.modal-content table th:nth-child(1), /* ID */
+.modal-content table th:nth-child(5), /* Quantity */
+.modal-content table th:nth-child(6), /* Price */
+.modal-content table td:nth-child(1),
+.modal-content table td:nth-child(5),
+.modal-content table td:nth-child(6) {
+  text-align: center;
+}
+
+/* Bold headers */
+.modal-content table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Description column line height for readability */
+.modal-content table td:nth-child(3) {
+  line-height: 1.5;
+}
+
+/* Image styling */
+.modal-content table td img {
+  width: 80px; /* Consistent width */
+  height: 80px; /* Consistent height */
+  object-fit: cover; /* Ensure image fits without distortion */
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  display: block;
+  margin: 0 auto; /* Center the image */
+}
+
+/* Zebra striping for rows */
+.modal-content table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover effect on rows */
+.modal-content table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.tab__content#viewproduct {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-right: 10px;
+  color: #333;
+}
+
+.form-group select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+  min-width: 200px;
+}
+
+.table.table-bordered {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table.table-bordered thead {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.table.table-bordered th,
+.table.table-bordered td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.table.table-bordered th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Center-align numeric columns */
+.table.table-bordered th:nth-child(1), /* Product ID */
+.table.table-bordered th:nth-child(4), /* Price */
+.table.table-bordered td:nth-child(1),
+.table.table-bordered td:nth-child(4) {
+  text-align: center;
+}
+
+/* Description column line height */
+.table.table-bordered td:nth-child(3) {
+  line-height: 1.5;
+}
+
+/* Image styling */
+.table.table-bordered td img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Zebra striping */
+.table.table-bordered tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover effect */
+.table.table-bordered tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Pagination */
+.pagination {
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination .page-item {
+  margin: 0 5px;
+}
+
+.pagination .page-link {
+  color: #007bff;
+  border-radius: 5px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination .page-link:hover {
+  background-color: #e9ecef;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table.table-bordered {
+      font-size: 0.85rem;
+  }
+
+  .table.table-bordered th,
+  .table.table-bordered td {
+      padding: 8px 10px;
+  }
+
+  .table.table-bordered td img {
+      width: 60px;
+      height: 60px;
+  }
+}
+/* admin/public/css/style.css */
+
+/* Style the select element */
+.form-group select#prod_catt {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+  min-width: 200px;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Style the placeholder (disabled option) */
+.form-group select#prod_catt option[disabled] {
+  color: #888;
+  font-style: italic;
+}
+
+/* Ensure category options are styled normally */
+.form-group select#prod_catt option:not([disabled]) {
+  color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modal-content {
+      width: 90%;
+      margin: 10% auto;
+      padding: 15px;
+  }
+
+  .modal-content table {
+      font-size: 0.85rem;
+  }
+
+  .modal-content table th,
+  .modal-content table td {
+      padding: 8px 10px;
+  }
+
+  .modal-content table td img {
+      width: 60px;
+      height: 60px;
+  }
 }
 /* 🔹 Responsive Design */
 @media (max-width: 600px) {

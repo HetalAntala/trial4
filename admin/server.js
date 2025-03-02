@@ -34,6 +34,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));  
 app.use(express.static(path.join(__dirname, "public", "html"))); 
+// app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.use(session({
     secret: "your_secret_key",

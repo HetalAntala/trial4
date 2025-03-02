@@ -72,7 +72,7 @@ function fetchProductsByCategory(page = 1) {
                             <td>${product.description || product.P_DESC || 'N/A'}</td>
                             <td>${product.price || product.P_PRICE || 'N/A'}</td>
                             <td>
-                                <img src="/uploads/${product.image || product.P_IMAGE || 'default.jpg'}" alt="${product.product_name || product.P_NAME || 'Product'}" width="50">
+                                <img src="${product.image || product.P_IMAGE || 'default.jpg'}" alt="${product.product_name || product.P_NAME || 'Product'}" width="50">
                             </td>
                             <td>${categoryName}</td>
                         </tr>
