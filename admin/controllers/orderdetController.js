@@ -19,9 +19,10 @@ db.connect(err => {
 // Define the base URL for the client-side images
 const CLIENT_IMAGE_BASE_URL = 'http://localhost:4000/images/'; // Adjust this to your client server's URL
 
-// Fetch all orders
+// Fetch all orders with optional status filter
 exports.getAllOrders = (req, res) => {
-    const query = `
+    const status = req.query.status; // Get status from query parameter
+    let query = `
         SELECT 
             O_id, 
             O_date, 
@@ -29,18 +30,22 @@ exports.getAllOrders = (req, res) => {
             C_id
         FROM order_master
     `;
+    
+    const queryParams = [];
+    if (status && ['Pending', 'Processing', 'Shipped', 'Delivered', 'Canceled'].includes(status)) {
+        query += ` WHERE O_status = ?`;
+        queryParams.push(status);
+    }
 
-    db.query(query, (err, results) => {
+    db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error fetching orders:', err);
             res.status(500).json({ error: 'Internal server error' });
         } else {
-            console.log('Fetched orders:', results);
             res.json(results);
         }
     });
 };
-
 exports.getOrderDetails = (req, res) => {
     const orderId = req.params.id;
 
@@ -184,5 +189,31 @@ exports.getOrderDetails = (req, res) => {
                     res.status(500).json({ error: 'Database error', details: err.message });
                 });
         });
+    });
+};
+
+// Update order status
+exports.updateOrderStatus = (req, res) => {
+    const { orderId, status } = req.body;
+
+    if (!orderId || !['Pending', 'Processing', 'Shipped', 'Delivered', 'Canceled'].includes(status)) {
+        return res.status(400).json({ error: 'Invalid order ID or status' });
+    }
+
+    const query = `
+        UPDATE order_master 
+        SET O_status = ? 
+        WHERE O_id = ?
+    `;
+
+    db.query(query, [status, orderId], (err, result) => {
+        if (err) {
+            console.error('Error updating order status:', err);
+            res.status(500).json({ error: 'Database error', details: err.sqlMessage });
+        } else if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'Order not found' });
+        } else {
+            res.json({ success: true, message: 'Order status updated successfully' });
+        }
     });
 };

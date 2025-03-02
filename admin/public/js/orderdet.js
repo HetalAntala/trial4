@@ -1,17 +1,50 @@
 // Helper function to format date
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-}
+// function formatDate(dateString) {
+//     const date = new Date(dateString);
+//     const day = String(date.getDate()).padStart(2, '0');
+//     const month = String(date.getMonth() + 1).padStart(2, '0');
+//     const year = date.getFullYear();
+//     return `${day}-${month}-${year}`;
+// }
 
-// Fetch and display orders
-function fetchOrders() {
-    fetch('/order/orderdets')
+// // Fetch and display orders
+// function fetchOrders() {
+//     fetch('/order/orderdets')
+//         .then(response => {
+//             console.log('Response Status:', response.status);
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log('Fetched Orders:', data);
+//             const tableBody = document.querySelector('#orders-table tbody');
+//             tableBody.innerHTML = '';
+
+//             data.forEach(order => {
+//                 const formattedDate = formatDate(order.O_date);
+//                 const row = `
+//                     <tr>
+//                         <td>${order.O_id}</td>
+//                         <td>${formattedDate}</td>
+//                         <td>${order.O_status}</td>
+//                         <td>${order.C_id}</td>
+//                         <td>
+//                             <button onclick="viewOrderDetails('${order.O_id}')">View</button>
+//                         </td>
+//                     </tr>
+//                 `;
+//                 tableBody.innerHTML += row;
+//             });
+//         })
+//         .catch(error => console.error('Error fetching orders:', error));
+// }
+
+// Fetch and display orders with filter
+function fetchOrders(statusFilter = '') {
+    const url = statusFilter ? `/order/orderdets?status=${statusFilter}` : '/order/orderdets';
+    
+    fetch(url)
         .then(response => {
-            console.log('Response Status:', response.status);
+            if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
         })
         .then(data => {
@@ -28,7 +61,8 @@ function fetchOrders() {
                         <td>${order.O_status}</td>
                         <td>${order.C_id}</td>
                         <td>
-                            <button onclick="viewOrderDetails('${order.O_id}')">View</button>
+                            <button class="btn" onclick="viewOrderDetails('${order.O_id}')">View</button>
+                            <button class="btn" onclick="openUpdateStatusModal('${order.O_id}', '${order.O_status}')">Update Status</button>
                         </td>
                     </tr>
                 `;
@@ -38,6 +72,65 @@ function fetchOrders() {
         .catch(error => console.error('Error fetching orders:', error));
 }
 
+// Filter orders based on status dropdown
+document.addEventListener('DOMContentLoaded', () => {
+    fetchOrders(); // Initial fetch without filter
+
+    const statusFilter = document.getElementById('status-filter');
+    statusFilter.addEventListener('change', (e) => {
+        fetchOrders(e.target.value);
+    });
+});
+
+// Helper function to format date (already provided)
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+// Open modal to update order status
+function openUpdateStatusModal(orderId, currentStatus) {
+    document.getElementById('update-order-id').value = orderId;
+    document.getElementById('update-status').value = currentStatus;
+    document.getElementById('updateStatusModal').style.display = 'block';
+}
+
+// Close modal
+function closeUpdateStatusModal() {
+    document.getElementById('updateStatusModal').style.display = 'none';
+}
+
+// Handle status update form submission
+document.getElementById('updateStatusForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const orderId = document.getElementById('update-order-id').value;
+    const newStatus = document.getElementById('update-status').value;
+
+    try {
+        const response = await fetch(`/order/orderdets/${orderId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, status: newStatus })
+        });
+
+        if (!response.ok) throw new Error('Failed to update status');
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Order status updated successfully!');
+            closeUpdateStatusModal();
+            fetchOrders(document.getElementById('status-filter').value); // Refresh orders
+        } else {
+            alert('Failed to update status: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Error updating status. Please try again.');
+    }
+});
 // View order details
 function viewOrderDetails(orderId) {
     const orderDetailsContainer = document.getElementById("order-details");
@@ -175,3 +268,5 @@ document.getElementById("assignDeliveryForm").addEventListener("submit", async f
     closeAssignDeliveryModal();
     fetchOrders1();
 });
+
+

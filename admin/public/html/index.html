@@ -200,6 +200,81 @@
             <div class="tab__content" content id="orders">
               <h3 class="tab__header">Orders</h3>
               <div class="tab__body">
+                  <!-- Status Filter Dropdown -->
+                  <div class="filter-container" style="margin-bottom: 20px;">
+                      <label for="status-filter">Filter by Status:</label>
+                      <select id="status-filter">
+                          <option value="">All</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Canceled">Canceled</option>
+                      </select>
+                  </div>
+          
+                  <table id="orders-table">
+                      <thead>
+                          <tr>
+                              <th>Order ID</th>
+                              <th>Date</th>
+                              <th>Status</th>
+                              <th>Customer ID</th>
+                              <th>Action</th>
+                          </tr>
+                      </thead>
+                      <tbody></tbody>
+                  </table>
+          
+                  <!-- Order Details Modal (already present) -->
+                  <div id="order-details-modal" class="modal">
+                      <div class="modal-content">
+                          <span class="close" onclick="closeModal()">&times;</span>
+                          <h2>Order Details</h2>
+                          <table>
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>Product Name</th>
+                                      <th>Description</th>
+                                      <th>Image</th>
+                                      <th>Quantity</th>
+                                      <th>Price</th>
+                                      <th>Category</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="order-details"></tbody>
+                          </table>
+                      </div>
+                  </div>
+          
+                  <!-- Update Status Modal -->
+                  <div id="updateStatusModal" class="modal" style="display: none;">
+                      <div class="modal-content">
+                          <span class="close" onclick="closeUpdateStatusModal()">&times;</span>
+                          <h2>Update Order Status</h2>
+                          <form id="updateStatusForm">
+                              <input type="hidden" id="update-order-id">
+                              <div class="form-group">
+                                  <label for="update-status">Status:</label>
+                                  <select id="update-status" required>
+                                      <option value="Pending">Pending</option>
+                                      <option value="Processing">Processing</option>
+                                      <option value="Shipped">Shipped</option>
+                                      <option value="Delivered">Delivered</option>
+                                      <option value="Canceled">Canceled</option>
+                                  </select>
+                              </div>
+                              <button type="submit" class="btn primary">Update</button>
+                              <button type="button" class="btn-cancel" onclick="closeUpdateStatusModal()">Cancel</button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+            <div class="tab__content" content id="orders">
+              <h3 class="tab__header">Orders</h3>
+              <div class="tab__body">
                 <table id="orders-table">
                   <thead>
                       <tr>
