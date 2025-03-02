@@ -72,6 +72,8 @@ app.use('/product', productRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes);
 
+const reportRoutes = require('./routes/reportRoutes');
+app.use('/report', reportRoutes);
 
 // Start the server
 app.listen(PORT, () => {

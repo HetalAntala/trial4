@@ -100,17 +100,12 @@ const getSubcategoriesByCategory = (req, res) => {
         return res.status(400).json({ error: "Category ID is required" });
     }
 
-    const query = "SELECT * FROM subcategory WHERE cy_id = ?";  // Ensure 'cy_id' is correct column name
+    const query = "SELECT * FROM subcategory WHERE cy_id = ? AND is_deleted = 0";
     conn.query(query, [categoryId], (err, results) => {
         if (err) {
             console.error("❌ Error fetching subcategories:", err);
             return res.status(500).json({ error: "Database error" });
         }
-
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No subcategories found" });
-        }
-
         res.json(results);
     });
 };
@@ -122,53 +117,16 @@ const getSubSubcategories = (req, res) => {
         return res.status(400).json({ error: "Subcategory ID is required" });
     }
 
-    const query = "SELECT * FROM subsubcategory WHERE sub_id = ?";
+    const query = "SELECT * FROM subsubcategory WHERE sub_id = ? AND is_deleted = 0";
     conn.query(query, [subcategoryId], (err, results) => {
         if (err) {
             console.error("❌ Error fetching sub-subcategories:", err);
             return res.status(500).json({ error: "Database error" });
         }
-
         res.json(results);
     });
 };
 
-
-// ✅ Fetch all categories, subcategories, and sub-subcategories
-// const addCategory = (req, res) => {
-//     const { cy_name , cy_desc} = req.body;
-//     const cy_image = req.file ? `${req.file.filename}` : null; 
-
-//     if (!cy_name) {
-//         return res.status(400).json({ error: 'Category name is required' });
-//     }
-
-//     const getMaxCategoryIdQuery = `SELECT MAX(cy_id) AS maxId FROM category`;
-
-//     conn.query(getMaxCategoryIdQuery, (err, result) => {
-//         if (err) {
-//             console.error('Error fetching max category ID:', err);
-//             return res.status(500).json({ error: 'Database error' });
-//         }
-
-//         let newCategoryId;
-//         if (result[0].maxId) {
-//             const lastIdNumber = parseInt(result[0].maxId.replace(/\D/g, ""), 10);
-//             newCategoryId = `CY${String(lastIdNumber + 1).padStart(2, '0')}`;
-//         } else {
-//             newCategoryId = `CY01`;
-//         }
-
-//         const insertQuery = 'INSERT INTO category (cy_id, cy_name, cy_desc, cy_image) VALUES (?, ?, ?)';
-//         conn.query(insertQuery, [newCategoryId, cy_name, cy_desc, cy_image], (err, result) => {
-//             if (err) {
-//                 console.error('Error inserting category:', err);
-//                 return res.status(500).json({ error: 'Database error' });
-//             }
-//             res.json({ message: 'Category added successfully', id: newCategoryId });
-//         });
-//     });
-// };
 
 const addCategory = (req, res) => {
     const { cy_name, cy_desc } = req.body;
@@ -440,64 +398,46 @@ const removeCategory=(req,res)=>{
         res.json({ message: "✅ Category removed successfully (soft delete)" });
     });
 };
-// ✅ Delete Category and Image
-// const deleteCategory = (req, res) => {
-//     const categoryId = req.params.id;
-//     const getImageQuery = 'SELECT cy_image FROM category WHERE cy_id = ?';
 
-//     // 1. Get Image Path
-//     conn.query(getImageQuery, [categoryId], (err, result) => {
-//         if (err) {
-//             console.error('Error fetching image:', err);
-//             return res.status(500).json({ error: 'Database error' });
-//         }
+const removeSubCategory = (req, res) => {
+    const subcategoryId = req.params.id;
 
-//         // 2. Delete Image File
-//         if (result[0] && result[0].cy_image) {
-//             const oldImagePath = path.join(__dirname, '..', 'public', 'images', path.basename(result[0].cy_image));
-//             fs.unlink(oldImagePath, (err) => {
-//                 if (err) {
-//                     console.error('Error deleting old image:', err);
-//                 } else {
-//                     console.log('Old image deleted successfully:', oldImagePath);
-//                 }
-//             });
-//         }
+    if (!subcategoryId) {
+        return res.status(400).json({ error: "Subcategory ID is required" });
+    }
 
-//         // 3. Delete Category from DB
-//         const deleteQuery = 'DELETE FROM category WHERE cy_id = ?';
-//         conn.query(deleteQuery, [categoryId], (err, result) => {
-//             if (err) {
-//                 console.error('Error deleting category:', err);
-//                 return res.status(500).json({ error: 'Database error' });
-//             }
+    const query = "UPDATE subcategory SET is_deleted = 1 WHERE sub_id = ?";
+    conn.query(query, [subcategoryId], (err, result) => {
+        if (err) {
+            console.error("❌ Error marking subcategory as deleted:", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Subcategory not found" });
+        }
+        res.json({ message: "✅ Subcategory removed successfully (soft delete)" });
+    });
+};
 
-//             // 4. Initialize Counter
-//             const setCounterQuery = 'SET @count = 0';
-//             conn.query(setCounterQuery, (err) => {
-//                 if (err) {
-//                     console.error('Error setting counter:', err);
-//                     return res.status(500).json({ error: 'Database error' });
-//                 }
+const removeSubSubCategory = (req, res) => {
+    const subsubcategoryId = req.params.id;
 
-//                 // 5. Reorder IDs Dynamically
-//                 const reorderQuery = `
-//                     UPDATE category 
-//                     SET cy_id = CONCAT('CY', LPAD(@count := @count + 1, 2, '0'))
-//                     ORDER BY cy_id;
-//                 `;
-//                 conn.query(reorderQuery, (err) => {
-//                     if (err) {
-//                         console.error('Error reordering IDs:', err);
-//                         return res.status(500).json({ error: 'Database error' });
-//                     }
-//                     res.json({ message: 'Category deleted and IDs reordered successfully' });
-//                 });
-//             });
-//         });
-//     });
-// };
+    if (!subsubcategoryId) {
+        return res.status(400).json({ error: "Sub-subcategory ID is required" });
+    }
 
+    const query = "UPDATE subsubcategory SET is_deleted = 1 WHERE ss_id = ?";
+    conn.query(query, [subsubcategoryId], (err, result) => {
+        if (err) {
+            console.error("❌ Error marking sub-subcategory as deleted:", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Sub-subcategory not found" });
+        }
+        res.json({ message: "✅ Sub-subcategory removed successfully (soft delete)" });
+    });
+};
 function deleteSubCategory(req, res) {
     const { id } = req.params;
 
@@ -887,8 +827,8 @@ module.exports = {
     updateSubcategory,
     updateSubSubcategory,
     removeCategory,
-    deleteSubCategory,
-    deleteSubSubCategory,
+    removeSubCategory,      
+    removeSubSubCategory,
     getSubcategoriesByCategory,
     getAllCategories,
     getSubSubcategories,

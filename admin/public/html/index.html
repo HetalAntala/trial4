@@ -84,37 +84,7 @@
           <p class="account__tab" data-target="#delivery">
             <img src="../ad-images/icon/delivery-truck.png" alt=""> Delivery
         </p>
-        <!-- <p class="account__tab" data-target="#support">
-            <img src="../ad-images/icon/support.png" alt=""> Customer Support
-        </p>
-        <p class="account__tab" data-target="#inbox">
-            <img src="../ad-images/icon/inbox.png" alt=""> Inbox
-        </p> -->
-            <!-- <p class="account__tab accordion-menu" data-target="#report" data-accordion-btn>
-              <img src="../ad-images/icon/insurance.png" alt="">Authentication
-              <ul class="submenu-category-list" data-accordion>
-    
-                <li class="submenu-category" data-target="#login">
-                    <a href="login.html" class="submenu-title">Login</a>
-                </li>
-    
-                <li class="submenu-category" data-target="#register">
-                  <a href="register.html" class="submenu-title">Register</a>
-                </li>
-                
-                <li class="submenu-category" data-target="#forgot">
-                  <a href="forgot.html" class="submenu-title">Forgot Password</a>
-                </li>
-                <li>
-                <li class="submenu-category" data-target="#setting">
-                  <a href="" class="submenu-title"><img src="./ad-images/icon/settings.png" alt="">Setting</a>
-                </li>
-                </li>
-              </ul>
-            </p>  -->
-            <!-- <p class="account__tab" data-target="#logout">
-              <img src="../ad-images/icon/logout.png" alt="">Logout</button>
-            </p> -->
+        
           </div>
         </div>
       </aside>
@@ -158,15 +128,17 @@
         </nav>
         </div>
         <div class="cards">
-          <div class="tabs__content">
+
             <div class="tab__content active-tab" content id="dashboard">
+              <h3 class="tab__header">Dashboard</h3>
               <div class="dashboard-cards">
-                <div class="card">Total Sales: <span>$12,345</span></div>
-                <div class="card">Total Orders: <span>245</span></div>
-                <div class="card">Customers: <span>150</span></div>
-            </div>
-            <canvas id="salesChart"></canvas>
-            </div>
+                  <div class="card">Total Sales: <span id="totalSales">$0</span></div>
+                  <div class="card">Total Orders: <span id="totalOrders">0</span></div>
+                  <div class="card">Customers: <span id="totalCustomers">0</span></div>
+              </div>
+              <canvas id="salesTrendChart" width="400" height="200"></canvas>
+           </div>
+
             <div class="tab__content" content id="customer">
               <div class="container1">
                 <h2>Customer Table</h2>
@@ -617,35 +589,7 @@
                   </div>
               </div>
           </div>
-            <div class="tab__content" id="viewproduct">
-              <div class="form-group">
-                <label for="prod_catt">Select Category:</label>
-                <select id="prod_catt" onchange="fetchProductsByCategory()">
-                  <option value="">Select Category</option>
-                </select>
-              </div>
-              <table id="product-table" class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Image</th>
-                    <th>Category</th>
-                  </tr>
-                </thead>
-                <tbody id="product-details">
-                  <tr>
-                    <td colspan="6" class="text-center">Please select a category to view products</td>
-                  </tr>
-                </tbody>
-              </table>
-              <!-- Pagination Controls -->
-              <nav>
-                <ul class="pagination" id="pagination-controls"></ul>
-              </nav>
-            </div>
+        
           
             <div class="tab__content" content id="addproduct">
               <h3>Add / Update Product</h3>
@@ -675,20 +619,47 @@
               </form>
             </div>
             <div class="tab__content" content id="inventory">
-              <h1>Inventory Management</h1>
-              <table id="inventory-table">
-                  <thead>
-                      <tr>
-                          <th>Product</th>
-                          <th>Stock Level</th>
-                          <th>Low Stock Alert</th>
-                          <th>Actions</th>
-                      </tr>
-                  </thead>
-                  <tbody id="inventory-table-body">
-                      <!-- Inventory data will be dynamically added here -->
-                  </tbody>
-              </table>
+                    <!-- Inventory Status -->
+                    <div class="report-section">
+                        <h4>Inventory Status (Low Stock & Out of Stock)</h4>
+                        <div class="filter-container">
+                            <label for="inventoryCategoryFilter">Category:</label>
+                            <select id="inventoryCategoryFilter" onchange="updateInventoryStatus()">
+                                <option value="">All Categories</option>
+                                <!-- Categories will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div id="criticalStockAlert" class="alert-banner hidden">
+                            <strong>Warning:</strong> <span id="criticalStockMessage"></span>
+                            <button class="btn alert-btn" onclick="sendRestockAlert()">Send Restock Alert</button>
+                        </div>
+                        <h5>Low Stock Products (Stock ≤ 5)</h5>
+                        <table id="lowStockTable">
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lowStockProducts"></tbody>
+                        </table>
+                        <h5>Out of Stock Products (Stock = 0)</h5>
+                        <table id="outOfStockTable">
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody id="outOfStockProducts"></tbody>
+                        </table>
+                    </div>
+
+          
           </div>
           <div class="tab__content" content id="sales">
             <h1>Sales & Analytics</h1>
@@ -776,12 +747,79 @@
               </div>
           </div>
       </div>
-            <div class="tab__content" content id="report">
+      <div class="tab__content" content id="report">
+        <h3 class="tab__header">Reports</h3>
+        <div class="report-section">
+          <h4>Order Summary</h4>
+          <div class="export-buttons">
+            <button class="btn primary" onclick="exportSales('csv')">Export as CSV</button>
+            <button class="btn primary" onclick="exportSales('pdf')">Export as PDF</button>
+        </div>
+          <div class="filter-container">
+              <label for="orderDateRange">Date Range:</label>
+              <select id="orderDateRange" onchange="updateOrderSummary()">
+                  <option value="today">Today</option>
+                  <option value="last7days">Last 7 Days</option>
+                  <option value="last30days">Last 30 Days</option>
+                  <option value="custom">Custom Range</option>
+              </select>
+              <div id="customDateRange" style="display: none;">
+                  <label for="orderStartDate">Start Date:</label>
+                  <input type="date" id="orderStartDate">
+                  <label for="orderEndDate">End Date:</label>
+                  <input type="date" id="orderEndDate">
+                  <button onclick="updateOrderSummary()">Apply</button>
+              </div>
+          </div>
+          <div class="stats">
+              <div class="stat-card">Pending Orders: <span id="pendingOrders">0</span></div>
+              <div class="stat-card">Delivered Orders: <span id="deliveredOrders">0</span></div>
+              <div class="stat-card">Canceled Orders: <span id="canceledOrders">0</span></div>
+          </div>
+          <div class="charts-container">
+              <div class="chart-wrapper">
+                  <canvas id="orderSummaryPieChart" width="400" height="200"></canvas>
+              </div>
+              <div class="chart-wrapper">
+                  <canvas id="orderSummaryBarChart" width="400" height="200"></canvas>
+              </div>
+          </div>
+      </div>
+        <div class="tab__body">
+            <!-- CSV Report Generation -->
+            <div class="report-section">
+                <h4>Generate CSV Report</h4>
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" name="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" name="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter" name="status">
+                            <option value="">All</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Canceled">Canceled</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn primary">Generate CSV</button>
+                </form>
+            </div>
+        </div>
+    </div>
+            <!-- <div class="tab__content" content id="report">
               <h3 class="tab__header">Reports</h3>
               <div class="tab__body">
                 
               </div>
-            </div>
+            </div> -->
             <div class="tab__content" content id="setting">
               <h3 class="tab__header">Setting</h3>
               <div class="tab__body">
@@ -858,6 +896,7 @@
     <script src="../js/product.js"></script>
     <script src="../js/category.js"></script>
     <script src="../js/inventory.js"></script>
+    <script src="../js/report.js"></script>
     <!-- <script src="../js/category2.js"></script> -->
 <script>
 const btnScrollToTop = document.querySelector("#btnScrollToTop");

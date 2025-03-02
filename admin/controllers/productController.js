@@ -506,8 +506,6 @@ function generateProductId(lastId, primaryKey) {
     return `${prefix}${String(numericPart).padStart(4, '0')}`;
 }
 
-
-// Update product details
 // Update product details
 const updateProduct = (req, res) => {
     const { tableName, productId, productData, images } = req.body;

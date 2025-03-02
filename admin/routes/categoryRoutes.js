@@ -26,12 +26,12 @@ router.put('/rcategories/:id', categoryController.removeCategory);
 
 router.post('/subcategories', categoryController.upload.single('sub_image'), categoryController.addSubCategory);
 router.put('/subcategories/:id', upload.single('sub_image'), categoryController.updateSubcategory);
-router.delete('/subcategories/:id', categoryController.deleteSubCategory);
+router.put('/rsubcategories/:id', categoryController.removeSubCategory);
 
 
 router.post('/subsubcategories', upload.single('ss_image'),categoryController.addSubSubCategory);
 router.put('/subsubcategories/:id', upload.single('ss_image'),categoryController.updateSubSubcategory);
-router.delete('/subsubcategories/:id', categoryController.deleteSubSubCategory);
+router.put('/rsubsubcategories/:id', categoryController.removeSubSubCategory);
 
 
 module.exports = router;

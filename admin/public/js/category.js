@@ -19,7 +19,7 @@ const fetchCategories = async () => {
         categories.forEach(category => {
             // Display Category Row
             let row = `
-                <tr>
+                <tr id="category-row-${category.category_id}">
                     <td>${category.category_id}</td>
                     <td id="cat-name-${category.category_id}">${category.category_name}</td>
                     <td>${category.category_desc ? category.category_desc : 'No description'}</td>
@@ -101,26 +101,19 @@ function removeCategory(categoryId) {
     fetch(`/category/rcategories/${encodeURIComponent(categoryId)}`, { method: "PUT" })
         .then(response => response.json())
         .then(data => {
-            alert(data.message); // ✅ Show success message
+            alert(data.message); // Show success message
             
-            // ✅ Hide the category from the UI
-            document.getElementById(`category-row-${categoryId}`).style.display = "none";
+            // Hide the category from the UI if the element exists
+            const row = document.getElementById(`category-row-${categoryId}`);
+            if (row) {
+                row.style.display = "none";
+            } else {
+                console.warn(`⚠ Category row with ID "category-row-${categoryId}" not found in DOM`);
+            }
         })
         .catch(error => console.error("❌ Error removing category:", error));
 }
 
-
-// function deleteCategory(categoryId) {
-//     if (!confirm("Are you sure you want to delete this category? All related subcategories will also be removed!")) return;
-    
-//     fetch(`/category/categories/${categoryId}`, { method: 'DELETE' })
-//     .then(response => response.json())
-//     .then(data => {
-//         alert("Category deleted successfully!");
-//         fetchCategories(); // Refresh category list
-//     })
-//     .catch(error => console.error('Error deleting category:', error));
-// }
 
 function openUpdateModal(categoryId, categoryName, categoryDesc, categoryImage) {
     document.getElementById("updateCategoryModal").classList.remove("hidden");
@@ -269,7 +262,7 @@ function fetchSubcategories() {
                         <td>${categoryId}</td>
                         <td>
                             <button class="btn" onclick="openUpdateSubModal('${sub.sub_id}', '${sub.sub_name}', '${sub.sub_desc}')">Update</button>
-                            <button class="btn" onclick="deleteSubcategory('${sub.sub_id}')">Delete</button>
+                            <button class="btn" onclick="removeSubcategory('${sub.sub_id}')">Remove</button>
                         </td>
                     </tr>
                 `;
@@ -281,6 +274,21 @@ function fetchSubcategories() {
     })
     .catch(error => console.error('❌ Error fetching subcategories:', error));
 
+}
+
+function removeSubcategory(subId) {
+    if (!confirm("Are you sure you want to remove this subcategory from the website?")) return;
+
+    fetch(`/category/rsubcategories/${subId}`, { method: 'PUT' })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            document.getElementById(`subcategory-row-${subId}`).style.display = "none"; // Hide row
+        })
+        .catch(error => console.error('Error removing subcategory:', error));
 }
 
 // ✅ Auto Fetch Subcategories When Category is Selected
@@ -333,54 +341,6 @@ document.getElementById('updateSubcategoryForm').addEventListener('submit', func
         .catch(error => console.error('Error updating subcategory:', error));
 });
 
-
-// Delete Subcategory
-function deleteSubCategory(subId) {
-    if (!confirm("Are you sure you want to delete this subcategory?")) return;
-
-    fetch(`/category/subcategories/${subId}`, { method: 'DELETE' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert("Subcategory deleted successfully!");
-            fetchsubCategories(); // Refresh category list
-        })
-        .catch(error => console.error('Error deleting subcategory:', error));
-}
-
-  
-// Fetch and Populate Subcategories for a Specific Category
-// function fetchSubCategory(categoryId) {
-//     console.log('Fetching subcategories for category:', categoryId);
-
-//     fetch(`/category/subcategories/${categoryId}`)
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error(`HTTP error! status: ${response.status}`);
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('Fetched Subcategories:', data);
-//             const subcategorySelect = document.getElementById('parent-subcategory');
-
-//             // Clear existing options
-//             subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-
-//             // Populate Dropdown with Subcategories
-//             data.forEach(subcategory => {
-//                 const option = document.createElement('option');
-//                 option.value = subcategory.sub_id;
-//                 option.textContent = subcategory.sub_name;
-//                 subcategorySelect.appendChild(option);
-//             });
-//         })
-//         .catch(error => console.error('Error fetching subcategories:', error));
-// }
 function handleSubCategoryChange(dropdownId, subcategoryDropdownId) {
     const categoryId = document.getElementById(dropdownId).value;
     const subcategoryDropdown = document.getElementById(subcategoryDropdownId);
@@ -427,7 +387,7 @@ function fetchSubSubcategories() {
                             <td>${subcategoryId}</td>
                             <td>
                                 <button class="btn" onclick="openUpdateSubSubModal('${ssc.ss_id}', '${ssc.ss_name}', '${ssc.ss_desc}')">Update</button>
-                                <button class="btn" onclick="deleteSubSubcategory('${ssc.ss_id}')">Delete</button>
+                                <button class="btn" onclick="removeSubSubcategory('${ssc.ss_id}')">Remove</button>
                             </td>
                         </tr>
                     `;
@@ -562,21 +522,19 @@ document.getElementById("updateSubSubcategoryForm").addEventListener("submit", a
 
 
 
-function deleteSubSubcategory(ssId) {
-    if (!confirm("Are you sure you want to delete this sub-subcategory?")) return;
+function removeSubSubcategory(ssId) {
+    if (!confirm("Are you sure you want to remove this sub-subcategory from the website?")) return;
 
-    fetch(`/category/subsubcategories/${ssId}`, { method: 'DELETE' })
+    fetch(`/category/rsubsubcategories/${ssId}`, { method: 'PUT' })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            alert("Sub-Subcategory deleted successfully!");
-            fetchCategories(); 
+            alert(data.message);
+            document.getElementById(`subsubcategory-row-${ssId}`).style.display = "none"; // Hide row
         })
-        .catch(error => console.error('Error deleting sub-subcategory:', error));
+        .catch(error => console.error('Error removing sub-subcategory:', error));
 }
 
 
