@@ -1,3 +1,32 @@
+// orderdet.js
+window.showOrderDetails = function(orderId) {
+    fetch(`/order/orderdets/details/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            const modal = document.getElementById('order-details-modal');
+            const orderDetails = document.getElementById('order-details');
+            orderDetails.innerHTML = '';
+
+            let total = 0;
+            data.forEach(item => {
+                total += item.quantity * item.price;
+                orderDetails.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.description}</td>
+                        <td><img src="${item.image}" alt="${item.name}" width="50"></td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.price}</td>
+                        <td>${item.category}</td>
+                    </tr>
+                `;
+            });
+
+            modal.style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching order details:', error));
+};
 // Helper function to format date
 // function formatDate(dateString) {
 //     const date = new Date(dateString);

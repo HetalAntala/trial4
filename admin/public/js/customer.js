@@ -1,3 +1,17 @@
+// customer.js
+window.highlightCustomer = function(customerId) {
+    const customerTableBody = document.getElementById('customer-table-body');
+    const rows = customerTableBody.getElementsByTagName('tr');
+    for (let row of rows) {
+        const idCell = row.cells[0].textContent;
+        if (idCell === customerId) {
+            row.style.backgroundColor = '#e0e7ff'; // Highlight color
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+        }
+    }
+};
+
 // Fetch data from backend and display in the table
 const fetchCustomers = async () => {
     try {

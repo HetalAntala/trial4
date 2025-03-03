@@ -25,68 +25,51 @@
           </div>
         </div>
         <div class="sidebar container grid">
-          <div class="account__tabs">
-            <p class="account__tab active-tab" data-target="#dashboard">
-              <!-- <span class="fa-solid fa-house"></span> -->
-              <img src="../ad-images/icon/dashboard.png" alt="">Dashboard
-            </p>
-            <p class="account__tab"  onclick="toggleDropdown('productDropdown')">
-              <img src="../ad-images/icon/new-product.png" alt=""> Product
-              <i class="fas fa-chevron-down ml-2"></i>
-            </p>
-            <div class="hidden" id="productDropdown">
-              <a class="block" onclick="showSection('viewproduct')" data-target="#viewproduct">
-               View
-              </a>
-              <a class="block" onclick="showSection('addproduct')" data-target="#addproduct">
-              Add
-              </a>
-             </div>
-             <p class="account__tab" data-target="#orders">
-              <img src="../ad-images/icon/order.png" alt=""> Orders
-            </p>
-             <p class="account__tab" onclick="toggleDropdown('categoriesDropdown')">
-              <img src="../ad-images/icon/list.png" alt=""> Category
-              <i class="fas fa-chevron-down ml-2"></i> 
-            </p>
-            <div class="hidden" id="categoriesDropdown">
-              <a class="block" onclick="showSection('category')" data-target="#category">
-               Main Categories
-              </a>
-              <a class="block" onclick="showSection('subcategory')" data-target="#subcategory">
-               Sub Categories
-              </a>
-              <a class="block" onclick="showSection('subsubcategory')" data-target="#subsubcategory">
-               SubSub Categories
-               </a>
-               <a class="block" onclick="showSection('createtbl')" data-target="#createtbl">
-                Crate Table
-                </a>
-             </div>
-            
-            <p class="account__tab" data-target="#customer">
-              <img src="../ad-images/icon/user.png" alt="">Customer
-            </p>
-           
-            <p class="account__tab" data-target="#sales">
-              <img src="../ad-images/icon/statistics.png" alt=""> Analytics
-            </p>
-            
-           
-            <p class="account__tab" data-target="#report">
-              <img src="../ad-images/icon/report.png" alt="">Report
-            </p>
-            <p class="account__tab" data-target="#review">
-              <img src="../ad-images/icon/review.png" alt="">Review
-            </p>
-            <p class="account__tab" data-target="#inventory">
-              <img src="../ad-images/icon/checklists.png" alt=""> Inventory
-          </p>
-          <p class="account__tab" data-target="#delivery">
-            <img src="../ad-images/icon/delivery-truck.png" alt=""> Delivery
-        </p>
-        
-          </div>
+            <div class="account__tabs">
+                <p class="account__tab active-tab" data-target="#dashboard" onclick="showSection('dashboard')">
+                    <img src="../ad-images/icon/dashboard.png" alt="">Dashboard
+                </p>
+                <p class="account__tab" onclick="toggleDropdown('productDropdown')">
+                    <img src="../ad-images/icon/new-product.png" alt=""> Product
+                    <i class="fas fa-chevron-down ml-2"></i>
+                </p>
+                <div class="hidden" id="productDropdown">
+                    <a class="block" onclick="showSection('viewproduct')" data-target="#viewproduct">View</a>
+                    <a class="block" onclick="showSection('addproduct')" data-target="#addproduct">Add</a>
+                </div>
+                <p class="account__tab" data-target="#orders" onclick="showSection('orders')">
+                    <img src="../ad-images/icon/order.png" alt=""> Orders
+                </p>
+                <p class="account__tab" onclick="toggleDropdown('categoriesDropdown')">
+                    <img src="../ad-images/icon/list.png" alt=""> Category
+                    <i class="fas fa-chevron-down ml-2"></i> 
+                </p>
+                <div class="hidden" id="categoriesDropdown">
+                    <a class="block" onclick="showSection('category')" data-target="#category">Main Categories</a>
+                    <a class="block" onclick="showSection('subcategory')" data-target="#subcategory">Sub Categories</a>
+                    <a class="block" onclick="showSection('subsubcategory')" data-target="#subsubcategory">SubSub Categories</a>
+                    <a class="block" onclick="showSection('createtbl')" data-target="#createtbl">Crate Table</a>
+                </div>
+                <p class="account__tab" data-target="#customer" onclick="showSection('customer')">
+                    <img src="../ad-images/icon/user.png" alt="">Customer
+                </p>
+                <p class="account__tab" data-target="#report" onclick="toggleDropdown('reportsDropdown')">
+                    <img src="../ad-images/icon/report.png" alt="">Report
+                    <i class="fas fa-chevron-down ml-2"></i>
+                </p>
+                <div class="hidden" id="reportsDropdown">
+                    <a class="block" onclick="showSection('report', 'order-report')" data-target="#report">Order Report</a>
+                    <a class="block" onclick="showSection('report', 'sales-report')" data-target="#report">Sales Report</a>
+                    <a class="block" onclick="showSection('report', 'customer-report')" data-target="#report">Customer Report</a>
+                    <a class="block" onclick="showSection('report', 'inventory-report')" data-target="#report">Inventory Report</a>
+                </div>
+                <p class="account__tab" data-target="#review" onclick="showSection('review')">
+                    <img src="../ad-images/icon/review.png" alt="">Review
+                </p>
+                <p class="account__tab" data-target="#delivery" onclick="showSection('delivery')">
+                    <img src="../ad-images/icon/delivery-truck.png" alt=""> Delivery
+                </p>
+            </div>
         </div>
       </aside>
       <div class="right">
@@ -97,49 +80,129 @@
           </button>       
           <nav class="right-navbar">
             <div class="theme-toggler">
-              <span class="material-icons-sharp active"> light_mode </span>
-              <span class="material-icons-sharp"> dark_mode </span>
+                <span class="material-icons-sharp active">light_mode</span>
+                <span class="material-icons-sharp">dark_mode</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="toggleNotificationDropdown()">
                 <i class="fas fa-bell"></i>
+                <!-- Notification Dropdown -->
+                <div class="dropdown-menu" id="notificationDropdown" style="display: none;">
+                    <div class="dropdown-header">
+                        <h4>Notifications</h4>
+                        <button onclick="clearNotifications()" class="btn-clear">Clear All</button>
+                    </div>
+                    <ul id="notificationList">
+                        <!-- Notifications will be dynamically added here -->
+                    </ul>
+                </div>
             </div>
-            <div class="nav-item message">
+            <div class="nav-item" onclick="toggleMessagesDropdown()">
                 <i class="fas fa-envelope"></i>
+                <!-- Messages Dropdown -->
+                <div class="dropdown-menu" id="messagesDropdown" style="display: none;">
+                    <div class="dropdown-header">
+                        <h4>Messages</h4>
+                        <button onclick="clearMessages()" class="btn-clear">Clear All</button>
+                    </div>
+                    <ul id="messagesList">
+                        <!-- Messages will be dynamically added here -->
+                    </ul>
+                </div>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="showSection('setting')">
                 <i class="fas fa-cog"></i>
             </div>
             <div class="nav-item profile" onclick="toggleDropdown1()">
-              <img src="" alt="Profile Picture" class="profile-photo">
-          </div>
-          <div class="dropdown-menu" id="dropdownMenu">
-              <div class="user-info">
-                  <img src="" alt="Profile Picture" class="profile-photo">
-                  <div>
-                      <span class="user-name">John Doe</span>
-                      <span class="user-role">Admin</span>
-                  </div>
-              </div>
-              <ul>
-                  <li><i class="fas fa-user"></i> My Profile</li>
-                  <li><i class="fas fa-cog"></i> Settings</li>
-                  <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Log Out</li>
-              </ul>
-          </div>
+                <img src="" alt="Profile Picture" class="profile-photo">
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="user-info">
+                    <img src="" alt="Profile Picture" class="profile-photo">
+                    <div>
+                        <span class="user-name">John Doe</span>
+                        <span class="user-role">Admin</span>
+                    </div>
+                </div>
+                <ul>
+                    <li><i class="fas fa-user"></i> My Profile</li>
+                    <li onclick="showSection('setting')"><i class="fas fa-cog"></i> Settings</li>
+                    <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</li>
+                </ul>
+            </div>
         </nav>
         </div>
         <div class="cards">
-
             <div class="tab__content active-tab" content id="dashboard">
-              <h3 class="tab__header">Dashboard</h3>
-              <div class="dashboard-cards">
-                  <div class="card">Total Sales: <span id="totalSales">$0</span></div>
-                  <div class="card">Total Orders: <span id="totalOrders">0</span></div>
-                  <div class="card">Customers: <span id="totalCustomers">0</span></div>
-              </div>
-              <canvas id="salesTrendChart" width="400" height="200"></canvas>
-           </div>
-
+                <h3 class="tab__header">Dashboard</h3>
+            
+                <!-- Key Metrics -->
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h4>Daily Sales</h4>
+                        <span id="dailySales">Rs. 0</span>
+                    </div>
+                    <div class="card">
+                        <h4>Weekly Sales</h4>
+                        <span id="weeklySales">Rs. 0</span>
+                    </div>
+                    <div class="card">
+                        <h4>Monthly Sales</h4>
+                        <span id="monthlySales">Rs. 0</span>
+                    </div>
+                    <div class="card">
+                        <h4>Total Orders</h4>
+                        <span id="totalOrders">0</span>
+                    </div>
+                    <div class="card">
+                        <h4>Total Active Customers</h4>
+                        <span id="totalActiveCustomers">0</span>
+                    </div>
+                    <div class="card">
+                        <h4>Inventory Levels</h4>
+                        <span id="totalInventory">0</span>
+                    </div>
+                </div>
+            
+                <!-- Graphical Insights -->
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <h4>Sales Trends</h4>
+                        <canvas id="salesTrendChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h4>Best-Selling Products</h4>
+                        <div class="filter-container">
+                            <label for="bestSellersCategoryFilter">Filter by Category:</label>
+                            <select id="bestSellersCategoryFilter" onchange="updateBestSellersChart()">
+                                <option value="">All Categories</option>
+                                <!-- Categories will be populated dynamically -->
+                            </select>
+                        </div>
+                        <canvas id="bestSellersChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h4>Order Status Distribution</h4>
+                        <canvas id="orderStatusChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            
+                <!-- Recent Activity Log -->
+                <div class="recent-activity">
+                    <h4>Recent Activity</h4>
+                    <ul id="recentActivityLog">
+                        <!-- Activities will be dynamically added here -->
+                    </ul>
+                </div>
+            
+                <!-- Quick Actions -->
+                <!-- <div class="quick-actions">
+                    <h4>Quick Actions</h4>
+                    <button class="btn primary" onclick="showSection('addproduct')">Add Product</button>
+                    <button class="btn primary" onclick="showSection('orders')">View Orders</button>
+                    <button class="btn primary" onclick="showSection('report', 'sales-report')">View Sales Report</button>
+                    <button class="btn primary" onclick="showSection('inventory')">Manage Inventory</button>
+                </div> -->
+            </div>
             <div class="tab__content" content id="customer">
               <div class="container1">
                 <h2>Customer Table</h2>
@@ -721,93 +784,190 @@
       </div>
       
     
-      <div class="tab__content" content id="support">
-          <h1>Customer Support</h1>
-          <table id="support-table">
-              <thead>
-                  <tr>
-                      <th>Request ID</th>
-                      <th>Customer</th>
-                      <th>Type</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                  </tr>
-              </thead>
-              <tbody id="support-table-body"></tbody>
-          </table>
-          <div id="supportRequestModal" class="modal">
-              <div class="modal-content">
-                  <h2>Handle Request</h2>
-                  <span class="modal-close" onclick="closeSupportRequestModal()">×</span>
-                  <form id="supportRequestForm" class="modal-form">
-                      <div class="form-group">
-                          <label for="request-status">Status</label>
-                          <select id="request-status" required>
-                              <option value="pending">Pending</option>
-                              <option value="processed">Processed</option>
-                              <option value="rejected">Rejected</option>
-                          </select>
-                      </div>
-                      <button type="submit" class="btn primary">Save</button>
-                      <button type="button" class="btn-cancel" onclick="closeSupportRequestModal()">Cancel</button>
-                  </form>
-              </div>
-          </div>
-      </div>
       <div class="tab__content" content id="report">
         <h3 class="tab__header">Reports</h3>
-        <div class="report-section">
-          <h4>Order Summary</h4>
-          <div class="export-buttons">
-            <button class="btn primary" onclick="exportSales('csv')">Export as CSV</button>
-            <button class="btn primary" onclick="exportSales('pdf')">Export as PDF</button>
-        </div>
-          <div class="filter-container">
-              <label for="orderDateRange">Date Range:</label>
-              <select id="orderDateRange" onchange="updateOrderSummary()">
-                  <option value="today">Today</option>
-                  <option value="last7days">Last 7 Days</option>
-                  <option value="last30days">Last 30 Days</option>
-                  <option value="custom">Custom Range</option>
-              </select>
-              <div id="customDateRange" style="display: none;">
-                  <label for="orderStartDate">Start Date:</label>
-                  <input type="date" id="orderStartDate">
-                  <label for="orderEndDate">End Date:</label>
-                  <input type="date" id="orderEndDate">
-                  <button onclick="updateOrderSummary()">Apply</button>
-              </div>
-          </div>
-          <div class="stats">
-              <div class="stat-card">Pending Orders: <span id="pendingOrders">0</span></div>
-              <div class="stat-card">Delivered Orders: <span id="deliveredOrders">0</span></div>
-              <div class="stat-card">Canceled Orders: <span id="canceledOrders">0</span></div>
-          </div>
-          <div class="charts-container">
-              <div class="chart-wrapper">
-                  <canvas id="orderSummaryPieChart" width="400" height="200"></canvas>
-              </div>
-              <div class="chart-wrapper">
-                  <canvas id="orderSummaryBarChart" width="400" height="200"></canvas>
-              </div>
-          </div>
-      </div>
         <div class="tab__body">
-            <!-- CSV Report Generation -->
-            <div class="report-section">
-                <h4>Generate CSV Report</h4>
-                <form id="reportForm">
-                    <div class="form-group">
-                        <label for="startDate">Start Date:</label>
-                        <input type="date" id="startDate" name="startDate">
+            <!-- Sales Report -->
+            <div id="sales-report" class="report-subsection hidden">
+                <div class="report-section">
+                    <h4>Sales Report</h4>
+                    <div class="filter-container">
+                        <label for="salesDateRange">Date Range:</label>
+                        <select id="salesDateRange" onchange="fetchSalesReport()">
+                            <option value="today">Today</option>
+                            <option value="last7days">Last 7 Days</option>
+                            <option value="last30days">Last 30 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <div id="salesCustomDateRange" style="display: none;">
+                            <label for="salesStartDate">Start Date:</label>
+                            <input type="date" id="salesStartDate">
+                            <label for="salesEndDate">End Date:</label>
+                            <input type="date" id="salesEndDate">
+                            <button onclick="fetchSalesReport()">Apply</button>
+                        </div>
+                        <label for="salesGroupBy">Group By:</label>
+                        <select id="salesGroupBy" onchange="fetchSalesReport()">
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label for="endDate">End Date:</label>
-                        <input type="date" id="endDate" name="endDate">
+                    <div class="export-buttons">
+                        <button class="btn primary" onclick="exportSalesReport('csv')">Export as CSV</button>
+                        <button class="btn primary" onclick="exportSalesReport('pdf')">Export as PDF</button>
                     </div>
-                    <div class="form-group">
-                        <label for="statusFilter">Status:</label>
-                        <select id="statusFilter" name="status">
+                    <div class="stats">
+                        <div class="stat-card">Total Sales: <span id="totalSales">$0</span></div>
+                    </div>
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <canvas id="salesByPeriodChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="salesByProductChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="salesByCategoryChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Customer Report -->
+            <div id="customer-report" class="report-subsection hidden">
+                <div class="report-section">
+                    <h4>Customer Report</h4>
+                    <div class="filter-container">
+                        <label for="customerDateRange">Date Range:</label>
+                        <select id="customerDateRange" onchange="fetchCustomerReport()">
+                            <option value="today">Today</option>
+                            <option value="last7days">Last 7 Days</option>
+                            <option value="last30days">Last 30 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <div id="customerCustomDateRange" style="display: none;">
+                            <label for="customerStartDate">Start Date:</label>
+                            <input type="date" id="customerStartDate">
+                            <label for="customerEndDate">End Date:</label>
+                            <input type="date" id="customerEndDate">
+                            <button onclick="fetchCustomerReport()">Apply</button>
+                        </div>
+                    </div>
+                    <div class="export-buttons">
+                        <button class="btn primary" onclick="exportCustomerReport('csv')">Export as CSV</button>
+                        <button class="btn primary" onclick="exportCustomerReport('pdf')">Export as PDF</button>
+                    </div>
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <h5>Customer Demographics</h5>
+                            <canvas id="customerDemographicsChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <h5>Top Customers by Purchase History</h5>
+                            <canvas id="customerPurchaseHistoryChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <h5>Top Customers by Lifetime Value</h5>
+                            <canvas id="customerLifetimeValueChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Inventory Report -->
+            <div id="inventory-report" class="report-subsection hidden">
+                <div class="report-section">
+                    <h4>Inventory Report</h4>
+                    <div class="filter-container">
+                        <label for="inventoryCategoryFilter">Category:</label>
+                        <select id="inventoryCategoryFilter" onchange="fetchInventoryReport()">
+                            <option value="">All Categories</option>
+                            <!-- Categories will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="export-buttons">
+                        <button class="btn primary" onclick="exportInventoryReport('csv')">Export as CSV</button>
+                        <button class="btn primary" onclick="exportInventoryReport('pdf')">Export as PDF</button>
+                    </div>
+                    <div id="criticalStockAlert" class="alert-banner hidden">
+                        <strong>Warning:</strong> <span id="criticalStockMessage"></span>
+                        <button class="btn alert-btn" onclick="sendRestockAlert()">Send Restock Alert</button>
+                    </div>
+                    <h5>Low Stock Products (Stock ≤ 5)</h5>
+                    <table id="lowStockTable">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockProducts"></tbody>
+                    </table>
+                    <h5>Out of Stock Products (Stock = 0)</h5>
+                    <table id="outOfStockTable">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outOfStockProducts"></tbody>
+                    </table>
+                    <h5>Inventory Turnover</h5>
+                    <table id="inventoryTurnoverTable">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Total Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTurnover"></tbody>
+                    </table>
+                    <h5>Slow Moving Products (Total Sold ≤ 5)</h5>
+                    <table id="slowMovingTable">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Total Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slowMovingProducts"></tbody>
+                    </table>
+                </div>
+            </div>
+    
+            <!-- Order Report -->
+            <div id="order-report" class="report-subsection hidden">
+                <div class="report-section">
+                    <h4>Order Summary</h4>
+                    <div class="filter-container">
+                        <label for="orderDateRange">Date Range:</label>
+                        <select id="orderDateRange" onchange="fetchOrderReport()">
+                            <option value="today">Today</option>
+                            <option value="last7days">Last 7 Days</option>
+                            <option value="last30days">Last 30 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <div id="customDateRange" style="display: none;">
+                            <label for="orderStartDate">Start Date:</label>
+                            <input type="date" id="orderStartDate">
+                            <label for="orderEndDate">End Date:</label>
+                            <input type="date" id="orderEndDate">
+                            <button onclick="fetchOrderReport()">Apply</button>
+                        </div>
+                        <label for="orderStatusFilter">Status:</label>
+                        <select id="orderStatusFilter" onchange="fetchOrderReport()">
                             <option value="">All</option>
                             <option value="Pending">Pending</option>
                             <option value="Processing">Processing</option>
@@ -816,78 +976,115 @@
                             <option value="Canceled">Canceled</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn primary">Generate CSV</button>
-                </form>
+                    <div class="export-buttons">
+                        <button class="btn primary" onclick="exportOrderReport('csv')">Export as CSV</button>
+                        <button class="btn primary" onclick="exportOrderReport('pdf')">Export as PDF</button>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-card">Pending Orders: <span id="pendingOrders">0</span></div>
+                        <div class="stat-card">Delivered Orders: <span id="deliveredOrders">0</span></div>
+                        <div class="stat-card">Canceled Orders: <span id="canceledOrders">0</span></div>
+                    </div>
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <h5>Order Status Summary</h5>
+                            <canvas id="orderSummaryPieChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="orderSummaryBarChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <h5>Fulfillment Times</h5>
+                    <table id="fulfillmentTimesTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Delivery Date</th>
+                                <th>Fulfillment Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fulfillmentTimes"></tbody>
+                    </table>
+                    <h5>Shipping Details</h5>
+                    <table id="shippingDetailsTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer ID</th>
+                                <th>Address</th>
+                                <th>Pincode</th>
+                                <th>Delivery Person</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shippingDetails"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-            <!-- <div class="tab__content" content id="report">
-              <h3 class="tab__header">Reports</h3>
-              <div class="tab__body">
-                
-              </div>
-            </div> -->
-            <div class="tab__content" content id="setting">
-              <h3 class="tab__header">Setting</h3>
-              <div class="tab__body">
-                <div class="card">
-                  <!-- Account -->
-                  <div class="card-body">
+    <div class="tab__content" content id="setting">
+        <h3 class="tab__header">Settings</h3>
+        <div class="tab__body">
+            <div class="card">
+                <!-- Account -->
+                <div class="card-body">
                     <div class="account">
-                      <img
-                        src="./ad-images/profile/img2.jpg"
-                        alt="user-avatar"
-                        class="avatar"
-                        id="uploadedAvatar" />
-                      <div class="button-wrapper">
-                        <label for="upload" class="button" tabindex="0">
-                          <span>Upload new photo</span>
-                          <input
-                            type="file"
-                            id="upload"
-                            class="account-file-input"
-                            hidden
-                            accept="image/png, image/jpeg" />
-                        </label>
-                        <button type="button" class="button1">
-                          <span>Reset</span>
-                        </button>
-  
-                        <div class="imgtext">Allowed JPG, GIF or PNG. Max size of 800K</div>
-                      </div>
+                        <img
+                            src="./ad-images/profile/img2.jpg"
+                            alt="user-avatar"
+                            class="avatar"
+                            id="uploadedAvatar"
+                        />
+                        <div class="button-wrapper">
+                            <label for="upload" class="button" tabindex="0">
+                                <span>Upload new photo</span>
+                                <input
+                                    type="file"
+                                    id="upload"
+                                    class="account-file-input"
+                                    hidden
+                                    accept="image/png, image/jpeg"
+                                />
+                            </label>
+                            <button type="button" class="button1" onclick="resetAvatar()">
+                                <span>Reset</span>
+                            </button>
+                            <div class="imgtext">Allowed JPG, GIF or PNG. Max size of 800K</div>
+                        </div>
                     </div>
-                  </div>
-                 <div class="card-body"> 
-                    <form id="formAccountSettings" method="">
-  
-                          <label for="userName" class="form-label">User Name</label>
-                          <input
+                </div>
+                <div class="card-body"> 
+                    <form id="formAccountSettings" onsubmit="saveAdminSettings(event)">
+                        <label for="userName" class="form-label">User Name</label>
+                        <input
                             class="form-control"
                             type="text"
                             id="userName"
                             name="userName"
                             value="John"
-                             />
-                      <br/>
-                          <label for="email" class="form-label">E-mail    </label>
-                          <input
+                        />
+                        <br/>
+                        <label for="email" class="form-label">E-mail</label>
+                        <input
                             class="form-control"
-                            type="text"
+                            type="email"
                             id="email"
                             name="email"
                             value="john.doe@example.com"
-                            placeholder="john.doe@example.com"/>
-                        
-                      <div class="change">
-                        <button type="submit" class="button">Save changes</button>
-                        <button type="reset" class="button1">Cancel</button>
-                      </div>
+                            placeholder="john.doe@example.com"
+                        />
+                        <div class="change">
+                            <button type="submit" class="button">Save changes</button>
+                            <button type="reset" class="button1">Cancel</button>
+                        </div>
                     </form>
-                  </div>
-                  <!-- /Account -->
                 </div>
-              </div>
+                <!-- /Account -->
             </div>
+        </div>
+    </div>
           </div>
         </div>
       </div>
@@ -906,33 +1103,7 @@
     <script src="../js/report.js"></script>
     <!-- <script src="../js/category2.js"></script> -->
 <script>
-const btnScrollToTop = document.querySelector("#btnScrollToTop");
-const icon = btnScrollToTop.querySelector("i");
 
-btnScrollToTop.addEventListener("click", function () {
-    if (window.scrollY === 0) {
-        // Scroll to bottom and change arrow direction
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-        icon.classList.add("fa-arrow-up");
-        icon.classList.remove("fa-arrow-down");
-    } else {
-        // Scroll to top and change arrow direction
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        icon.classList.add("fa-arrow-down");
-        icon.classList.remove("fa-arrow-up");
-    }
-});
-
-// Update icon on scroll event (optional for better UX)
-window.addEventListener("scroll", function () {
-    if (window.scrollY === 0) {
-        icon.classList.add("fa-arrow-down");
-        icon.classList.remove("fa-arrow-up");
-    } else {
-        icon.classList.add("fa-arrow-up");
-        icon.classList.remove("fa-arrow-down");
-    }
-});
 
   function showSection(sectionId) {
     const section = document.getElementById(sectionId);
@@ -954,8 +1125,6 @@ window.addEventListener("scroll", function () {
             dropdown.classList.toggle('hidden');
         }
        
-</script>
-<script>
   fetch("/auth/check-session")
     .then(response => response.json())
     .then(data => {
@@ -987,8 +1156,92 @@ window.addEventListener("scroll", function () {
     }
 });
 
-  </script>
 
+  </script>
+<script>
+const btnScrollToTop = document.querySelector("#btnScrollToTop");
+const icon = btnScrollToTop.querySelector("i");
+
+btnScrollToTop.addEventListener("click", function () {
+    if (window.scrollY === 0) {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        icon.classList.add("fa-arrow-up");
+        icon.classList.remove("fa-arrow-down");
+    } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        icon.classList.add("fa-arrow-down");
+        icon.classList.remove("fa-arrow-up");
+    }
+});
+
+window.addEventListener("scroll", function () {
+    if (window.scrollY === 0) {
+        icon.classList.add("fa-arrow-down");
+        icon.classList.remove("fa-arrow-up");
+    } else {
+        icon.classList.add("fa-arrow-up");
+        icon.classList.remove("fa-arrow-down");
+    }
+});
+
+let currentReportType = 'order-report'; // Default report type (declared here)
+
+document.addEventListener('DOMContentLoaded', () => {
+    showSection('dashboard');
+});
+
+function showSection(sectionId, reportType) {
+    console.log(`showSection called with sectionId: ${sectionId}, reportType: ${reportType}`);
+    const section = document.getElementById(sectionId);
+    
+    if (!section) {
+        console.error(`❌ Error: Section with ID "${sectionId}" not found.`);
+        return;
+    }
+
+    // Hide all sections and remove active class from tabs
+    document.querySelectorAll(".tab__content").forEach(sec => sec.classList.add("hidden"));
+    document.querySelectorAll(".account__tab").forEach(tab => tab.classList.remove("active"));
+
+    // Show the selected section and highlight the tab
+    section.classList.remove("hidden");
+    const activeTab = document.querySelector(`.account__tab[data-target="#${sectionId}"]`);
+    if (activeTab) activeTab.classList.add("active");
+
+    // Handle report subsections
+    if (sectionId === 'report') {
+        if (!reportType) reportType = 'order-report';
+        currentReportType = reportType;
+        document.querySelectorAll('.report-subsection').forEach(subsection => {
+            subsection.classList.add('hidden');
+        });
+        const subsection = document.getElementById(reportType);
+        if (subsection) subsection.classList.remove('hidden');
+
+        switch (reportType) {
+            case 'sales-report':
+                fetchSalesReport();
+                break;
+            case 'customer-report':
+                fetchCustomerReport();
+                break;
+            case 'inventory-report':
+                fetchInventoryReport();
+                break;
+            case 'order-report':
+                fetchOrderReport();
+                break;
+            default:
+                console.warn(`Unknown report type: ${reportType}`);
+        }
+    }
+}
+
+function toggleDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.classList.toggle('hidden');
+}
+</script>
   </body>
 </html>
 
