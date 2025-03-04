@@ -6,16 +6,16 @@ let orderStatusChart = null;
 let bestSellersData = []; // Store the full best-sellers data for filtering
 
 // Fetch categories for the inventory filter dropdown (also used for best-sellers filter)
-function fetchInventoryCategories() {
-    fetch('/report/inventory-categories')
+function fetchInventoryCategories1() {
+    fetch('/report/inventory-categories1')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Failed to fetch categories: ${response.statusText}`);
             }
             return response.json();
         })
-        .then(categories => {
-            console.log('Categories received:', categories);
+        .then(data => {
+            console.log('Categories received:', data);
             const categoryFilter = document.getElementById('inventoryCategoryFilter');
             const bestSellersCategoryFilter = document.getElementById('bestSellersCategoryFilter');
             if (!categoryFilter || !bestSellersCategoryFilter) {
@@ -24,13 +24,16 @@ function fetchInventoryCategories() {
             }
             categoryFilter.innerHTML = '<option value="">All Categories</option>';
             bestSellersCategoryFilter.innerHTML = '<option value="">All Categories</option>';
-            if (categories && categories.length > 0) {
+
+            // Ensure data is an array
+            const categories = Array.isArray(data) ? data : [];
+            if (categories.length > 0) {
                 categories.forEach(cat => {
                     categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
                     bestSellersCategoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
                 });
             } else {
-                console.warn('No categories returned from the server');
+                console.warn('No valid categories returned from the server');
             }
         })
         .catch(error => {
@@ -40,47 +43,89 @@ function fetchInventoryCategories() {
 }
 
 // Update Best-Sellers Chart based on selected category
-// Update Best-Sellers Chart based on selected category
 function updateBestSellersChart() {
     const selectedCategory = document.getElementById('bestSellersCategoryFilter').value;
-    console.log('Selected category for best-sellers filter:', selectedCategory);
-    console.log('Best-sellers data:', bestSellersData);
-
     let filteredData = bestSellersData;
     if (selectedCategory) {
-        filteredData = bestSellersData.filter(item => {
-            if (!item.category) {
-                console.warn(`Best-seller item missing category field:`, item);
-                return false;
-            }
-            return item.category.toLowerCase() === selectedCategory.toLowerCase();
-        });
+        filteredData = bestSellersData.filter(item => item.category?.toLowerCase() === selectedCategory.toLowerCase());
     }
 
-    console.log('Filtered best-sellers:', filteredData);
+    // Map categories to colors
+    const categoryColors = {};
+    const uniqueCategories = [...new Set(filteredData.map(item => item.category))];
+    uniqueCategories.forEach((cat, index) => {
+        const hue = (index * 137.5) % 360; // Generate distinct colors
+        categoryColors[cat] = `hsl(${hue}, 70%, 60%)`;
+    });
 
     if (bestSellersChart) bestSellersChart.destroy();
     const bestSellersCtx = document.getElementById('bestSellersChart').getContext('2d');
     bestSellersChart = new Chart(bestSellersCtx, {
         type: 'bar',
         data: {
-            labels: filteredData.map(item => item.productName || 'Unknown'),
+            labels: filteredData.map(item => item.productName || `Product ID: ${item.Product_id} (Category: ${item.category})`),
             datasets: [{
                 label: 'Units Sold',
                 data: filteredData.map(item => item.totalSold),
-                backgroundColor: 'rgba(115, 128, 236, 0.6)',
-                borderColor: '#7380ec',
+                backgroundColor: filteredData.map(item => categoryColors[item.category] || 'rgba(115, 128, 236, 0.6)'),
+                borderColor: filteredData.map(item => categoryColors[item.category] || '#7380ec'),
                 borderWidth: 1
             }]
         },
         options: {
             scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Units Sold' } }
-            }
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Units Sold'
+                    }
+                },
+                x: {
+                    ticks: {
+                        // Rotate labels to 45 degrees to prevent overlap
+                        maxRotation: 45,
+                        minRotation: 45,
+                        // Optionally, limit the maximum length of labels
+                        callback: function(value, index, values) {
+                            // Wrap long labels into multiple lines
+                            const maxLength = 15; // Adjust based on your needs
+                            if (typeof value === 'string' && value.length > maxLength) {
+                                const words = value.split(' ');
+                                let line = '';
+                                const lines = [];
+                                for (const word of words) {
+                                    if ((line + word).length > maxLength) {
+                                        lines.push(line.trim());
+                                        line = word + ' ';
+                                    } else {
+                                        line += word + ' ';
+                                    }
+                                }
+                                lines.push(line.trim());
+                                return lines; // Chart.js will display each line separately
+                            }
+                            return value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            layout: {
+                padding: {
+                    bottom: 30 // Increase bottom padding to accommodate rotated labels
+                }
+            },
+            maintainAspectRatio: false // Allow the chart to adjust its height
         }
     });
+    const chartContainer = document.getElementById('bestSellersChart').parentElement;
+        chartContainer.style.height = '400px'; // Adjust height to give more space
 }
-
 
 // Fetch Dashboard Data
 function fetchDashboardData() {
@@ -95,9 +140,9 @@ function fetchDashboardData() {
             if (!data || !data.keyMetrics || !data.charts || !data.recentActivity) {
                 console.error('Invalid response format:', data);
                 // Reset UI on error
-                document.getElementById('dailySales').textContent = '$0';
-                document.getElementById('weeklySales').textContent = '$0';
-                document.getElementById('monthlySales').textContent = '$0';
+                document.getElementById('dailySales').textContent = 'Rs. 0';
+                document.getElementById('weeklySales').textContent = 'Rs. 0';
+                document.getElementById('monthlySales').textContent = 'Rs. 0';
                 document.getElementById('totalOrders').textContent = '0';
                 document.getElementById('totalActiveCustomers').textContent = '0';
                 document.getElementById('totalInventory').textContent = '0';
@@ -110,9 +155,9 @@ function fetchDashboardData() {
             }
 
             // Update Key Metrics
-            document.getElementById('dailySales').textContent = `$${data.keyMetrics.dailySales.toFixed(2)}`;
-            document.getElementById('weeklySales').textContent = `$${data.keyMetrics.weeklySales.toFixed(2)}`;
-            document.getElementById('monthlySales').textContent = `$${data.keyMetrics.monthlySales.toFixed(2)}`;
+            document.getElementById('dailySales').textContent = `Rs. ${data.keyMetrics.dailySales.toFixed(2)}`;
+            document.getElementById('weeklySales').textContent = `Rs. ${data.keyMetrics.weeklySales.toFixed(2)}`;
+            document.getElementById('monthlySales').textContent = `Rs. ${data.keyMetrics.monthlySales.toFixed(2)}`;
             document.getElementById('totalOrders').textContent = data.keyMetrics.totalOrders;
             document.getElementById('totalActiveCustomers').textContent = data.keyMetrics.totalActiveCustomers;
             document.getElementById('totalInventory').textContent = data.keyMetrics.totalInventory;
@@ -135,7 +180,7 @@ function fetchDashboardData() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Sales ($)' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Sales (Rs.)' } },
                         x: { title: { display: true, text: 'Date' } }
                     }
                 }
@@ -244,9 +289,9 @@ function fetchDashboardData() {
         .catch(error => {
             console.error('Error fetching dashboard data:', error);
             // Reset UI on error
-            document.getElementById('dailySales').textContent = '$0';
-            document.getElementById('weeklySales').textContent = '$0';
-            document.getElementById('monthlySales').textContent = '$0';
+            document.getElementById('dailySales').textContent = 'Rs. 0';
+            document.getElementById('weeklySales').textContent = 'Rs. 0';
+            document.getElementById('monthlySales').textContent = 'Rs. 0';
             document.getElementById('totalOrders').textContent = '0';
             document.getElementById('totalActiveCustomers').textContent = '0';
             document.getElementById('totalInventory').textContent = '0';
@@ -261,7 +306,7 @@ function fetchDashboardData() {
 // Call fetchDashboardData when the Dashboard tab is shown
 document.addEventListener('DOMContentLoaded', () => {
     fetchDashboardData();
-    fetchInventoryCategories();
+    fetchInventoryCategories1();
 });
 
 
@@ -352,11 +397,19 @@ function fetchSalesReport() {
     if (groupBy) queryParams.append('groupBy', groupBy);
 
     fetch(`/report/sales-report?${queryParams.toString()}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Sales Report Data:", data);
+            console.log("Sales by Product:", data.salesByProduct);
+
             // Update Total Sales
             const totalSales = data.totalSales.reduce((sum, item) => sum + item.totalSales, 0);
-            document.getElementById('totalSales').textContent = `$${totalSales.toFixed(2)}`;
+            document.getElementById('totalSales').textContent = `Rs. ${totalSales.toFixed(2)}`;
 
             // Sales by Period Chart
             if (salesByPeriodChart) salesByPeriodChart.destroy();
@@ -376,7 +429,7 @@ function fetchSalesReport() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Sales ($)' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Sales (Rs.)' } },
                         x: { title: { display: true, text: 'Period' } }
                     }
                 }
@@ -388,7 +441,7 @@ function fetchSalesReport() {
             salesByProductChart = new Chart(productCtx, {
                 type: 'bar',
                 data: {
-                    labels: data.salesByProduct.map(item => item.productName || 'Unknown'),
+                    labels: data.salesByProduct.map(item => item.productName || 'Unknown'), // Fallback to "Unknown" if productName is null
                     datasets: [{
                         label: 'Total Revenue',
                         data: data.salesByProduct.map(item => item.totalRevenue),
@@ -399,7 +452,7 @@ function fetchSalesReport() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Revenue ($)' } }
+                        y: { beginAtZero: true, title: { display: true, text: 'Revenue (Rs.)' } }
                     }
                 }
             });
@@ -421,12 +474,15 @@ function fetchSalesReport() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Revenue ($)' } }
+                        y: { beginAtZero: true, title: { display: true, text: 'Revenue (Rs.)' } }
                     }
                 }
             });
         })
-        .catch(error => console.error('Error fetching sales report:', error));
+        .catch(error => {
+            console.error('Error fetching sales report:', error);
+            alert('Failed to fetch sales report. Please try again later.');
+        });
 }
 
 // Export Sales Report
@@ -557,7 +613,7 @@ function fetchCustomerReport() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Total Spent ($)' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Total Spent (Rs.)' } },
                         x: { title: { display: true, text: 'Customer ID' } }
                     }
                 }
@@ -580,7 +636,7 @@ function fetchCustomerReport() {
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Lifetime Value ($)' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Lifetime Value (Rs.)' } },
                         x: { title: { display: true, text: 'Customer ID' } }
                     }
                 }
@@ -767,26 +823,34 @@ function exportInventoryReport(format) {
 }
 
 // Send Restock Alert
-function sendRestockAlert() {
-    if (criticalStockData.length === 0) {
-        alert('No critical stock items to notify about.');
-        return;
-    }
+// function sendRestockAlert() {
+//     if (criticalStockData.length === 0) {
+//         alert('No critical stock items to notify about.');
+//         return;
+//     }
 
-    fetch('/order/orderdets/send-restock-alert', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ criticalStock: criticalStockData })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-    })
-    .catch(error => {
-        console.error('Error sending restock alert:', error);
-        alert('Failed to send restock alert.');
-    });
-}
+//     fetch('/report/send-restock-alert', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ criticalStock: criticalStockData })
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         alert(data.message || 'Restock alert sent successfully!');
+//         // Optionally hide the alert banner after sending
+//         const alertBanner = document.getElementById('criticalStockAlert');
+//         alertBanner.classList.add('hidden');
+//     })
+//     .catch(error => {
+//         console.error('Error sending restock alert:', error);
+//         alert('Failed to send restock alert. Please try again.');
+//     });
+// }
 
 // Fetch Order Report
 function fetchOrderReport() {
@@ -855,11 +919,11 @@ function fetchOrderReport() {
             orderBarChart = new Chart(barCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Pending', 'Delivered', 'Canceled'],
+                    labels: ['Processing', 'Delivered', 'Canceled'],
                     datasets: [{
                         label: 'Order Counts',
                         data: [
-                            data.statusSummary.find(item => item.status === 'Pending')?.count || 0,
+                            data.statusSummary.find(item => item.status === 'Processing')?.count || 0,
                             data.statusSummary.find(item => item.status === 'Delivered')?.count || 0,
                             data.statusSummary.find(item => item.status === 'Canceled')?.count || 0
                         ],
@@ -872,22 +936,6 @@ function fetchOrderReport() {
                         y: { beginAtZero: true, title: { display: true, text: 'Number of Orders' } }
                     }
                 }
-            });
-
-            // Fulfillment Times Table
-            const fulfillmentTbody = document.getElementById('fulfillmentTimes');
-            fulfillmentTbody.innerHTML = '';
-            data.fulfillmentTimes.forEach(item => {
-                const row = `
-                    <tr>
-                        <td>${item.O_id}</td>
-                        <td>${item.orderDate}</td>
-                        <td>${item.O_status}</td>
-                        <td>${item.deliveryDate || 'N/A'}</td>
-                        <td>${item.fulfillmentDays || 'N/A'}</td>
-                    </tr>
-                `;
-                fulfillmentTbody.innerHTML += row;
             });
 
             // Shipping Details Table

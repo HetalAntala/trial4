@@ -97,8 +97,10 @@ exports.getDashboardData = (req, res) => {
 
         // Map category names to table names
         const categoryTableMap = new Map(
-            categories.map(c => [c.CY_NAME, c.CY_NAME.toLowerCase().replace(/\s+/g, '_')])
+            categories.map(c => [c.CY_NAME.trim().toLowerCase(), c.CY_NAME.trim().toLowerCase().replace(/\s+/g, '_')])
         );
+
+        console.log("Category Table Map:", Array.from(categoryTableMap.entries()));
 
         // Dynamic Total Inventory
         const inventoryPromises = [];
@@ -175,7 +177,7 @@ exports.getDashboardData = (req, res) => {
                             columns.forEach(col => {
                                 const field = col.Field.toLowerCase();
                                 if (field.includes('id') && !field.includes('cy_id')) columnMap.id = col.Field;
-                                else if (field.includes('name')) columnMap.name = col.Field;
+                                else if (field === 'p_name' || field.includes('name') || field === 'title' || field === 'description' || field === 'product_name') columnMap.name = col.Field;
                             });
 
                             if (!columnMap.id || !columnMap.name) {
@@ -190,20 +192,20 @@ exports.getDashboardData = (req, res) => {
                                     \`${tableName}\`.${columnMap.name} as productName,
                                     SUM(od.O_Qty) as totalSold,
                                     SUM(od.O_price * od.O_Qty) as totalRevenue,
-                                    c.CY_NAME as category
+                                    ? as category
                                 FROM order_details od
                                 JOIN order_master om ON od.O_id = om.O_id
-                                JOIN plants p ON od.Product_id = p.P_ID
-                                JOIN category c ON p.CY_ID = c.CY_ID
                                 LEFT JOIN \`${tableName}\` ON od.Product_id = \`${tableName}\`.${columnMap.id}
-                                WHERE om.O_status = 'Delivered' AND c.CY_NAME = ?
-                                GROUP BY od.Product_id, \`${tableName}\`.${columnMap.name}, c.CY_NAME
+                                WHERE om.O_status = 'Delivered'
+                                GROUP BY od.Product_id, \`${tableName}\`.${columnMap.name}
+                                HAVING SUM(od.O_Qty) > 0
                             `;
                             db.query(query, [categoryName], (err, result) => {
                                 if (err) {
                                     reject(err);
                                     return;
                                 }
+                                console.log(`Best sellers for category ${categoryName}:`, result);
                                 resolve(result);
                             });
                         });
@@ -220,6 +222,8 @@ exports.getDashboardData = (req, res) => {
                     .filter(item => item.totalSold > 0)
                     .sort((a, b) => b.totalSold - a.totalSold)
                     .slice(0, 5);
+
+                console.log("Best Sellers Data:", bestSellers);
 
                 // Proceed with the rest of the queries
                 Promise.all([
@@ -271,7 +275,6 @@ exports.getDashboardData = (req, res) => {
     });
 };
 
-
 exports.getInventoryCategories = (req, res) => {
     const query = `SELECT CY_NAME FROM category`;
     console.log('Fetching categories from database...');
@@ -286,7 +289,52 @@ exports.getInventoryCategories = (req, res) => {
     });
 };
 
+exports.getFeedbackReport = (req, res) => {
+    const { startDate, endDate, rating } = req.query;
 
+    let query = `
+        SELECT 
+            f.F_id AS feedback_id,
+            c.C_username AS customer_name,
+            f.F_desc AS feedback_desc,
+            DATE_FORMAT(f.F_date, '%Y-%m-%d') AS feedback_date,
+            f.product_id,
+            f.star_rating AS rating
+        FROM Feedback f
+        JOIN customer c ON f.C_id = c.C_id
+    `;
+    const queryParams = [];
+
+    // Apply filters
+    let whereClauses = [];
+    if (startDate) {
+        whereClauses.push('f.F_date >= ?');
+        queryParams.push(startDate);
+    }
+    if (endDate) {
+        whereClauses.push('f.F_date <= ?');
+        queryParams.push(endDate);
+    }
+    if (rating) {
+        whereClauses.push('f.star_rating = ?');
+        queryParams.push(rating);
+    }
+    if (whereClauses.length > 0) {
+        query += ` WHERE ${whereClauses.join(' AND ')}`;
+    }
+
+    // Sort by date descending (most recent first)
+    query += ` ORDER BY f.F_date DESC`;
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error fetching feedback report:', err);
+            return res.status(500).json({ error: 'Database error', details: err.message });
+        }
+        console.log('Feedback Report Results:', results);
+        res.json(results);
+    });
+};
 
 
 
@@ -304,95 +352,99 @@ exports.getInventoryStatus = (req, res) => {
             categories.map(c => [c.CY_NAME, c.CY_NAME.toLowerCase().replace(/\s+/g, '_')])
         );
 
-        const lowStockQueries = [];
-        const outOfStockQueries = [];
-        const queryParams = [];
-        const outOfStockParams = [];
-
+        const queryPromises = [];
         for (const [categoryName, tableName] of categoryTableMap) {
             if (category && category !== categoryName) continue;
 
-            db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
-                if (err || result.length === 0) {
-                    console.log(`Table ${tableName} does not exist:`, err?.sqlMessage);
-                    return;
-                }
+            queryPromises.push(
+                new Promise((resolve, reject) => {
+                    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
+                        if (err) {
+                            console.error(`Error checking table ${tableName}:`, err);
+                            reject(err);
+                            return;
+                        }
+                        if (result.length === 0) {
+                            console.log(`Table ${tableName} does not exist.`);
+                            resolve({ lowStock: [], outOfStock: [] });
+                            return;
+                        }
 
-                db.query(`SHOW COLUMNS FROM \`${tableName}\``, (err, columns) => {
-                    if (err) {
-                        console.error(`Error fetching schema for ${tableName}:`, err.sqlMessage);
-                        return;
-                    }
+                        db.query(`SHOW COLUMNS FROM \`${tableName}\``, (err, columns) => {
+                            if (err) {
+                                console.error(`Error fetching schema for ${tableName}:`, err);
+                                reject(err);
+                                return;
+                            }
 
-                    const columnMap = {
-                        id: null,
-                        name: null,
-                        stock: null
-                    };
+                            const columnMap = {
+                                id: null,
+                                name: null,
+                                stock: null
+                            };
 
-                    columns.forEach(col => {
-                        const field = col.Field.toLowerCase();
-                        if (field.includes('id') && !field.includes('cy_id')) columnMap.id = col.Field;
-                        else if (field.includes('name')) columnMap.name = col.Field;
-                        else if (field.includes('stock')) columnMap.stock = col.Field;
+                            columns.forEach(col => {
+                                const field = col.Field.toLowerCase();
+                                if (field.includes('id') && !field.includes('cy_id')) columnMap.id = col.Field;
+                                else if (field.includes('name')) columnMap.name = col.Field;
+                                else if (field.includes('stock')) columnMap.stock = col.Field;
+                            });
+
+                            if (!columnMap.id || !columnMap.name || !columnMap.stock) {
+                                console.warn(`Table ${tableName} missing required columns (id, name, or stock)`);
+                                resolve({ lowStock: [], outOfStock: [] });
+                                return;
+                            }
+
+                            const lowStockQuery = `
+                                SELECT 
+                                    \`${tableName}\`.${columnMap.id} as productId, 
+                                    \`${tableName}\`.${columnMap.name} as productName, 
+                                    \`${tableName}\`.${columnMap.stock} as stock,
+                                    '${categoryName}' as category
+                                FROM \`${tableName}\` 
+                                WHERE \`${tableName}\`.${columnMap.stock} <= ? AND \`${tableName}\`.${columnMap.stock} > 0
+                            `;
+                            const outOfStockQuery = `
+                                SELECT 
+                                    \`${tableName}\`.${columnMap.id} as productId, 
+                                    \`${tableName}\`.${columnMap.name} as productName, 
+                                    \`${tableName}\`.${columnMap.stock} as stock,
+                                    '${categoryName}' as category
+                                FROM \`${tableName}\` 
+                                WHERE \`${tableName}\`.${columnMap.stock} = 0
+                            `;
+
+                            Promise.all([
+                                new Promise((resolve, reject) => db.query(lowStockQuery, [lowStockThreshold], (err, result) => err ? reject(err) : resolve(result))),
+                                new Promise((resolve, reject) => db.query(outOfStockQuery, [], (err, result) => err ? reject(err) : resolve(result)))
+                            ])
+                            .then(([lowStock, outOfStock]) => {
+                                resolve({ lowStock, outOfStock });
+                            })
+                            .catch(err => reject(err));
+                        });
                     });
-
-                    if (!columnMap.id || !columnMap.name || !columnMap.stock) {
-                        console.warn(`Table ${tableName} missing required columns (id, name, or stock)`);
-                        return;
-                    }
-
-                    const lowStockQueryPart = `
-                        SELECT 
-                            \`${tableName}\`.${columnMap.id} as productId, 
-                            \`${tableName}\`.${columnMap.name} as productName, 
-                            \`${tableName}\`.${columnMap.stock} as stock,
-                            '${categoryName}' as category
-                        FROM \`${tableName}\` 
-                        WHERE \`${tableName}\`.${columnMap.stock} <= ? AND \`${tableName}\`.${columnMap.stock} > 0
-                    `;
-                    lowStockQueries.push(lowStockQueryPart);
-                    queryParams.push(lowStockThreshold);
-
-                    const outOfStockQueryPart = `
-                        SELECT 
-                            \`${tableName}\`.${columnMap.id} as productId, 
-                            \`${tableName}\`.${columnMap.name} as productName, 
-                            \`${tableName}\`.${columnMap.stock} as stock,
-                            '${categoryName}' as category
-                        FROM \`${tableName}\` 
-                        WHERE \`${tableName}\`.${columnMap.stock} = 0
-                    `;
-                    outOfStockQueries.push(outOfStockQueryPart);
-                });
-            });
+                })
+            );
         }
 
-        setTimeout(() => {
-            if (lowStockQueries.length === 0) {
-                return res.json({ lowStock: [], outOfStock: [], criticalStock: [] });
-            }
-
-            const finalLowStockQuery = lowStockQueries.join(' UNION ') + ' ORDER BY stock ASC';
-            const finalOutOfStockQuery = outOfStockQueries.join(' UNION ');
-
-            Promise.all([
-                new Promise((resolve, reject) => db.query(finalLowStockQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-                new Promise((resolve, reject) => db.query(finalOutOfStockQuery, outOfStockParams, (err, result) => err ? reject(err) : resolve(result)))
-            ])
-            .then(([lowStock, outOfStock]) => {
+        Promise.all(queryPromises)
+            .then(results => {
+                const lowStock = results.flatMap(result => result.lowStock).sort((a, b) => a.stock - b.stock);
+                const outOfStock = results.flatMap(result => result.outOfStock);
                 const criticalStock = lowStock.filter(item => item.stock <= 2);
+
                 res.json({
-                    lowStock: lowStock,
-                    outOfStock: outOfStock,
-                    criticalStock: criticalStock
+                    lowStock,
+                    outOfStock,
+                    criticalStock
                 });
             })
             .catch(err => {
                 console.error('Error fetching inventory status:', err);
-                res.status(500).json({ error: 'Database error', details: err.message });
+                res.status(500).json({ error: 'Database error', details: err.sqlMessage || err.message });
             });
-        }, 1000);
     });
 };
 
@@ -410,6 +462,7 @@ exports.getInventoryCategories = (req, res) => {
 };
 
 // Sales Report Data
+// reportController.js (relevant part)
 exports.getSalesReport = (req, res) => {
     const { startDate, endDate, groupBy } = req.query;
 
@@ -421,14 +474,16 @@ exports.getSalesReport = (req, res) => {
         JOIN order_master om ON od.O_id = om.O_id
         WHERE om.O_status = 'Delivered'
     `;
-    // Initial query to get sales by product without product name
     let salesByProductQuery = `
         SELECT 
             od.Product_id,
             SUM(od.O_Qty) as totalUnitsSold,
-            SUM(od.O_price * od.O_Qty) as totalRevenue
+            SUM(od.O_price * od.O_Qty) as totalRevenue,
+            c.CY_NAME as categoryName
         FROM order_details od
         JOIN order_master om ON od.O_id = om.O_id
+        JOIN plants p ON od.Product_id = p.P_ID
+        JOIN category c ON p.CY_ID = c.CY_ID
         WHERE om.O_status = 'Delivered'
     `;
     let salesByCategoryQuery = `
@@ -444,7 +499,6 @@ exports.getSalesReport = (req, res) => {
     `;
     const queryParams = [];
 
-    // Apply date filters
     if (startDate) {
         salesQuery += ` AND om.O_date >= ?`;
         salesByProductQuery += ` AND om.O_date >= ?`;
@@ -458,7 +512,6 @@ exports.getSalesReport = (req, res) => {
         queryParams.push(endDate);
     }
 
-    // Properly add GROUP BY after WHERE clause
     if (groupBy === 'daily') {
         salesQuery = salesQuery.replace('%Y-%m', '%Y-%m-%d');
         salesQuery += ` GROUP BY DATE_FORMAT(om.O_date, '%Y-%m-%d')`;
@@ -469,7 +522,7 @@ exports.getSalesReport = (req, res) => {
         salesQuery += ` GROUP BY DATE_FORMAT(om.O_date, '%Y-%m')`;
     }
 
-    salesByProductQuery += ` GROUP BY od.Product_id ORDER BY totalRevenue DESC LIMIT 10`;
+    salesByProductQuery += ` GROUP BY od.Product_id, c.CY_NAME ORDER BY totalRevenue DESC LIMIT 10`;
     salesByCategoryQuery += ` GROUP BY c.CY_NAME ORDER BY totalRevenue DESC`;
 
     Promise.all([
@@ -478,7 +531,7 @@ exports.getSalesReport = (req, res) => {
         new Promise((resolve, reject) => db.query(salesByCategoryQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
     .then(([totalSales, salesByProductRaw, salesByCategory]) => {
-        // Fetch categories and map to table names
+        console.log("salesByProductRaw:", salesByProductRaw);
         db.query('SELECT CY_ID, CY_NAME FROM category', (err, categories) => {
             if (err) {
                 console.error('Error fetching categories:', err);
@@ -486,70 +539,101 @@ exports.getSalesReport = (req, res) => {
             }
 
             const categoryTableMap = new Map(
-                categories.map(c => [c.CY_NAME, c.CY_NAME.toLowerCase().replace(/\s+/g, '_')])
+                categories.map(c => [c.CY_NAME.trim().toLowerCase(), c.CY_NAME.trim().toLowerCase().replace(/\s+/g, '_')])
             );
 
-            // Fetch product names dynamically for each Product_id
+            console.log("Category Table Map:", Array.from(categoryTableMap.entries()));
+
             const namePromises = salesByProductRaw.map(item => {
                 return new Promise((resolve) => {
-                    // Try each product table until we find a match
-                    let resolved = false;
                     const productId = item.Product_id;
-                    const nameQueries = [];
+                    const categoryName = item.categoryName.trim().toLowerCase();
+                    const tableName = categoryTableMap.get(categoryName);
 
-                    for (const [categoryName, tableName] of categoryTableMap) {
-                        nameQueries.push(
-                            new Promise((resolveQuery) => {
-                                db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
-                                    if (err || result.length === 0) {
-                                        resolveQuery({ tableName, productName: null });
-                                        return;
-                                    }
+                    console.log(`Processing Product_id: ${productId}, Category: ${categoryName}, Table: ${tableName}`);
 
-                                    db.query(`SHOW COLUMNS FROM \`${tableName}\` LIKE '%name%'`, (err, columns) => {
-                                        if (err || columns.length === 0) {
-                                            resolveQuery({ tableName, productName: null });
-                                            return;
-                                        }
-
-                                        const nameColumn = columns[0].Field;
-                                        const idColumn = columns.find(col => col.Field.toLowerCase().includes('id') && !col.Field.includes('cy_id'))?.Field;
-                                        if (!idColumn) {
-                                            resolveQuery({ tableName, productName: null });
-                                            return;
-                                        }
-
-                                        const query = `
-                                            SELECT \`${nameColumn}\` as productName
-                                            FROM \`${tableName}\`
-                                            WHERE \`${idColumn}\` = ?
-                                        `;
-                                        db.query(query, [productId], (err, result) => {
-                                            if (err || result.length === 0) {
-                                                resolveQuery({ tableName, productName: null });
-                                                return;
-                                            }
-                                            resolveQuery({ tableName, productName: result[0].productName });
-                                        });
-                                    });
-                                });
-                            })
-                        );
-                    }
-
-                    Promise.all(nameQueries).then(results => {
-                        const found = results.find(r => r.productName !== null);
+                    if (!tableName) {
+                        console.warn(`No table found for category ${categoryName}`);
                         resolve({
                             Product_id: item.Product_id,
-                            productName: found ? found.productName : 'Unknown Product',
+                            productName: `Unknown Product (Category: ${item.categoryName})`,
                             totalUnitsSold: item.totalUnitsSold,
                             totalRevenue: item.totalRevenue
+                        });
+                        return;
+                    }
+
+                    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
+                        if (err || result.length === 0) {
+                            console.warn(`Table ${tableName} does not exist for category ${categoryName}`);
+                            resolve({
+                                Product_id: item.Product_id,
+                                productName: `Unknown Product (Category: ${item.categoryName})`,
+                                totalUnitsSold: item.totalUnitsSold,
+                                totalRevenue: item.totalRevenue
+                            });
+                            return;
+                        }
+
+                        // Try multiple column name patterns for the product name
+                        db.query(`SHOW COLUMNS FROM \`${tableName}\` WHERE Field LIKE '%name%' OR Field IN ('title', 'description', 'product_name', 'p_name')`, (err, columns) => {
+                            if (err || columns.length === 0) {
+                                console.warn(`Table ${tableName} has no name column for category ${categoryName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: `Unknown Product (Category: ${item.categoryName})`,
+                                    totalUnitsSold: item.totalUnitsSold,
+                                    totalRevenue: item.totalRevenue
+                                });
+                                return;
+                            }
+
+                            const nameColumn = columns[0].Field;
+                            const idColumn = columns.find(col => col.Field.toLowerCase().includes('id') && !col.Field.includes('cy_id'))?.Field || 'P_ID';
+                            console.log(`Using nameColumn: ${nameColumn}, idColumn: ${idColumn}`);
+
+                            if (!idColumn) {
+                                console.warn(`Table ${tableName} has no ID column for category ${categoryName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: `Unknown Product (Category: ${item.categoryName})`,
+                                    totalUnitsSold: item.totalUnitsSold,
+                                    totalRevenue: item.totalRevenue
+                                });
+                                return;
+                            }
+
+                            const query = `
+                                SELECT \`${nameColumn}\` as productName
+                                FROM \`${tableName}\`
+                                WHERE \`${idColumn}\` = ?
+                            `;
+                            db.query(query, [productId], (err, result) => {
+                                if (err || result.length === 0) {
+                                    console.warn(`Product_id ${productId} not found in table ${tableName}. Query: ${query}`);
+                                    resolve({
+                                        Product_id: item.Product_id,
+                                        productName: `Unknown Product (Category: ${item.categoryName})`,
+                                        totalUnitsSold: item.totalUnitsSold,
+                                        totalRevenue: item.totalRevenue
+                                    });
+                                    return;
+                                }
+                                console.log(`Found product name for Product_id ${productId}: ${result[0].productName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: result[0].productName,
+                                    totalUnitsSold: item.totalUnitsSold,
+                                    totalRevenue: item.totalRevenue
+                                });
+                            });
                         });
                     });
                 });
             });
 
             Promise.all(namePromises).then(salesByProduct => {
+                console.log("Final Sales by Product with Names:", salesByProduct);
                 res.json({
                     totalSales: totalSales || [],
                     salesByProduct: salesByProduct || [],
@@ -557,16 +641,15 @@ exports.getSalesReport = (req, res) => {
                 });
             }).catch(err => {
                 console.error('Error fetching product names:', err);
-                res.status(500).json({ error: 'Database error', details: err.message });
+                res.status(500).json({ error: 'Database error', details: err.sqlMessage || err.message });
             });
         });
     })
     .catch(err => {
         console.error('Error fetching sales report:', err);
-        res.status(500).json({ error: 'Database error', details: err.message });
+        res.status(500).json({ error: 'Database error', details: err.sqlMessage || err.message });
     });
 };
-
 // Customer Report Data
 exports.getCustomerReport = (req, res) => {
     const { startDate, endDate } = req.query;
@@ -615,12 +698,19 @@ exports.getCustomerReport = (req, res) => {
     purchaseHistoryQuery += ` GROUP BY om.C_id ORDER BY totalSpent DESC LIMIT 10`;
     lifetimeValueQuery += ` GROUP BY om.C_id ORDER BY lifetimeValue DESC LIMIT 10`;
 
+    console.log('demographicsQuery:', demographicsQuery);
+    console.log('purchaseHistoryQuery:', purchaseHistoryQuery, queryParams);
+    console.log('lifetimeValueQuery:', lifetimeValueQuery, queryParams);
+
     Promise.all([
         new Promise((resolve, reject) => db.query(demographicsQuery, (err, result) => err ? reject(err) : resolve(result))),
         new Promise((resolve, reject) => db.query(purchaseHistoryQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
         new Promise((resolve, reject) => db.query(lifetimeValueQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
     .then(([demographics, purchaseHistory, lifetimeValue]) => {
+        console.log('Demographics Data:', demographics);
+        console.log('Purchase History Data:', purchaseHistory);
+        console.log('Lifetime Value Data:', lifetimeValue);
         res.json({
             demographics: demographics || [],
             purchaseHistory: purchaseHistory || [],
@@ -632,7 +722,6 @@ exports.getCustomerReport = (req, res) => {
         res.status(500).json({ error: 'Database error', details: err.message });
     });
 };
-
 // Inventory Report Data
 exports.getInventoryReport = (req, res) => {
     const lowStockThreshold = 5;
@@ -746,70 +835,54 @@ exports.getOrderReport = (req, res) => {
             COUNT(*) as count
         FROM order_master om
     `;
-    let fulfillmentTimeQuery = `
-        SELECT 
-            om.O_id,
-            om.O_date as orderDate,
-            om.O_status,
-            MIN(dh.delivery_date) as deliveryDate,
-            DATEDIFF(MIN(dh.delivery_date), om.O_date) as fulfillmentDays
-        FROM order_master om
-        LEFT JOIN delivery_history dh ON om.O_id = dh.order_id
-        WHERE om.O_status = 'Delivered'
-    `;
     let shippingDetailsQuery = `
         SELECT 
             om.O_id,
             om.C_id,
             c.C_address as customerAddress,
             c.C_pincode as customerPincode,
-            dp.DP_NAME as deliveryPerson
+            dp.D_NAME as deliveryPerson
         FROM order_master om
         JOIN customer c ON om.C_id = c.C_id
-        LEFT JOIN delivery d ON om.O_id = d.order_id
-        LEFT JOIN delivery_person dp ON d.DP_id = dp.DP_id
+        LEFT JOIN deliveries d ON om.O_id = d.O_id
+        LEFT JOIN delivery_persons dp ON d.D_id = dp.D_id
     `;
     const queryParams = [];
 
     let whereClauses = [];
     if (startDate) {
-        whereClauses.push('O_date >= ?');
+        whereClauses.push('om.O_date >= ?');
         queryParams.push(startDate);
     }
     if (endDate) {
-        whereClauses.push('O_date <= ?');
+        whereClauses.push('om.O_date <= ?');
         queryParams.push(endDate);
     }
     if (status && ['Pending', 'Processing', 'Shipped', 'Delivered', 'Canceled'].includes(status)) {
-        whereClauses.push('O_status = ?');
+        whereClauses.push('om.O_status = ?');
         queryParams.push(status);
-    }
-    if (whereClauses.length > 0) {
-        const whereClause = ` WHERE ${whereClauses.join(' AND ')}`;
-        statusQuery += whereClause;
-        fulfillmentTimeQuery += whereClause;
-        shippingDetailsQuery += whereClause;
-    }
+    } 
+
 
     statusQuery += ` GROUP BY O_status`;
-    fulfillmentTimeQuery += ` GROUP BY om.O_id LIMIT 10`;
     shippingDetailsQuery += ` LIMIT 10`;
+
+    console.log('statusQuery:', statusQuery, queryParams);
+    console.log('shippingDetailsQuery:', shippingDetailsQuery, queryParams);
 
     Promise.all([
         new Promise((resolve, reject) => db.query(statusQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-        new Promise((resolve, reject) => db.query(fulfillmentTimeQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
         new Promise((resolve, reject) => db.query(shippingDetailsQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
-    .then(([statusSummary, fulfillmentTimes, shippingDetails]) => {
+    .then(([statusSummary,  shippingDetails]) => {
         res.json({
             statusSummary: statusSummary || [],
-            fulfillmentTimes: fulfillmentTimes || [],
             shippingDetails: shippingDetails || []
         });
     })
     .catch(err => {
         console.error('Error fetching order report:', err);
-        res.status(500).json({ error: 'Database error', details: err.message });
+        res.status(500).json({ error: 'Database error', details: err.sqlMessage || err.message });
     });
 };
 
@@ -829,9 +902,12 @@ exports.exportSalesReportCSV = (req, res) => {
         SELECT 
             od.Product_id,
             SUM(od.O_Qty) as totalUnitsSold,
-            SUM(od.O_price * od.O_Qty) as totalRevenue
+            SUM(od.O_price * od.O_Qty) as totalRevenue,
+            c.CY_NAME as categoryName
         FROM order_details od
         JOIN order_master om ON od.O_id = om.O_id
+        JOIN plants p ON od.Product_id = p.P_ID
+        JOIN category c ON p.CY_ID = c.CY_ID
         WHERE om.O_status = 'Delivered'
     `;
     let salesByCategoryQuery = `
@@ -870,7 +946,7 @@ exports.exportSalesReportCSV = (req, res) => {
         totalSalesQuery += ` GROUP BY DATE_FORMAT(om.O_date, '%Y-%m')`;
     }
 
-    salesByProductQuery += ` GROUP BY od.Product_id ORDER BY totalRevenue DESC LIMIT 10`;
+    salesByProductQuery += ` GROUP BY od.Product_id, c.CY_NAME ORDER BY totalRevenue DESC LIMIT 10`;
     salesByCategoryQuery += ` GROUP BY c.CY_NAME ORDER BY totalRevenue DESC`;
 
     Promise.all([
@@ -879,7 +955,7 @@ exports.exportSalesReportCSV = (req, res) => {
         new Promise((resolve, reject) => db.query(salesByCategoryQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
     .then(([totalSales, salesByProductRaw, salesByCategory]) => {
-        // Fetch categories and map to table names
+        console.log("salesByProductRaw (CSV):", salesByProductRaw);
         db.query('SELECT CY_ID, CY_NAME FROM category', (err, categories) => {
             if (err) {
                 console.error('Error fetching categories:', err);
@@ -887,73 +963,93 @@ exports.exportSalesReportCSV = (req, res) => {
             }
 
             const categoryTableMap = new Map(
-                categories.map(c => [c.CY_NAME, c.CY_NAME.toLowerCase().replace(/\s+/g, '_')])
+                categories.map(c => [c.CY_NAME.trim().toLowerCase(), c.CY_NAME.trim().toLowerCase().replace(/\s+/g, '_')])
             );
 
-            // Fetch product names dynamically for each Product_id
+            console.log("Category Table Map:", Array.from(categoryTableMap.entries()));
+
             const namePromises = salesByProductRaw.map(item => {
                 return new Promise((resolve) => {
-                    let resolved = false;
                     const productId = item.Product_id;
-                    const nameQueries = [];
+                    const categoryName = item.categoryName ? item.categoryName.trim().toLowerCase() : null;
+                    const tableName = categoryName ? categoryTableMap.get(categoryName) : null;
 
-                    for (const [categoryName, tableName] of categoryTableMap) {
-                        nameQueries.push(
-                            new Promise((resolveQuery) => {
-                                db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
-                                    if (err || result.length === 0) {
-                                        resolveQuery({ tableName, productName: null });
-                                        return;
-                                    }
+                    console.log(`Fetching product name for Product_id: ${productId}, Category: ${categoryName}, Table: ${tableName}`);
 
-                                    db.query(`SHOW COLUMNS FROM \`${tableName}\` LIKE '%name%'`, (err, columns) => {
-                                        if (err || columns.length === 0) {
-                                            resolveQuery({ tableName, productName: null });
-                                            return;
-                                        }
-
-                                        const nameColumn = columns[0].Field;
-                                        const idColumn = columns.find(col => col.Field.toLowerCase().includes('id') && !col.Field.includes('cy_id'))?.Field;
-                                        if (!idColumn) {
-                                            resolveQuery({ tableName, productName: null });
-                                            return;
-                                        }
-
-                                        const query = `
-                                            SELECT \`${nameColumn}\` as productName
-                                            FROM \`${tableName}\`
-                                            WHERE \`${idColumn}\` = ?
-                                        `;
-                                        db.query(query, [productId], (err, result) => {
-                                            if (err || result.length === 0) {
-                                                resolveQuery({ tableName, productName: null });
-                                                return;
-                                            }
-                                            resolveQuery({ tableName, productName: result[0].productName });
-                                        });
-                                    });
-                                });
-                            })
-                        );
-                    }
-
-                    Promise.all(nameQueries).then(results => {
-                        const found = results.find(r => r.productName !== null);
+                    if (!tableName) {
+                        console.warn(`No table found for category ${categoryName}`);
                         resolve({
                             Product_id: item.Product_id,
-                            productName: found ? found.productName : 'Unknown Product',
-                            totalUnitsSold: item.totalUnitsSold,
-                            totalRevenue: item.totalRevenue
+                            productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                            totalUnitsSold: item.totalUnitsSold || 0,
+                            totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                        });
+                        return;
+                    }
+
+                    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
+                        if (err || result.length === 0) {
+                            console.warn(`Table ${tableName} does not exist for category ${categoryName}`);
+                            resolve({
+                                Product_id: item.Product_id,
+                                productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                totalUnitsSold: item.totalUnitsSold || 0,
+                                totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                            });
+                            return;
+                        }
+
+                        db.query(`SHOW COLUMNS FROM \`${tableName}\` WHERE Field LIKE '%name%' OR Field IN ('title', 'description', 'product_name', 'p_name')`, (err, columns) => {
+                            if (err || columns.length === 0) {
+                                console.warn(`Table ${tableName} has no name column for category ${categoryName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                    totalUnitsSold: item.totalUnitsSold || 0,
+                                    totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                });
+                                return;
+                            }
+
+                            const nameColumn = columns[0].Field;
+                            const idColumn = columns.find(col => col.Field.toLowerCase().includes('id') && !col.Field.includes('cy_id'))?.Field || 'P_ID';
+                            console.log(`Using nameColumn: ${nameColumn}, idColumn: ${idColumn}`);
+
+                            const query = `
+                                SELECT \`${nameColumn}\` as productName
+                                FROM \`${tableName}\`
+                                WHERE \`${idColumn}\` = ?
+                            `;
+                            db.query(query, [productId], (err, result) => {
+                                if (err || result.length === 0) {
+                                    console.warn(`Product_id ${productId} not found in table ${tableName}. Query: ${query}`);
+                                    resolve({
+                                        Product_id: item.Product_id,
+                                        productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                        totalUnitsSold: item.totalUnitsSold || 0,
+                                        totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                    });
+                                    return;
+                                }
+                                console.log(`Found product name for Product_id ${productId}: ${result[0].productName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: result[0].productName,
+                                    totalUnitsSold: item.totalUnitsSold || 0,
+                                    totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                });
+                            });
                         });
                     });
                 });
             });
 
             Promise.all(namePromises).then(salesByProduct => {
+                console.log("Final Sales by Product with Names (CSV):", salesByProduct);
                 const totalSalesData = totalSales.map(item => ({
                     Section: 'Total Sales by Period',
                     Period: item.period,
-                    TotalSales: item.totalSales
+                    TotalSales: item.totalSales ? item.totalSales.toFixed(2) : '0.00'
                 }));
                 const salesByProductData = salesByProduct.map(item => ({
                     Section: 'Sales by Product',
@@ -965,8 +1061,8 @@ exports.exportSalesReportCSV = (req, res) => {
                 const salesByCategoryData = salesByCategory.map(item => ({
                     Section: 'Sales by Category',
                     CategoryName: item.categoryName,
-                    TotalUnitsSold: item.totalUnitsSold,
-                    TotalRevenue: item.totalRevenue
+                    TotalUnitsSold: item.totalUnitsSold || 0,
+                    TotalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
                 }));
 
                 const csvData = [
@@ -995,7 +1091,6 @@ exports.exportSalesReportCSV = (req, res) => {
         res.status(500).json({ error: 'Database error', details: err.message });
     });
 };
-
 // Export Sales Report as PDF
 exports.exportSalesReportPDF = (req, res) => {
     const { startDate, endDate, groupBy } = req.query;
@@ -1011,12 +1106,13 @@ exports.exportSalesReportPDF = (req, res) => {
     let salesByProductQuery = `
         SELECT 
             od.Product_id,
-            pm.product_name as productName,
             SUM(od.O_Qty) as totalUnitsSold,
-            SUM(od.O_price * od.O_Qty) as totalRevenue
+            SUM(od.O_price * od.O_Qty) as totalRevenue,
+            c.CY_NAME as categoryName
         FROM order_details od
         JOIN order_master om ON od.O_id = om.O_id
-        JOIN product_mapping pm ON od.Product_id = pm.product_id
+        JOIN plants p ON od.Product_id = p.P_ID
+        JOIN category c ON p.CY_ID = c.CY_ID
         WHERE om.O_status = 'Delivered'
     `;
     let salesByCategoryQuery = `
@@ -1026,8 +1122,8 @@ exports.exportSalesReportPDF = (req, res) => {
             SUM(od.O_price * od.O_Qty) as totalRevenue
         FROM order_details od
         JOIN order_master om ON od.O_id = om.O_id
-        JOIN product_mapping pm ON od.Product_id = pm.product_id
-        JOIN category c ON pm.category_id = c.CY_ID
+        JOIN plants p ON od.Product_id = p.P_ID
+        JOIN category c ON p.CY_ID = c.CY_ID
         WHERE om.O_status = 'Delivered'
     `;
     const queryParams = [];
@@ -1055,56 +1151,164 @@ exports.exportSalesReportPDF = (req, res) => {
         totalSalesQuery += ` GROUP BY DATE_FORMAT(om.O_date, '%Y-%m')`;
     }
 
-    salesByProductQuery += ` GROUP BY od.Product_id, pm.product_name ORDER BY totalRevenue DESC LIMIT 10`;
+    salesByProductQuery += ` GROUP BY od.Product_id, c.CY_NAME ORDER BY totalRevenue DESC LIMIT 10`;
     salesByCategoryQuery += ` GROUP BY c.CY_NAME ORDER BY totalRevenue DESC`;
 
-    Promise.all([
-        new Promise((resolve, reject) => db.query(totalSalesQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-        new Promise((resolve, reject) => db.query(salesByProductQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-        new Promise((resolve, reject) => db.query(salesByCategoryQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
-    ])
-    .then(([totalSales, salesByProduct, salesByCategory]) => {
-        const doc = new PDFDocument();
-        let buffers = [];
-        doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => {
-            const pdfData = Buffer.concat(buffers);
-            res.writeHead(200, {
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="sales_report.pdf"',
-                'Content-Length': pdfData.length
+    db.query('SELECT CY_ID, CY_NAME FROM category', (err, categories) => {
+        if (err) {
+            console.error('Error fetching categories:', err);
+            return res.status(500).json({ error: 'Database error', details: err.sqlMessage });
+        }
+
+        const categoryTableMap = new Map(
+            categories.map(c => [c.CY_NAME.trim().toLowerCase(), c.CY_NAME.trim().toLowerCase().replace(/\s+/g, '_')])
+        );
+
+        console.log("Category Table Map:", Array.from(categoryTableMap.entries()));
+
+        Promise.all([
+            new Promise((resolve, reject) => db.query(totalSalesQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
+            new Promise((resolve, reject) => db.query(salesByProductQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
+            new Promise((resolve, reject) => db.query(salesByCategoryQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
+        ])
+        .then(([totalSales, salesByProductRaw, salesByCategory]) => {
+            console.log("salesByProductRaw (PDF):", salesByProductRaw);
+            const namePromises = salesByProductRaw.map(item => {
+                return new Promise((resolve) => {
+                    const productId = item.Product_id;
+                    const categoryName = item.categoryName ? item.categoryName.trim().toLowerCase() : null;
+                    const tableName = categoryName ? categoryTableMap.get(categoryName) : null;
+
+                    console.log(`Fetching product name for Product_id: ${productId}, Category: ${categoryName}, Table: ${tableName}`);
+
+                    if (!tableName) {
+                        console.warn(`No table found for category ${categoryName}`);
+                        resolve({
+                            Product_id: item.Product_id,
+                            productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                            totalUnitsSold: item.totalUnitsSold || 0,
+                            totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                        });
+                        return;
+                    }
+
+                    db.query(`SHOW TABLES LIKE ?`, [tableName], (err, result) => {
+                        if (err || result.length === 0) {
+                            console.warn(`Table ${tableName} does not exist for category ${categoryName}`);
+                            resolve({
+                                Product_id: item.Product_id,
+                                productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                totalUnitsSold: item.totalUnitsSold || 0,
+                                totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                            });
+                            return;
+                        }
+
+                        db.query(`SHOW COLUMNS FROM \`${tableName}\` WHERE Field LIKE '%name%' OR Field IN ('title', 'description', 'product_name', 'p_name')`, (err, columns) => {
+                            if (err || columns.length === 0) {
+                                console.warn(`Table ${tableName} has no name column for category ${categoryName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                    totalUnitsSold: item.totalUnitsSold || 0,
+                                    totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                });
+                                return;
+                            }
+
+                            const nameColumn = columns[0].Field;
+                            const idColumn = columns.find(col => col.Field.toLowerCase().includes('id') && !col.Field.includes('cy_id'))?.Field || 'P_ID';
+                            console.log(`Using nameColumn: ${nameColumn}, idColumn: ${idColumn}`);
+
+                            const query = `
+                                SELECT \`${nameColumn}\` as productName
+                                FROM \`${tableName}\`
+                                WHERE \`${idColumn}\` = ?
+                            `;
+                            db.query(query, [productId], (err, result) => {
+                                if (err || result.length === 0) {
+                                    console.warn(`Product_id ${productId} not found in table ${tableName}. Query: ${query}`);
+                                    resolve({
+                                        Product_id: item.Product_id,
+                                        productName: `Unknown Product (Category: ${item.categoryName || 'Not Specified'})`,
+                                        totalUnitsSold: item.totalUnitsSold || 0,
+                                        totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                    });
+                                    return;
+                                }
+                                console.log(`Found product name for Product_id ${productId}: ${result[0].productName}`);
+                                resolve({
+                                    Product_id: item.Product_id,
+                                    productName: result[0].productName,
+                                    totalUnitsSold: item.totalUnitsSold || 0,
+                                    totalRevenue: item.totalRevenue ? item.totalRevenue.toFixed(2) : '0.00'
+                                });
+                            });
+                        });
+                    });
+                });
             });
-            res.end(pdfData);
+
+            Promise.all(namePromises).then(salesByProduct => {
+                console.log("Final Sales by Product with Names (PDF):", salesByProduct);
+                const doc = new PDFDocument();
+                let buffers = [];
+                doc.on('data', buffers.push.bind(buffers));
+                doc.on('end', () => {
+                    const pdfData = Buffer.concat(buffers);
+                    res.writeHead(200, {
+                        'Content-Type': 'application/pdf',
+                        'Content-Disposition': 'attachment; filename="sales_report.pdf"',
+                        'Content-Length': pdfData.length
+                    });
+                    res.end(pdfData);
+                });
+
+                doc.fontSize(20).text('Sales Report', { align: 'center' });
+                doc.moveDown();
+
+                doc.fontSize(14).text('Total Sales by Period', { underline: true });
+                doc.moveDown(0.5);
+                if (totalSales.length > 0) {
+                    totalSales.forEach(item => {
+                        doc.fontSize(12).text(`Period: ${item.period}, Total Sales: Rs. ${item.totalSales ? item.totalSales.toFixed(2) : '0.00'}`);
+                    });
+                } else {
+                    doc.fontSize(12).text('No sales data available for the selected period.');
+                }
+                doc.moveDown();
+
+                doc.fontSize(14).text('Sales by Product', { underline: true });
+                doc.moveDown(0.5);
+                if (salesByProduct.length > 0) {
+                    salesByProduct.forEach(item => {
+                        doc.fontSize(12).text(`Product: ${item.productName || 'Unknown Product'}, Units Sold: ${item.totalUnitsSold || 0}, Revenue: Rs. ${item.totalRevenue || '0.00'}`);
+                    });
+                } else {
+                    doc.fontSize(12).text('No product sales data available.');
+                }
+                doc.moveDown();
+
+                doc.fontSize(14).text('Sales by Category', { underline: true });
+                doc.moveDown(0.5);
+                if (salesByCategory.length > 0) {
+                    salesByCategory.forEach(item => {
+                        doc.fontSize(12).text(`Category: ${item.categoryName}, Units Sold: ${item.totalUnitsSold || 0}, Revenue: Rs. ${item.totalRevenue || '0.00'}`);
+                    });
+                } else {
+                    doc.fontSize(12).text('No category sales data available.');
+                }
+
+                doc.end();
+            }).catch(err => {
+                console.error('Error fetching product names for PDF export:', err);
+                res.status(500).json({ error: 'Database error', details: err.message });
+            });
+        })
+        .catch(err => {
+            console.error('Error exporting sales report as PDF:', err);
+            res.status(500).json({ error: 'Database error', details: err.message });
         });
-
-        doc.fontSize(20).text('Sales Report', { align: 'center' });
-        doc.moveDown();
-
-        doc.fontSize(14).text('Total Sales by Period', { underline: true });
-        doc.moveDown(0.5);
-        totalSales.forEach(item => {
-            doc.fontSize(12).text(`Period: ${item.period}, Total Sales: $${item.totalSales.toFixed(2)}`);
-        });
-        doc.moveDown();
-
-        doc.fontSize(14).text('Sales by Product', { underline: true });
-        doc.moveDown(0.5);
-        salesByProduct.forEach(item => {
-            doc.fontSize(12).text(`Product: ${item.productName || 'Unknown'}, Units Sold: ${item.totalUnitsSold}, Revenue: $${item.totalRevenue.toFixed(2)}`);
-        });
-        doc.moveDown();
-
-        doc.fontSize(14).text('Sales by Category', { underline: true });
-        doc.moveDown(0.5);
-        salesByCategory.forEach(item => {
-            doc.fontSize(12).text(`Category: ${item.categoryName}, Units Sold: ${item.totalUnitsSold}, Revenue: $${item.totalRevenue.toFixed(2)}`);
-        });
-
-        doc.end();
-    })
-    .catch(err => {
-        console.error('Error exporting sales report as PDF:', err);
-        res.status(500).json({ error: 'Database error', details: err.message });
     });
 };
 
@@ -1583,28 +1787,17 @@ exports.exportOrderReportCSV = (req, res) => {
             COUNT(*) as count
         FROM order_master om
     `;
-    let fulfillmentTimeQuery = `
-        SELECT 
-            om.O_id,
-            om.O_date as orderDate,
-            om.O_status,
-            MIN(dh.delivery_date) as deliveryDate,
-            DATEDIFF(MIN(dh.delivery_date), om.O_date) as fulfillmentDays
-        FROM order_master om
-        LEFT JOIN delivery_history dh ON om.O_id = dh.order_id
-        WHERE om.O_status = 'Delivered'
-    `;
     let shippingDetailsQuery = `
         SELECT 
             om.O_id,
             om.C_id,
             c.C_address as customerAddress,
             c.C_pincode as customerPincode,
-            dp.DP_NAME as deliveryPerson
+            dp.D_NAME as deliveryPerson
         FROM order_master om
         JOIN customer c ON om.C_id = c.C_id
-        LEFT JOIN delivery d ON om.O_id = d.order_id
-        LEFT JOIN delivery_person dp ON d.DP_id = dp.DP_id
+        LEFT JOIN deliveries d ON om.O_id = d.O_id
+        LEFT JOIN delivery_persons dp ON d.D_id = dp.D_id
     `;
     const queryParams = [];
 
@@ -1624,32 +1817,21 @@ exports.exportOrderReportCSV = (req, res) => {
     if (whereClauses.length > 0) {
         const whereClause = ` WHERE ${whereClauses.join(' AND ')}`;
         statusQuery += whereClause;
-        fulfillmentTimeQuery += whereClause;
         shippingDetailsQuery += whereClause;
     }
 
     statusQuery += ` GROUP BY O_status`;
-    fulfillmentTimeQuery += ` GROUP BY om.O_id LIMIT 10`;
     shippingDetailsQuery += ` LIMIT 10`;
 
     Promise.all([
         new Promise((resolve, reject) => db.query(statusQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-        new Promise((resolve, reject) => db.query(fulfillmentTimeQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
         new Promise((resolve, reject) => db.query(shippingDetailsQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
-    .then(([statusSummary, fulfillmentTimes, shippingDetails]) => {
+    .then(([statusSummary, shippingDetails]) => {
         const statusSummaryData = statusSummary.map(item => ({
             Section: 'Order Status Summary',
             Status: item.status,
             Count: item.count
-        }));
-        const fulfillmentTimesData = fulfillmentTimes.map(item => ({
-            Section: 'Fulfillment Times',
-            OrderID: item.O_id,
-            OrderDate: item.orderDate,
-            Status: item.O_status,
-            DeliveryDate: item.deliveryDate || 'N/A',
-            FulfillmentDays: item.fulfillmentDays || 'N/A'
         }));
         const shippingDetailsData = shippingDetails.map(item => ({
             Section: 'Shipping Details',
@@ -1663,12 +1845,10 @@ exports.exportOrderReportCSV = (req, res) => {
         const csvData = [
             ...statusSummaryData,
             { Section: '' },
-            ...fulfillmentTimesData,
-            { Section: '' },
             ...shippingDetailsData
         ];
 
-        const fields = ['Section', 'Status', 'Count', 'OrderID', 'OrderDate', 'DeliveryDate', 'FulfillmentDays', 'CustomerID', 'CustomerAddress', 'CustomerPincode', 'DeliveryPerson'];
+        const fields = ['Section', 'Status', 'Count', 'OrderID', 'OrderDate', 'DeliveryDate', 'CustomerID', 'CustomerAddress', 'CustomerPincode', 'DeliveryPerson'];
         const json2csvParser = new Parser({ fields });
         const csv = json2csvParser.parse(csvData);
 
@@ -1692,28 +1872,17 @@ exports.exportOrderReportPDF = (req, res) => {
             COUNT(*) as count
         FROM order_master om
     `;
-    let fulfillmentTimeQuery = `
-        SELECT 
-            om.O_id,
-            om.O_date as orderDate,
-            om.O_status,
-            MIN(dh.delivery_date) as deliveryDate,
-            DATEDIFF(MIN(dh.delivery_date), om.O_date) as fulfillmentDays
-        FROM order_master om
-        LEFT JOIN delivery_history dh ON om.O_id = dh.order_id
-        WHERE om.O_status = 'Delivered'
-    `;
     let shippingDetailsQuery = `
         SELECT 
             om.O_id,
             om.C_id,
             c.C_address as customerAddress,
             c.C_pincode as customerPincode,
-            dp.DP_NAME as deliveryPerson
+            dp.D_NAME as deliveryPerson
         FROM order_master om
         JOIN customer c ON om.C_id = c.C_id
-        LEFT JOIN delivery d ON om.O_id = d.order_id
-        LEFT JOIN delivery_person dp ON d.DP_id = dp.DP_id
+        LEFT JOIN deliveries d ON om.O_id = d.O_id
+        LEFT JOIN delivery_persons dp ON d.D_id = dp.D_id
     `;
     const queryParams = [];
 
@@ -1733,20 +1902,17 @@ exports.exportOrderReportPDF = (req, res) => {
     if (whereClauses.length > 0) {
         const whereClause = ` WHERE ${whereClauses.join(' AND ')}`;
         statusQuery += whereClause;
-        fulfillmentTimeQuery += whereClause;
         shippingDetailsQuery += whereClause;
     }
 
     statusQuery += ` GROUP BY O_status`;
-    fulfillmentTimeQuery += ` GROUP BY om.O_id LIMIT 10`;
     shippingDetailsQuery += ` LIMIT 10`;
 
     Promise.all([
         new Promise((resolve, reject) => db.query(statusQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
-        new Promise((resolve, reject) => db.query(fulfillmentTimeQuery, queryParams, (err, result) => err ? reject(err) : resolve(result))),
         new Promise((resolve, reject) => db.query(shippingDetailsQuery, queryParams, (err, result) => err ? reject(err) : resolve(result)))
     ])
-    .then(([statusSummary, fulfillmentTimes, shippingDetails]) => {
+    .then(([statusSummary, shippingDetails]) => {
         const doc = new PDFDocument();
         let buffers = [];
         doc.on('data', buffers.push.bind(buffers));
@@ -1767,13 +1933,6 @@ exports.exportOrderReportPDF = (req, res) => {
         doc.moveDown(0.5);
         statusSummary.forEach(item => {
             doc.fontSize(12).text(`Status: ${item.status}, Count: ${item.count}`);
-        });
-        doc.moveDown();
-
-        doc.fontSize(14).text('Fulfillment Times', { underline: true });
-        doc.moveDown(0.5);
-        fulfillmentTimes.forEach(item => {
-            doc.fontSize(12).text(`Order ID: ${item.O_id}, Order Date: ${item.orderDate}, Status: ${item.O_status}, Delivery Date: ${item.deliveryDate || 'N/A'}, Fulfillment Days: ${item.fulfillmentDays || 'N/A'}`);
         });
         doc.moveDown();
 

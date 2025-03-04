@@ -53,7 +53,7 @@
                 <p class="account__tab" data-target="#customer" onclick="showSection('customer')">
                     <img src="../ad-images/icon/user.png" alt="">Customer
                 </p>
-                <p class="account__tab" data-target="#report" onclick="toggleDropdown('reportsDropdown')">
+                <p class="account__tab"  onclick="toggleDropdown('reportsDropdown')">
                     <img src="../ad-images/icon/report.png" alt="">Report
                     <i class="fas fa-chevron-down ml-2"></i>
                 </p>
@@ -306,12 +306,6 @@
                           </form>
                       </div>
                   </div>
-              </div>
-          </div>
-            <div class="tab__content" content id="analytics">
-              <h3 class="tab__header">Analytics</h3>
-              <div class="tab__body">
-                
               </div>
             </div>
             <div class="tab__content" content id="createtbl">
@@ -657,9 +651,7 @@
                       </form>
                   </div>
               </div>
-          </div>
-        
-          
+            </div>
             <div class="tab__content" content id="addproduct">
               <h3>Add / Update Product</h3>
               <form id="addProductForm">
@@ -687,404 +679,370 @@
                 
               </form>
             </div>
+            <div class="tab__content" content id="review">
+                <h1>Review</h1>
+                <div class="filter-container">
+                    <label for="reviewDateRange">Date Range:</label>
+                    <select id="reviewDateRange" onchange="fetchFeedbackReport()">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="last7days">Last 7 Days</option>
+                        <option value="last30days">Last 30 Days</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                    <div id="reviewCustomDateRange" style="display: none;">
+                        <label for="reviewStartDate">Start Date:</label>
+                        <input type="date" id="reviewStartDate">
+                        <label for="reviewEndDate">End Date:</label>
+                        <input type="date" id="reviewEndDate">
+                        <button onclick="fetchFeedbackReport()">Apply</button>
+                    </div>
+                    <label for="reviewRatingFilter">Rating:</label>
+                    <select id="reviewRatingFilter" onchange="fetchFeedbackReport()">
+                        <option value="">All Ratings</option>
+                        <option value="1">1 Star</option>
+                        <option value="2">2 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="5">5 Stars</option>
+                    </select>
+                </div>
+                <table id="review-table">
+                    <thead>
+                        <tr>
+                            <th>Feedback ID</th>
+                            <th>Customer Name</th>
+                            <th>Feedback Desc</th>
+                            <th>Feedback Date</th>
+                            <th>Product ID</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="review-table-body"></tbody>
+                </table>
+            </div>
             
-            <div class="tab__content" content id="inventory">
-                    <!-- Inventory Status -->
-                    <div class="report-section">
-                        <h4>Inventory Status (Low Stock & Out of Stock)</h4>
-                        <div class="filter-container">
-                            <label for="inventoryCategoryFilter">Category:</label>
-                            <select id="inventoryCategoryFilter" onchange="updateInventoryStatus()">
-                                <option value="">All Categories</option>
-                                <!-- Categories will be populated dynamically -->
+            <div class="tab__content" content id="delivery">
+            <h1>Delivery Management</h1>
+            <table id="delivery-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Delivery Person</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="delivery-table-body"></tbody>
+            </table>
+            
+            <!-- Assign Delivery Modal -->
+            <div id="assignDeliveryModal" class="modal">
+                <div class="modal-content">
+                    <h2>Assign Delivery</h2>
+                    <span class="modal-close" onclick="closeAssignDeliveryModal()">×</span>
+                    <form id="assignDeliveryForm">
+                        <input type="hidden" id="assign-order-id">
+                        <div class="form-group">
+                            <label for="delivery-person">Select Delivery Person</label>
+                            <select id="delivery-person" required>
+                                <option value="">Loading...</option>
                             </select>
                         </div>
-                        <div id="criticalStockAlert" class="alert-banner hidden">
-                            <strong>Warning:</strong> <span id="criticalStockMessage"></span>
-                            <button class="btn alert-btn" onclick="sendRestockAlert()">Send Restock Alert</button>
-                        </div>
-                        <h5>Low Stock Products (Stock ≤ 5)</h5>
-                        <table id="lowStockTable">
-                            <thead>
-                                <tr>
-                                    <th>Product ID</th>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Stock</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lowStockProducts"></tbody>
-                        </table>
-                        <h5>Out of Stock Products (Stock = 0)</h5>
-                        <table id="outOfStockTable">
-                            <thead>
-                                <tr>
-                                    <th>Product ID</th>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Stock</th>
-                                </tr>
-                            </thead>
-                            <tbody id="outOfStockProducts"></tbody>
-                        </table>
-                    </div>
-
-          
-          </div>
-          <div class="tab__content" content id="sales">
-            <h1>Sales & Analytics</h1>
-            <div class="analytics-filters">
-                <label for="date-range">Date Range:</label>
-                <select id="date-range">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                </select>
-                <button class="btn primary" onclick="generateReport()">Generate Report</button>
-            </div>
-            <canvas id="salesChartAnalytics"></canvas>
-            <div class="best-sellers">
-                <h3>Best-Selling Products</h3>
-                <ul id="best-sellers-list"></ul>
-            </div>
-        </div>
-        <div class="tab__content" content id="delivery">
-          <h1>Delivery Management</h1>
-          <table id="delivery-table">
-              <thead>
-                  <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Status</th>
-                      <th>Delivery Person</th>
-                      <th>Actions</th>
-                  </tr>
-              </thead>
-              <tbody id="delivery-table-body"></tbody>
-          </table>
-          
-          <!-- Assign Delivery Modal -->
-          <div id="assignDeliveryModal" class="modal">
-              <div class="modal-content">
-                  <h2>Assign Delivery</h2>
-                  <span class="modal-close" onclick="closeAssignDeliveryModal()">×</span>
-                  <form id="assignDeliveryForm">
-                      <input type="hidden" id="assign-order-id">
-                      <div class="form-group">
-                          <label for="delivery-person">Select Delivery Person</label>
-                          <select id="delivery-person" required>
-                              <option value="">Loading...</option>
-                          </select>
-                      </div>
-                      <button type="submit" class="btn primary">Assign</button>
-                      <button type="button" class="btn-cancel" onclick="closeAssignDeliveryModal()">Cancel</button>
-                  </form>
-              </div>
-          </div>
-      </div>
-      
-    
-      <div class="tab__content" content id="report">
-        <h3 class="tab__header">Reports</h3>
-        <div class="tab__body">
-            <!-- Sales Report -->
-            <div id="sales-report" class="report-subsection hidden">
-                <div class="report-section">
-                    <h4>Sales Report</h4>
-                    <div class="filter-container">
-                        <label for="salesDateRange">Date Range:</label>
-                        <select id="salesDateRange" onchange="fetchSalesReport()">
-                            <option value="today">Today</option>
-                            <option value="last7days">Last 7 Days</option>
-                            <option value="last30days">Last 30 Days</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                        <div id="salesCustomDateRange" style="display: none;">
-                            <label for="salesStartDate">Start Date:</label>
-                            <input type="date" id="salesStartDate">
-                            <label for="salesEndDate">End Date:</label>
-                            <input type="date" id="salesEndDate">
-                            <button onclick="fetchSalesReport()">Apply</button>
-                        </div>
-                        <label for="salesGroupBy">Group By:</label>
-                        <select id="salesGroupBy" onchange="fetchSalesReport()">
-                            <option value="monthly">Monthly</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="daily">Daily</option>
-                        </select>
-                    </div>
-                    <div class="export-buttons">
-                        <button class="btn primary" onclick="exportSalesReport('csv')">Export as CSV</button>
-                        <button class="btn primary" onclick="exportSalesReport('pdf')">Export as PDF</button>
-                    </div>
-                    <div class="stats">
-                        <div class="stat-card">Total Sales: <span id="totalSales">$0</span></div>
-                    </div>
-                    <div class="charts-container">
-                        <div class="chart-wrapper">
-                            <canvas id="salesByPeriodChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="salesByProductChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="salesByCategoryChart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Customer Report -->
-            <div id="customer-report" class="report-subsection hidden">
-                <div class="report-section">
-                    <h4>Customer Report</h4>
-                    <div class="filter-container">
-                        <label for="customerDateRange">Date Range:</label>
-                        <select id="customerDateRange" onchange="fetchCustomerReport()">
-                            <option value="today">Today</option>
-                            <option value="last7days">Last 7 Days</option>
-                            <option value="last30days">Last 30 Days</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                        <div id="customerCustomDateRange" style="display: none;">
-                            <label for="customerStartDate">Start Date:</label>
-                            <input type="date" id="customerStartDate">
-                            <label for="customerEndDate">End Date:</label>
-                            <input type="date" id="customerEndDate">
-                            <button onclick="fetchCustomerReport()">Apply</button>
-                        </div>
-                    </div>
-                    <div class="export-buttons">
-                        <button class="btn primary" onclick="exportCustomerReport('csv')">Export as CSV</button>
-                        <button class="btn primary" onclick="exportCustomerReport('pdf')">Export as PDF</button>
-                    </div>
-                    <div class="charts-container">
-                        <div class="chart-wrapper">
-                            <h5>Customer Demographics</h5>
-                            <canvas id="customerDemographicsChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <h5>Top Customers by Purchase History</h5>
-                            <canvas id="customerPurchaseHistoryChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <h5>Top Customers by Lifetime Value</h5>
-                            <canvas id="customerLifetimeValueChart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Inventory Report -->
-            <div id="inventory-report" class="report-subsection hidden">
-                <div class="report-section">
-                    <h4>Inventory Report</h4>
-                    <div class="filter-container">
-                        <label for="inventoryCategoryFilter">Category:</label>
-                        <select id="inventoryCategoryFilter" onchange="fetchInventoryReport()">
-                            <option value="">All Categories</option>
-                            <!-- Categories will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="export-buttons">
-                        <button class="btn primary" onclick="exportInventoryReport('csv')">Export as CSV</button>
-                        <button class="btn primary" onclick="exportInventoryReport('pdf')">Export as PDF</button>
-                    </div>
-                    <div id="criticalStockAlert" class="alert-banner hidden">
-                        <strong>Warning:</strong> <span id="criticalStockMessage"></span>
-                        <button class="btn alert-btn" onclick="sendRestockAlert()">Send Restock Alert</button>
-                    </div>
-                    <h5>Low Stock Products (Stock ≤ 5)</h5>
-                    <table id="lowStockTable">
-                        <thead>
-                            <tr>
-                                <th>Product ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lowStockProducts"></tbody>
-                    </table>
-                    <h5>Out of Stock Products (Stock = 0)</h5>
-                    <table id="outOfStockTable">
-                        <thead>
-                            <tr>
-                                <th>Product ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                            </tr>
-                        </thead>
-                        <tbody id="outOfStockProducts"></tbody>
-                    </table>
-                    <h5>Inventory Turnover</h5>
-                    <table id="inventoryTurnoverTable">
-                        <thead>
-                            <tr>
-                                <th>Product ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                                <th>Total Sold</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventoryTurnover"></tbody>
-                    </table>
-                    <h5>Slow Moving Products (Total Sold ≤ 5)</h5>
-                    <table id="slowMovingTable">
-                        <thead>
-                            <tr>
-                                <th>Product ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                                <th>Total Sold</th>
-                            </tr>
-                        </thead>
-                        <tbody id="slowMovingProducts"></tbody>
-                    </table>
-                </div>
-            </div>
-    
-            <!-- Order Report -->
-            <div id="order-report" class="report-subsection hidden">
-                <div class="report-section">
-                    <h4>Order Summary</h4>
-                    <div class="filter-container">
-                        <label for="orderDateRange">Date Range:</label>
-                        <select id="orderDateRange" onchange="fetchOrderReport()">
-                            <option value="today">Today</option>
-                            <option value="last7days">Last 7 Days</option>
-                            <option value="last30days">Last 30 Days</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                        <div id="customDateRange" style="display: none;">
-                            <label for="orderStartDate">Start Date:</label>
-                            <input type="date" id="orderStartDate">
-                            <label for="orderEndDate">End Date:</label>
-                            <input type="date" id="orderEndDate">
-                            <button onclick="fetchOrderReport()">Apply</button>
-                        </div>
-                        <label for="orderStatusFilter">Status:</label>
-                        <select id="orderStatusFilter" onchange="fetchOrderReport()">
-                            <option value="">All</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Canceled">Canceled</option>
-                        </select>
-                    </div>
-                    <div class="export-buttons">
-                        <button class="btn primary" onclick="exportOrderReport('csv')">Export as CSV</button>
-                        <button class="btn primary" onclick="exportOrderReport('pdf')">Export as PDF</button>
-                    </div>
-                    <div class="stats">
-                        <div class="stat-card">Pending Orders: <span id="pendingOrders">0</span></div>
-                        <div class="stat-card">Delivered Orders: <span id="deliveredOrders">0</span></div>
-                        <div class="stat-card">Canceled Orders: <span id="canceledOrders">0</span></div>
-                    </div>
-                    <div class="charts-container">
-                        <div class="chart-wrapper">
-                            <h5>Order Status Summary</h5>
-                            <canvas id="orderSummaryPieChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="orderSummaryBarChart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                    <h5>Fulfillment Times</h5>
-                    <table id="fulfillmentTimesTable">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Delivery Date</th>
-                                <th>Fulfillment Days</th>
-                            </tr>
-                        </thead>
-                        <tbody id="fulfillmentTimes"></tbody>
-                    </table>
-                    <h5>Shipping Details</h5>
-                    <table id="shippingDetailsTable">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer ID</th>
-                                <th>Address</th>
-                                <th>Pincode</th>
-                                <th>Delivery Person</th>
-                            </tr>
-                        </thead>
-                        <tbody id="shippingDetails"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="tab__content" content id="setting">
-        <h3 class="tab__header">Settings</h3>
-        <div class="tab__body">
-            <div class="card">
-                <!-- Account -->
-                <div class="card-body">
-                    <div class="account">
-                        <img
-                            src="./ad-images/profile/img2.jpg"
-                            alt="user-avatar"
-                            class="avatar"
-                            id="uploadedAvatar"
-                        />
-                        <div class="button-wrapper">
-                            <label for="upload" class="button" tabindex="0">
-                                <span>Upload new photo</span>
-                                <input
-                                    type="file"
-                                    id="upload"
-                                    class="account-file-input"
-                                    hidden
-                                    accept="image/png, image/jpeg"
-                                />
-                            </label>
-                            <button type="button" class="button1" onclick="resetAvatar()">
-                                <span>Reset</span>
-                            </button>
-                            <div class="imgtext">Allowed JPG, GIF or PNG. Max size of 800K</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body"> 
-                    <form id="formAccountSettings" onsubmit="saveAdminSettings(event)">
-                        <label for="userName" class="form-label">User Name</label>
-                        <input
-                            class="form-control"
-                            type="text"
-                            id="userName"
-                            name="userName"
-                            value="John"
-                        />
-                        <br/>
-                        <label for="email" class="form-label">E-mail</label>
-                        <input
-                            class="form-control"
-                            type="email"
-                            id="email"
-                            name="email"
-                            value="john.doe@example.com"
-                            placeholder="john.doe@example.com"
-                        />
-                        <div class="change">
-                            <button type="submit" class="button">Save changes</button>
-                            <button type="reset" class="button1">Cancel</button>
-                        </div>
+                        <button type="submit" class="btn primary">Assign</button>
+                        <button type="button" class="btn-cancel" onclick="closeAssignDeliveryModal()">Cancel</button>
                     </form>
                 </div>
-                <!-- /Account -->
             </div>
-        </div>
-    </div>
+            </div>
+            <div class="tab__content" content id="report">
+                <h3 class="tab__header">Reports</h3>
+                <div class="tab__body">
+                    <div id="sales-report" class="report-subsection hidden">
+                        <div class="report-section">
+                            <h4>Sales Report</h4>
+                            <div class="filter-container">
+                                <label for="salesDateRange">Date Range:</label>
+                                <select id="salesDateRange" onchange="fetchSalesReport()">
+                                    <option value="today">Today</option>
+                                    <option value="last7days">Last 7 Days</option>
+                                    <option value="last30days">Last 30 Days</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                                <div id="salesCustomDateRange" style="display: none;">
+                                    <label for="salesStartDate">Start Date:</label>
+                                    <input type="date" id="salesStartDate">
+                                    <label for="salesEndDate">End Date:</label>
+                                    <input type="date" id="salesEndDate">
+                                    <button onclick="fetchSalesReport()">Apply</button>
+                                </div>
+                                <label for="salesGroupBy">Group By:</label>
+                                <select id="salesGroupBy" onchange="fetchSalesReport()">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="daily">Daily</option>
+                                </select>
+                            </div>
+                            <div class="export-buttons">
+                                <button class="btn primary" onclick="exportSalesReport('csv')">Export as CSV</button>
+                                <button class="btn primary" onclick="exportSalesReport('pdf')">Export as PDF</button>
+                            </div>
+                            <div class="stats">
+                                <div class="stat-card">Total Sales: <span id="totalSales">$0</span></div>
+                            </div>
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <canvas id="salesByPeriodChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="salesByProductChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="salesByCategoryChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <div id="customer-report" class="report-subsection hidden">
+                        <div class="report-section">
+                            <h4>Customer Report</h4>
+                            <div class="filter-container">
+                                <label for="customerDateRange">Date Range:</label>
+                                <select id="customerDateRange" onchange="fetchCustomerReport()">
+                                    <option value="today">Today</option>
+                                    <option value="last7days">Last 7 Days</option>
+                                    <option value="last30days">Last 30 Days</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                                <div id="customerCustomDateRange" style="display: none;">
+                                    <label for="customerStartDate">Start Date:</label>
+                                    <input type="date" id="customerStartDate">
+                                    <label for="customerEndDate">End Date:</label>
+                                    <input type="date" id="customerEndDate">
+                                    <button onclick="fetchCustomerReport()">Apply</button>
+                                </div>
+                            </div>
+                            <div class="export-buttons">
+                                <button class="btn primary" onclick="exportCustomerReport('csv')">Export as CSV</button>
+                                <button class="btn primary" onclick="exportCustomerReport('pdf')">Export as PDF</button>
+                            </div>
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <h5>Customer Demographics</h5>
+                                    <canvas id="customerDemographicsChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h5>Top Customers by Purchase History</h5>
+                                    <canvas id="customerPurchaseHistoryChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h5>Top Customers by Lifetime Value</h5>
+                                    <canvas id="customerLifetimeValueChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    
+                    <div id="inventory-report" class="report-subsection hidden">
+                        <div class="report-section">
+                            <h4>Inventory Report</h4>
+                            <div class="filter-container">
+                                <label for="inventoryCategoryFilter">Category:</label>
+                                <select id="inventoryCategoryFilter" onchange="fetchInventoryReport()">
+                                    <option value="">All Categories</option>
+                                    Categories will be populated dynamically 
+                                </select>
+                            </div>
+                            <div class="export-buttons">
+                                <button class="btn primary" onclick="exportInventoryReport('csv')">Export as CSV</button>
+                                <button class="btn primary" onclick="exportInventoryReport('pdf')">Export as PDF</button>
+                            </div>
+                            <div id="criticalStockAlert" class="alert-banner hidden">
+                                <strong>Warning:</strong> <span id="criticalStockMessage"></span>
+                                <!-- <button class="btn alert-btn" onclick="sendRestockAlert()">Send Restock Alert</button> -->
+                            </div>
+                            <h5>Low Stock Products (Stock ≤ 5)</h5>
+                            <table id="lowStockTable">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockProducts"></tbody>
+                            </table>
+                            <h5>Out of Stock Products (Stock = 0)</h5>
+                            <table id="outOfStockTable">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="outOfStockProducts"></tbody>
+                            </table>
+                            <h5>Inventory Turnover</h5>
+                            <table id="inventoryTurnoverTable">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                        <th>Total Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTurnover"></tbody>
+                            </table>
+                            <h5>Slow Moving Products (Total Sold ≤ 5)</h5>
+                            <table id="slowMovingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                        <th>Total Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="slowMovingProducts"></tbody>
+                            </table>
+                        </div>
+                    </div>
+            
+            
+                    <div id="order-report" class="report-subsection hidden">
+                        <div class="report-section">
+                            <h4>Order Summary</h4>
+                            <div class="filter-container">
+                                <label for="orderDateRange">Date Range:</label>
+                                <select id="orderDateRange" onchange="fetchOrderReport()">
+                                    <option value="today">Today</option>
+                                    <option value="last7days">Last 7 Days</option>
+                                    <option value="last30days">Last 30 Days</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                                <div id="customDateRange" style="display: none;">
+                                    <label for="orderStartDate">Start Date:</label>
+                                    <input type="date" id="orderStartDate">
+                                    <label for="orderEndDate">End Date:</label>
+                                    <input type="date" id="orderEndDate">
+                                    <button onclick="fetchOrderReport()">Apply</button>
+                                </div>
+                                <label for="orderStatusFilter">Status:</label>
+                                <select id="orderStatusFilter" onchange="fetchOrderReport()">
+                                    <option value="">All</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Canceled">Canceled</option>
+                                </select>
+                            </div>
+                            <div class="export-buttons">
+                                <button class="btn primary" onclick="exportOrderReport('csv')">Export as CSV</button>
+                                <button class="btn primary" onclick="exportOrderReport('pdf')">Export as PDF</button>
+                            </div>
+                            <div class="stats">
+                                <div class="stat-card">Pending Orders: <span id="pendingOrders">0</span></div>
+                                <div class="stat-card">Delivered Orders: <span id="deliveredOrders">0</span></div>
+                                <div class="stat-card">Canceled Orders: <span id="canceledOrders">0</span></div>
+                            </div>
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <h5>Order Status Summary</h5>
+                                    <canvas id="orderSummaryPieChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="orderSummaryBarChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                            <h5>Shipping Details</h5>
+                            <table id="shippingDetailsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer ID</th>
+                                        <th>Address</th>
+                                        <th>Pincode</th>
+                                        <th>Delivery Person</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shippingDetails"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div class="tab__content" content id="setting">
+                <h3 class="tab__header">Settings</h3>
+                <div class="tab__body">
+                    <div class="card">
+                        <!-- Account -->
+                        <div class="card-body">
+                            <div class="account">
+                                <img
+                                    src="./ad-images/profile/img2.jpg"
+                                    alt="user-avatar"
+                                    class="avatar"
+                                    id="uploadedAvatar"
+                                />
+                                <div class="button-wrapper">
+                                    <label for="upload" class="button" tabindex="0">
+                                        <span>Upload new photo</span>
+                                        <input
+                                            type="file"
+                                            id="upload"
+                                            class="account-file-input"
+                                            hidden
+                                            accept="image/png, image/jpeg"
+                                        />
+                                    </label>
+                                    <button type="button" class="button1" onclick="resetAvatar()">
+                                        <span>Reset</span>
+                                    </button>
+                                    <div class="imgtext">Allowed JPG, GIF or PNG. Max size of 800K</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body"> 
+                            <form id="formAccountSettings" onsubmit="saveAdminSettings(event)">
+                                <label for="userName" class="form-label">User Name</label>
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="userName"
+                                    name="userName"
+                                    value="John"
+                                />
+                                <br/>
+                                <label for="email" class="form-label">E-mail</label>
+                                <input
+                                    class="form-control"
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value="john.doe@example.com"
+                                    placeholder="john.doe@example.com"
+                                />
+                                <div class="change">
+                                    <button type="submit" class="button">Save changes</button>
+                                    <button type="reset" class="button1">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /Account -->
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1101,6 +1059,8 @@
     <script src="../js/category.js"></script>
     <script src="../js/inventory.js"></script>
     <script src="../js/report.js"></script>
+    <script src="../js/delivery.js"></script>
+    <script src="../js/review.js"></script>
     <!-- <script src="../js/category2.js"></script> -->
 <script>
 
@@ -1235,8 +1195,12 @@ function showSection(sectionId, reportType) {
                 console.warn(`Unknown report type: ${reportType}`);
         }
     }
-}
 
+    // Fetch feedback when the Review section is shown
+    if (sectionId === 'review') {
+        fetchFeedbackReport();
+    }
+}
 function toggleDropdown(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     dropdown.classList.toggle('hidden');

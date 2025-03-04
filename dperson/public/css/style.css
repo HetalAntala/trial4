@@ -34,6 +34,24 @@
     --box-shadow: 0 2rem 3rem var(--color-light);
   }
   
+  .tab__content {
+    display: none; /* Hide all sections by default */
+}
+
+.tab__content.active-tab {
+    display: block; /* Show only the active section */
+}
+.completed-order {
+  background-color: #e8f5e9;
+}
+.completed-order .completion-status {
+  color: #2e7d32;
+  font-weight: bold;
+}
+.incomplete-order .completion-status {
+  color: #d32f2f;
+  font-weight: bold;
+}
   /* STYLES */
   * {
     margin: 0;

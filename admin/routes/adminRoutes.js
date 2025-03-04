@@ -11,4 +11,5 @@ router.get("/delivery-persons", adminController.getDeliveryPersons);
 // ✅ Assign delivery person to an order
 router.post("/assign-delivery", adminController.assignDelivery);
 
+router.post('/unassign-delivery', adminController.unassignDelivery);
 module.exports = router;
