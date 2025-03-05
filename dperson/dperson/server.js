@@ -35,11 +35,23 @@ db.connect((err) => {
 });
 
 app.get("/", (req, res) => {
-    if (!req.session.registered) {
-        res.sendFile(path.join(__dirname,"public", "html", "register.html"));
-    } else {
-        res.sendFile(path.join(__dirname,"public", "html", "login.html"));
-    }
+    db.query("SELECT COUNT(*) as count FROM delivery_persons", (err, results) => {
+        if (err) {
+            console.error("Error checking registered users:", err);
+            return res.status(500).send("Server error");
+        }
+
+        const userCount = results[0].count;
+        console.log("Registered Users Count:", userCount);
+
+        if (userCount === 0) {
+            console.log("Serving register.html");
+            res.sendFile(path.join(__dirname, "public", "html", "register.html"));
+        } else {
+            console.log("Serving login.html");
+            res.sendFile(path.join(__dirname, "public", "html", "login.html"));
+        }
+    });
 });
 
 const deliveryRoutes = require("./routes/droutes");

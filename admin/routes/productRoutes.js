@@ -7,16 +7,21 @@ const path = require('path');
 // Configure Multer Storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../public/images'));
+        cb(null, path.join(__dirname, 'C:/Users/HP/Desktop/study/trial5/trial4/public/Databse/'));
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
-// Accept multiple images for the product
 const upload = multer({
-    storage: storage
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('Databse/')) {
+            return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+    }
 }).fields([
     { name: 'prod_img1', maxCount: 1 },
     { name: 'prod_img2', maxCount: 1 },

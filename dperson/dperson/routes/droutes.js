@@ -11,6 +11,10 @@ router.post("/update-status", deliveryController.updateDeliveryStatus);
 // ✅ Update payment status
 router.post("/update-payment", deliveryController.updatePaymentStatus);
 
+router.get("/transaction-id/:deliveryId",deliveryController.getTransactionId);
+
+router.post("/verify-otp",deliveryController.verifyotp);
+
 router.post('/register', deliveryController.registerDeliveryPerson);
 
 router.post('/login', deliveryController.loginDeliveryPerson);
@@ -19,5 +23,4 @@ router.get("/check-session", deliveryController.checkSession);
 
 // ✅ Route for Logout
 router.post("/logout", deliveryController.logoutUser);
-
 module.exports = router;

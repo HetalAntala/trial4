@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Panel</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="top">
+                <div class="logo">
+                    <img src="../ad-images/logo.png" alt="Logo" />
+                    <h2>Nature's <span class="danger">Palette</span></h2>
+                </div>
+            </div>
+            <div class="sidebar">
+                <div class="account__tabs">
+                    <p class="account__tab active-tab" data-target="#dashboard" onclick="showSection('dashboard')">
+                        <img src="../ad-images/icon/dashboard.png" alt="">Dashboard
+                    </p>
+                    <p class="account__tab" data-target="#orders" onclick="showSection('orders')">
+                        <img src="../ad-images/icon/order.png" alt=""> Orders
+                    </p>
+                    <p class="account__tab" data-target="#completed-orders" onclick="showSection('completed-orders')">
+                        <img src="../ad-images/icon/checklists.png" alt=""> Completed Orders
+                    </p>
+                    <p class="account__tab" data-target="#logout" onclick="showSection('logout')" id="logoutBtn">
+                        <img src="../ad-images/icon/logout.png" alt=""> Logout
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="tab__content active-tab" content id="dashboard">
+                <h2>Welcome, <span id="deliveryPersonName">Delivery Person</span></h2>
+                <p>Manage your assigned deliveries efficiently.</p>
+                <div class="dashboard-metrics">
+                    <div class="metric-card">
+                        <h3>Total Deliveries</h3>
+                        <p id="total-deliveries">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Pending Deliveries</h3>
+                        <p id="pending-deliveries">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Completed Deliveries</h3>
+                        <p id="completed-deliveries">0</p>
+                    </div>
+                </div>
+                <div class="recent-orders">
+                    <h3>Recent Orders</h3>
+                    <div id="recent-orders-list" class="notification-list"></div>
+                </div>
+            </div>
+
+            <section content id="orders" class="tab__content">
+                <h2>Delivery Orders</h2>
+                <input type="text" id="searchOrders" placeholder="Search Orders..." onkeyup="searchOrders()">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Customer Address</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Payment Mode</th>
+                            <th>Payment Amount</th>
+                            <th>Payment Date</th>
+                            <th>Transaction ID</th>
+                            <th>OTP Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delivery-list"></tbody>
+                </table>
+            </section>
+
+            <section content id="completed-orders" class="tab__content">
+                <h2>Completed Orders</h2>
+                <input type="text" id="searchCompletedOrders" placeholder="Search Completed Orders..." onkeyup="searchCompletedOrders()">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Customer Address</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Payment Mode</th>
+                            <th>Payment Amount</th>
+                            <th>Payment Date</th>
+                            <th>Transaction ID</th>
+                            <th>OTP Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completed-delivery-list"></tbody>
+                </table>
+            </section>
+
+            <!-- Hidden section for logout -->
+            <section content id="logout" class="tab__content">
+                <h2>Logging out...</h2>
+            </section>
+        </main>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOtpModal()">×</span>
+            <h2>Verify OTP</h2>
+            <form id="otpForm">
+                <label for="otpInput">Please enter the OTP provided by the customer:</label>
+                <input type="text" id="otpInput" name="otp" required>
+                <p id="otpError" style="color: red; display: none;"></p>
+                <button type="submit">Verify</button>
+                <button type="button" onclick="closeOtpModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Use localStorage to persist otpVerifiedMap across page refreshes
+        let otpVerifiedMap = JSON.parse(localStorage.getItem('otpVerifiedMap')) || {};
+
+        // Save otpVerifiedMap to localStorage whenever it's updated
+        function saveOtpVerifiedMap() {
+            localStorage.setItem('otpVerifiedMap', JSON.stringify(otpVerifiedMap));
+        }
+
+        // Show the selected section and hide others
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.tab__content');
+            sections.forEach(section => {
+                section.classList.remove('active-tab');
+            });
+
+            const targetSection = document.querySelector(`#${sectionId}`);
+            if (targetSection) {
+                targetSection.classList.add('active-tab');
+            }
+
+            const tabs = document.querySelectorAll('.account__tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active-tab');
+                if (tab.dataset.target === `#${sectionId}`) {
+                    tab.classList.add('active-tab');
+                }
+            });
+        }
+
+        function redirectToOrder(orderId, targetTab) {
+            showSection(targetTab);
+            const tableId = targetTab === "orders" ? "delivery-list" : "completed-delivery-list";
+            const tableBody = document.getElementById(tableId);
+            if (tableBody) {
+                const row = tableBody.querySelector(`tr[data-id="${orderId}"]`);
+                if (row) {
+                    row.scrollIntoView({ behavior: "smooth", block: "center" });
+                    row.style.backgroundColor = "#e0f7fa";
+                    setTimeout(() => {
+                        row.style.backgroundColor = "";
+                    }, 2000);
+                } else {
+                    console.error(`Row with data-id="${orderId}" not found in table ${tableId}.`);
+                }
+            } else {
+                console.error(`Element with ID '${tableId}' not found.`);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchDeliveries);
+
+        async function fetchDeliveries() {
+            try {
+                const deliveryPersonId = localStorage.getItem("deliveryPersonId") || "11";
+                const response = await fetch(`/delivery/deliveries/${deliveryPersonId}`);
+                const deliveries = await response.json();
+
+                console.log("API Response (deliveries):", deliveries);
+
+                if (!Array.isArray(deliveries)) throw new Error("Invalid response format");
+
+                const incompleteDeliveries = deliveries.filter(d => !(d.status === "Delivered" && d.payment_status === "PAID"));
+                const completedDeliveries = deliveries.filter(d => d.status === "Delivered" && d.payment_status === "PAID");
+
+                incompleteDeliveries.sort((a, b) => new Date(a.order_date) - new Date(b.order_date));
+                completedDeliveries.sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
+
+                let total = deliveries.length;
+                let completed = completedDeliveries.length;
+                let pending = total - completed;
+
+                console.log("Total Orders:", total, "Pending:", pending, "Completed:", completed);
+
+                document.getElementById("total-deliveries").textContent = total;
+                document.getElementById("pending-deliveries").textContent = pending;
+                document.getElementById("completed-deliveries").textContent = completed;
+
+                const recentOrders = incompleteDeliveries
+                    .sort((a, b) => new Date(b.order_date) - new Date(a.order_date))
+                    .slice(0, 5);
+
+                const recentOrdersList = document.getElementById("recent-orders-list");
+                if (recentOrdersList) {
+                    recentOrdersList.innerHTML = "";
+                    recentOrders.forEach(delivery => {
+                        const formattedDate = delivery.order_date 
+                            ? new Date(delivery.order_date).toISOString().split('T')[0] 
+                            : "N/A";
+                        const orderId = delivery.O_ID || delivery.id;
+                        const targetTab = "orders";
+                        const notification = `
+                            <div class="notification-card" onclick="redirectToOrder('${orderId}', '${targetTab}')">
+                                <h4>Order ID: ${orderId}</h4>
+                                <p>Customer: ${delivery.customer_name || "N/A"}</p>
+                                <p>Order Date: ${formattedDate}</p>
+                                <p>Status: ${delivery.status}</p>
+                                <p>Payment Status: ${delivery.payment_status || "PENDING"}</p>
+                            </div>`;
+                        recentOrdersList.innerHTML += notification;
+                    });
+                } else {
+                    console.error("Element with ID 'recent-orders-list' not found.");
+                }
+
+                // const addNote = (sectionId, tableId) => {
+                //     const section = document.getElementById(sectionId);
+                //     const existingNote = section.querySelector('.delivery-note');
+                //     if (existingNote) return;
+
+                //     const note = document.createElement('p');
+                //     note.className = 'delivery-note';
+                //     note.textContent = "Note: First make order status as Delivered, then verify OTP and only make payment status as Paid.";
+                //     note.style.color = "#ff4444";
+                //     note.style.fontWeight = "bold";
+                //     note.style.marginBottom = "10px";
+                //     const referenceNode = document.getElementById(tableId);
+                //     if (referenceNode && referenceNode.parentElement === section) {
+                //         section.insertBefore(note, referenceNode);
+                //     } else {
+                //         console.error(`Reference node ${tableId} is not a child of ${sectionId}`);
+                //         section.prepend(note);
+                //     }
+                // };
+                // addNote("orders", "searchOrders");
+
+                const fetchTransactionIds = async (deliveries) => {
+                    const transactionPromises = deliveries.map(async (delivery) => {
+                        try {
+                            const response = await fetch(`/delivery/transaction-id/${delivery.id}`);
+                            if (!response.ok) throw new Error(await response.text());
+                            const data = await response.json();
+                            return { id: delivery.id, transactionId: data.transactionId || "Not available" };
+                        } catch (error) {
+                            console.error(`Error fetching transaction ID for delivery ${delivery.id}:`, error);
+                            return { id: delivery.id, transactionId: `Error: ${error.message}` };
+                        }
+                    });
+                    return await Promise.all(transactionPromises);
+                };
+
+                const incompleteTransactionIds = await fetchTransactionIds(incompleteDeliveries);
+                const completedTransactionIds = await fetchTransactionIds(completedDeliveries);
+
+                const getTransactionId = (transactionIds, deliveryId) => {
+                    const entry = transactionIds.find(item => item.id === deliveryId);
+                    return entry ? entry.transactionId : "-";
+                };
+
+                const tableBody = document.getElementById("delivery-list");
+                if (tableBody) {
+                    tableBody.innerHTML = "";
+                    incompleteDeliveries.forEach(delivery => {
+                        console.log("Populating incomplete deliveries:", incompleteDeliveries.length);
+                        const formattedDate = delivery.order_date 
+                            ? new Date(delivery.order_date).toISOString().split('T')[0] 
+                            : "N/A";
+                        const formattedPaymentDate = delivery.payment_date 
+                            ? new Date(delivery.payment_date).toISOString().split('T')[0] 
+                            : (["PENDING", "UNPAID"].includes(delivery.payment_status) ? "Awaiting Payment" : "N/A");
+
+                        const paymentModeDisplay = delivery.payment_mode || (["PENDING", "UNPAID"].includes(delivery.payment_status) ? "Awaiting Payment" : "N/A");
+                        const paymentAmountDisplay = delivery.payment_amount || (["PENDING", "UNPAID"].includes(delivery.payment_status) ? "Awaiting Payment" : "N/A");
+
+                        const initialStatus = delivery.payment_mode === "COD" ? "Placed" : delivery.payment_mode === "QR" ? "Processing" : delivery.status;
+                        const otpButton = `<button class="update-btn" onclick="verifyOtp(${delivery.id}, 'incomplete')">Verify OTP</button>`;
+                        const isOtpVerified = otpVerifiedMap[delivery.id] || false;
+                        console.log(`Delivery ${delivery.id}: isOtpVerified = ${isOtpVerified}, status = ${delivery.status}, isDisabled = ${!isOtpVerified}`);
+                        const isDisabled = !isOtpVerified;
+                        const markPaidButton = `<button id="mark-paid-${delivery.id}" class="update-btn" onclick="updatePayment(${delivery.id}, 'PAID')" ${isDisabled ? 'disabled' : ''}>Mark as Paid</button>`;
+                        const transactionId = getTransactionId(incompleteTransactionIds, delivery.id);
+
+                        const orderId = delivery.O_ID || delivery.id;
+                        const row = `<tr data-id="${orderId}">
+                            <td>${orderId}</td>
+                            <td>${delivery.customer_name || "N/A"}</td>
+                            <td>${delivery.customer_address || "N/A"}</td>
+                            <td>${formattedDate}</td>
+                            <td>${delivery.status}</td>
+                            <td>${delivery.payment_status || "PENDING"}</td>
+                            <td>${paymentModeDisplay}</td>
+                            <td>${paymentAmountDisplay}</td>
+                            <td>${formattedPaymentDate}</td>
+                            <td id="transaction-id-incomplete-${delivery.id}">${transactionId}</td>
+                            <td id="otp-status-incomplete-${delivery.id}" style="${isOtpVerified ? 'color: green;' : ''}">${isOtpVerified ? 'OTP Verified' : '-'}</td>
+                            <td>
+                                <button class="update-btn" onclick="updateStatus(${delivery.id}, 'Delivered')">Mark as Delivered</button>
+                                ${otpButton}
+                                ${markPaidButton}
+                            </td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    console.error("Element with ID 'delivery-list' not found.");
+                }
+
+                const completedTableBody = document.getElementById("completed-delivery-list");
+                if (completedTableBody) {
+                    completedTableBody.innerHTML = "";
+                    completedDeliveries.forEach(delivery => {
+                        console.log("Rendering completed delivery:", delivery.O_ID || delivery.id);
+                        const formattedDate = delivery.order_date ? new Date(delivery.order_date).toISOString().split('T')[0] : "N/A";
+                        const formattedPaymentDate = delivery.payment_date ? new Date(delivery.payment_date).toISOString().split('T')[0] : "N/A";
+                        const transactionId = getTransactionId(completedTransactionIds, delivery.id);
+                        const isOtpVerified = otpVerifiedMap[delivery.id] || false;
+                        console.log(`Completed Delivery ${delivery.id}: isOtpVerified = ${isOtpVerified}`);
+
+                        const orderId = delivery.O_ID || delivery.id;
+                        const row = `<tr data-id="${orderId}">
+                            <td>${orderId}</td>
+                            <td>${delivery.customer_name || "N/A"}</td>
+                            <td>${delivery.customer_address || "N/A"}</td>
+                            <td>${formattedDate}</td>
+                            <td>${delivery.status}</td>
+                            <td>${delivery.payment_status || "PENDING"}</td>
+                            <td>${delivery.payment_mode || "N/A"}</td>
+                            <td>${delivery.payment_amount || "N/A"}</td>
+                            <td>${formattedPaymentDate}</td>
+                            <td id="transaction-id-completed-${delivery.id}">${transactionId}</td>
+                            <td id="otp-status-completed-${delivery.id}" style="${isOtpVerified ? 'color: green;' : ''}">${isOtpVerified ? 'OTP Verified' : '-'}</td>
+                        </tr>`;
+                        completedTableBody.innerHTML += row;
+                    });
+                } else {
+                    console.error("Element with ID 'completed-delivery-list' not found.");
+                }
+            } catch (error) {
+                console.error("Error fetching deliveries:", error);
+            }
+        }
+
+        async function updateStatus(deliveryId, status) {
+            try {
+                const response = await fetch("/delivery/update-status", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ deliveryId, status })
+                });
+                if (!response.ok) throw new Error("Failed to update status");
+                fetchDeliveries();
+            } catch (error) {
+                console.error("Error updating status:", error);
+                alert("Failed to update status. Please try again or contact support.");
+            }
+        }
+
+        async function updatePayment(deliveryId, paymentStatus) {
+            try {
+                console.log("Sending update payment request:", { deliveryId, paymentStatus });
+                const response = await fetch("/delivery/update-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ deliveryId, paymentStatus })
+                });
+                console.log("Update payment response status:", response.status);
+                const responseData = await response.json();
+                console.log("Update payment response data:", responseData);
+                if (!response.ok) throw new Error(responseData.error || "Failed to update payment status");
+                fetchDeliveries();
+            } catch (error) {
+                console.error("Error updating payment status:", error);
+                alert("Failed to update payment status. Please try again or contact support.");
+            }
+        }
+
+        function verifyOtp(deliveryId, tableType) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById("otpModal");
+                const form = document.getElementById("otpForm");
+                const otpInput = document.getElementById("otpInput");
+                const otpError = document.getElementById("otpError");
+
+                otpInput.value = "";
+                otpError.style.display = "none";
+                otpError.textContent = "";
+                modal.style.display = "block";
+
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const otp = otpInput.value.trim();
+                    if (!otp) {
+                        otpError.style.display = "block";
+                        otpError.textContent = "OTP is required.";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch("/delivery/verify-otp", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ deliveryId, otp })
+                        });
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(errorText);
+                        }
+                        closeOtpModal();
+                        otpVerifiedMap[deliveryId] = true;
+                        saveOtpVerifiedMap();
+                        console.log(`After OTP verification for ${deliveryId}, otpVerifiedMap:`, otpVerifiedMap);
+                        fetchDeliveries();
+                        resolve(true);
+                    } catch (error) {
+                        console.error("Error verifying OTP:", error);
+                        otpError.style.display = "block";
+                        otpError.textContent = error.message;
+                        resolve(false);
+                    }
+                };
+            });
+        }
+
+        function closeOtpModal() {
+            const modal = document.getElementById("otpModal");
+            modal.style.display = "none";
+            const form = document.getElementById("otpForm");
+            form.onsubmit = null;
+        }
+
+        async function fetchTransactionId(deliveryId, tableType) {
+            try {
+                const response = await fetch(`/delivery/transaction-id/${deliveryId}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+                const data = await response.json();
+                const transactionId = data.transactionId || "Not available";
+                const cell = document.getElementById(`transaction-id-${tableType}-${deliveryId}`);
+                if (cell) {
+                    cell.textContent = transactionId;
+                }
+            } catch (error) {
+                console.error("Error fetching transaction ID:", error);
+                const cell = document.getElementById(`transaction-id-${tableType}-${deliveryId}`);
+                if (cell) {
+                    cell.textContent = `Error: ${error.message}`;
+                    cell.style.color = "red";
+                }
+            }
+        }
+
+        function searchOrders() {
+            let input = document.getElementById("searchOrders").value.toLowerCase();
+            let rows = document.querySelectorAll("#delivery-list tr");
+            rows.forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                row.style.display = rowText.includes(input) ? "" : "none";
+            });
+        }
+
+        function searchCompletedOrders() {
+            let input = document.getElementById("searchCompletedOrders").value.toLowerCase();
+            let rows = document.querySelectorAll("#completed-delivery-list tr");
+            rows.forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                row.style.display = rowText.includes(input) ? "" : "none";
+            });
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", async function() {
+            await fetch("/logout", { method: "POST" });
+            otpVerifiedMap = {};
+            saveOtpVerifiedMap();
+            window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>

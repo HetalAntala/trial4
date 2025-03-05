@@ -321,7 +321,7 @@ async function generateForm(fields, categoryName, categoryId) {
 
     const form = document.createElement('form');
     form.id = 'product-form';
-    form.enctype = 'multipart/form-data';
+    form.enctype = 'multipart/form-data'; // Ensure the form supports file uploads
 
     let tableName = categoryName.toLowerCase().replace(/\s+/g, '_');
     let primaryKey = await fetchPrimaryKey(tableName);
@@ -350,25 +350,17 @@ async function generateForm(fields, categoryName, categoryId) {
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
+
         const formData = new FormData(form);
 
-        const productData = {};
-        formData.forEach((value, key) => {
-            if (!value || value === 'undefined') return;
-            productData[key] = value;
-        });
-
-        const images = [];
-        for (let i = 1; i <= 3; i++) {
-            let fileInput = formData.get(`prod_img${i}`);
-            if (fileInput && fileInput.name) {
-                images.push(fileInput.name);
-            }
+        // Log the form data for debugging (excluding file content for brevity)
+        const formDataEntries = {};
+        for (let [key, value] of formData.entries()) {
+            formDataEntries[key] = value instanceof File ? value.name : value;
         }
+        console.log("Form Data to be sent:", formDataEntries);
 
-        console.log("Final Collected Data:", { categoryId, productData, images });
-
-        if (!categoryId || Object.keys(productData).length === 0) {
+        if (!formData.get('categoryId') || !formData.entries().next().value) {
             alert('Error: Missing required product details.');
             return;
         }
@@ -376,9 +368,9 @@ async function generateForm(fields, categoryName, categoryId) {
         try {
             const response = await fetch('/product/add', {
                 method: 'POST',
-                body: JSON.stringify({ categoryId, productData, images }),
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
+                body: formData, // Send the FormData object directly
+                credentials: 'include' // Include cookies if needed
+                // No Content-Type header; fetch sets multipart/form-data automatically
             });
 
             const result = await response.json();

@@ -119,7 +119,8 @@
                 const result = await response.json();
     
                 if (result.success) {
-                    alert("Login Successful!");
+                    errorMessage.style.color = "green";
+                    errorMessage.innerText = result.message;
                     localStorage.setItem("deliveryPersonId", result.id);
                     window.location.href = result.redirect; // Redirect to index.html
                 } else {
